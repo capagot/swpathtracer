@@ -54,6 +54,7 @@ void Buffer::save( const std::string &filename ) const
                    << std::endl;
 
     for ( unsigned int y = 0; y < v_resolution_; y++ )
+    {
         for ( unsigned int x = 0; x < h_resolution_; x++ )
         {
             // convert from real to [0.0f, 1.0f] with simple clamp, then
@@ -63,7 +64,13 @@ void Buffer::save( const std::string &filename ) const
             rendering_file << static_cast< int >( clamp( buffer_data_[x][y][0] ) * 255.0f + 0.5f ) << " ";
             rendering_file << static_cast< int >( clamp( buffer_data_[x][y][1] ) * 255.0f + 0.5f ) << " ";
             rendering_file << static_cast< int >( clamp( buffer_data_[x][y][2] ) * 255.0f + 0.5f ) << " ";
+
+            //rendering_file << buffer_data_[x][y][0]<< " ";
+            //rendering_file << buffer_data_[x][y][1]<< " ";
+            //rendering_file << buffer_data_[x][y][2]<< " ";
         }
+        //rendering_file << std::endl;
+    }
 
     rendering_file.close();
 

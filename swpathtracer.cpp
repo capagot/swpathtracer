@@ -14,15 +14,15 @@ float max_x =  1.0f;
 float min_y = -0.5f;
 float max_y =  0.5f;
 
-glm::vec3 position{ 1.0f, 1.0f, 0.0f };
+glm::vec3 position{ 1.0f, 1.0f, 2.0f };
 glm::vec3 up_vector{ 0.0f, 1.0f, 0.0f };
-glm::vec3 look_at{ 0.0f, 0.0f, -1.0f };
+glm::vec3 look_at{ 0.0f, 0.0f, 0.0f };
 
-unsigned int image_h_resolution = 512;
-unsigned int image_v_resolution = 512;
+unsigned int image_h_resolution = 1024;
+unsigned int image_v_resolution = 1024;
 float camera_field_of_view = 90.0f;
 int spectrum_num_samples = 3;
-Spectrum background_color{ glm::vec3{ 0.3f, 0.3f, 0.3f } };
+Spectrum background_color{ glm::vec3{ 0.0f, 0.0f, 0.2f } };
 
 int main( void )
 {
@@ -49,7 +49,9 @@ int main( void )
     //*/
 
     Scene scene{};
-    scene.load();
+    //scene.load();
+    scene.loadFromFile("models/tri_cube.obj");
+    //scene.loadFromFile("models/tri_monkey.obj");
 
     std::clog << std::endl;
     scene.printInfo();

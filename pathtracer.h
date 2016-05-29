@@ -9,6 +9,7 @@
 #define PATHTRACER_H_
 
 #include <limits>
+#include <omp.h>
 
 #include "camera.h"
 #include "scene.h"

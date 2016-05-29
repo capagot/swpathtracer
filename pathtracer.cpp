@@ -6,6 +6,7 @@
  */
 
 #include "pathtracer.h"
+#include "timer.h"
 
 PathTracer::PathTracer( const Camera &camera,
                         const Scene &scene,
@@ -31,22 +32,24 @@ void PathTracer::render( void )
 
     std::size_t x;
     std::size_t y;
-    std::size_t primitive_idx;
-    IntersectionRecord tmp_intersection_record;
     IntersectionRecord intersection_record;
+    IntersectionRecord tmp_intersection_record;
+    std::size_t primitive_idx;
 
-    // TODO: enable OpenMP
-    //#pragma omp parallel for private ( x, y )
+    std::size_t num_primitives = scene_.primitives_.size();
+
+    Timer t;
+    t.start();
+
+    #pragma omp parallel for schedule(dynamic, 1) private ( y, x, intersection_record, tmp_intersection_record, primitive_idx )
 
     for ( y = 0; y < camera_.v_resolution_; y++ )
+    {
         for ( x = 0; x < camera_.h_resolution_; x++ )
         {
             Ray ray( camera_.getRay( x, y ) );
 
             intersection_record.t_ = std::numeric_limits< float >::max();
-
-            // loops over object's primitives
-            std::size_t num_primitives = 2;// scene_.primitives_.size();
 
             for ( primitive_idx = 0; primitive_idx < num_primitives; primitive_idx++ )
                 if ( scene_.primitives_[primitive_idx]->intersect( ray, tmp_intersection_record ) )
@@ -66,8 +69,12 @@ void PathTracer::render( void )
                 buffer_.buffer_data_[x][y][2] = background_color_.spectrum_[2];
             }
         }
+    }
 
-    std::clog << "finished!";
+    t.stop();
+
+    std::clog << "finished!" << std::endl;
+    std::clog << "Rendering time: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
 }
 
 void PathTracer::printInfo( void ) const

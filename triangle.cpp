@@ -37,7 +37,7 @@ bool Triangle::intersect( const Ray &ray,
 
     float det = glm::dot( edge1, pvec );
 
-#define CULL_TEST
+//#define CULL_TEST
 
 #ifdef CULL_TEST // culling branch
 

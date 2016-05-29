@@ -10,8 +10,14 @@
 
 #include <list>
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <glm/glm.hpp>
+
+// assimp include files. These three are usually needed.
+#include "assimp/Importer.hpp"  //OO version Header!
+#include "assimp/scene.h" //#include "assimp/Scene.h"
+#include "assimp/postprocess.h" //#include "assimp/PostProcess.h"
 
 #include "triangle.h"
 #include "spectrum.h"
@@ -22,8 +28,9 @@ public:
 
     Scene( void );
 
-    // TODO: extend this function to load from files or other interfaces....
-    void load( void );
+    void load( void ); // TODO: remove this in the future.
+
+    int loadFromFile( const std::string &file_name );
 
     void printInfo( void );
 
@@ -36,6 +43,9 @@ public:
 
     std::list< Spectrum > spectrum_;
 
+private:
+
+    const aiScene* assimp_scene_ = nullptr;
 };
 
 #endif /* SCENE_H_ */
