@@ -7,8 +7,6 @@
 
 #include "perspective_camera.h"
 
-// TODO: perhaps it will be better to migrate this constant to the abstract Camera class,
-//       if the derived cameras also use it often.
 const float PerspectiveCamera::kDegreesToRadians = M_PI / 180.0f;
 
 PerspectiveCamera::PerspectiveCamera( unsigned int h_resolution,
@@ -24,17 +22,13 @@ PerspectiveCamera::PerspectiveCamera( unsigned int h_resolution,
                         look_at },
         fov_degrees_{ fov_degrees }
 {
-    aspect_ = static_cast< float >( h_resolution_) / v_resolution_;
-
-    setTopLeftPixelCenter();
+    setTopLeftCorner();
 }
 
-Ray PerspectiveCamera::getRay( unsigned int x, unsigned int y ) const
+Ray PerspectiveCamera::getRay( const glm::vec2 &sample_coord ) const
 {
-    // TODO: I think that the computation of the direction can be simplified....
-    //       for instance... (top_left_pixel_center - position) can be precomputed and stored.
     return Ray{ position_,
-                glm::normalize( ( top_left_pixel_center + pixel_width_ * static_cast< float >( x ) + pixel_height_ * static_cast< float >( y ) ) - position_ )};
+                glm::normalize( ( top_left_corner_ + pixel_width_ * sample_coord.x + pixel_height_ * sample_coord.y ) - position_ )};
 }
 
 void PerspectiveCamera::printInfo( void ) const
@@ -50,17 +44,8 @@ void PerspectiveCamera::printInfo( void ) const
     std::clog << " pixel_height_ .................: " << glm::length( pixel_height_ ) << std::endl;
 }
 
-void PerspectiveCamera::setTopLeftPixelCenter( void )
+void PerspectiveCamera::setTopLeftCorner( void )
 {
-    // TODO: this computation might be optimized!
-
     glm::vec3 screen_center{ -onb_.w_ * static_cast< float >( 1.0f /  tan( fov_degrees_ * 0.5f * PerspectiveCamera::kDegreesToRadians ) ) + position_ };
-    glm::vec3 top_left_corner = screen_center - onb_.u_  + ( onb_.v_ * 1.0f / aspect_ );
-    glm::vec3 bottom_left_corner = screen_center - onb_.u_  - ( onb_.v_ * 1.0f / aspect_ );
-    glm::vec3 top_right_corner = screen_center + onb_.u_  + ( onb_.v_ * 1.0f / aspect_ );
-
-    pixel_width_ = ( top_right_corner - top_left_corner ) / static_cast< float >( h_resolution_ );
-    pixel_height_ = ( bottom_left_corner - top_left_corner ) / static_cast< float >( v_resolution_ );
-
-    top_left_pixel_center = top_left_corner + pixel_width_ * 0.5f + pixel_height_ * 0.5f;
+    top_left_corner_ = screen_center - onb_.u_  + ( onb_.v_ / aspect_ );
 }

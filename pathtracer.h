@@ -8,29 +8,29 @@
 #ifndef PATHTRACER_H_
 #define PATHTRACER_H_
 
-#include <limits>
-#include <omp.h>
+#include "integrator.h"
 
-#include "camera.h"
-#include "scene.h"
-#include "renderer.h"
-
-class PathTracer : private Renderer
+class PathTracer : private Integrator
 {
 public:
 
-    PathTracer( const Camera &camera,
-                const Scene &scene,
-                Buffer &buffer,
-                const Spectrum background_color = Spectrum{ glm::vec3{ 1.0f, 0.0f, 0.0f } },
-                unsigned int spp = 10,
-                PixelSamplingMethod pixel_sampling_method = UNIFORM_SAMPLING,
-                unsigned int max_path_depth = 5,
-                TracingStoppingCriterion stop_criterion = MAX_DEPTH );
 
-    void render( void );
+    PathTracer( Camera &camera,
+                const Scene &scene,
+                const Spectrum background_color,
+                unsigned int max_path_depth,
+                TracingStoppingCriterion tracing_stop_criterion_,
+                Sampler &sampler,
+                Buffer &buffer );
+
+    Spectrum integrate( void );
 
     void printInfo( void ) const;
+
+private:
+
+    Spectrum integrate_recursive( const Ray &ray, int depth );
+
 };
 
 #endif /* PATHTRACER_H_ */

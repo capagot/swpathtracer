@@ -10,14 +10,16 @@
 
 #include <glm/glm.hpp>
 
-#include "spectrum.h"
+//#include "spectrum.h"
+#include "material.h"
 
 struct IntersectionRecord
 {
     float t_;
     glm::vec3 position_;
     //glm::vec3 normal_;
-    Spectrum spectrum_;
+    //Spectrum spectrum_;
+    Material material_;
 };
 
 #endif /* INTERSECTION_RECORD_H_ */

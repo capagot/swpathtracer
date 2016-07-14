@@ -25,7 +25,7 @@ public:
                         const glm::vec3 &up_vector,
                         const glm::vec3 &look_at );
 
-    Ray getRay( unsigned int x, unsigned int y ) const;
+    Ray getRay( const glm::vec2 &sample_coord ) const;
 
     void printInfo( void ) const;
 

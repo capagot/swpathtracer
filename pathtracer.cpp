@@ -8,73 +8,80 @@
 #include "pathtracer.h"
 #include "timer.h"
 
-PathTracer::PathTracer( const Camera &camera,
+PathTracer::PathTracer( Camera &camera,
                         const Scene &scene,
-                        Buffer &buffer,
                         const Spectrum background_color,
-                        unsigned int spp,
-                        PixelSamplingMethod pixel_sampling_method,
                         unsigned int max_path_depth,
-                        TracingStoppingCriterion stop_criterion ) :
-        Renderer::Renderer{ camera,
-                            scene,
-                            buffer,
-                            spp,
-                            pixel_sampling_method,
-                            max_path_depth,
-                            stop_criterion,
-                            background_color }
+                        TracingStoppingCriterion tracing_stop_criterion_,
+                        Sampler &sampler,
+                        Buffer &buffer ) :
+        Integrator{ camera,
+                    scene,
+                    background_color,
+                    max_path_depth,
+                    tracing_stop_criterion_,
+                    sampler,
+                    buffer }
 { }
 
-void PathTracer::render( void )
+Spectrum PathTracer::integrate( void )
 {
-    std::clog << "Rendering started... ";
-
-    std::size_t x;
-    std::size_t y;
-    IntersectionRecord intersection_record;
-    IntersectionRecord tmp_intersection_record;
-    std::size_t primitive_idx;
-
-    std::size_t num_primitives = scene_.primitives_.size();
-
     Timer t;
     t.start();
 
-    #pragma omp parallel for schedule(dynamic, 1) private ( y, x, intersection_record, tmp_intersection_record, primitive_idx )
+    #pragma omp parallel for schedule(dynamic, 1)
 
-    for ( y = 0; y < camera_.v_resolution_; y++ )
-    {
-        for ( x = 0; x < camera_.h_resolution_; x++ )
+    for ( std::size_t y = 0; y < camera_.v_resolution_; y++ )
+        for ( std::size_t x = 0; x < camera_.h_resolution_; x++ )
         {
-            Ray ray( camera_.getRay( x, y ) );
+            sampler_.generateSamplesCoords( glm::vec2{ x, y } );
 
-            intersection_record.t_ = std::numeric_limits< float >::max();
-
-            for ( primitive_idx = 0; primitive_idx < num_primitives; primitive_idx++ )
-                if ( scene_.primitives_[primitive_idx]->intersect( ray, tmp_intersection_record ) )
-                    if ( tmp_intersection_record.t_ < intersection_record.t_ )
-                        intersection_record = tmp_intersection_record;
-
-            if( intersection_record.t_ < std::numeric_limits< float >::max() )
+            for ( std::size_t samp = 0; samp < sampler_.size(); samp++ )
             {
-                buffer_.buffer_data_[x][y][0] = intersection_record.spectrum_.spectrum_[0] * intersection_record.t_ * 0.2f;
-                buffer_.buffer_data_[x][y][1] = intersection_record.spectrum_.spectrum_[1] * intersection_record.t_ * 0.2f;
-                buffer_.buffer_data_[x][y][2] = intersection_record.spectrum_.spectrum_[2] * intersection_record.t_ * 0.2f;
+                Ray ray( camera_.getRay( sampler_[samp] ) );
+                //buffer_.buffer_data_[x][y].spectrum_ += glm::vec3( (0.5f * ( sin( ( sampler_[samp].x*sampler_[samp].x + sampler_[samp].y*sampler_[samp].y ) / 100.0f ) ) ) );
+                buffer_.buffer_data_[x][y].spectrum_ += integrate_recursive( ray, 0 ).spectrum_;
             }
-            else
-            {
-                buffer_.buffer_data_[x][y][0] = background_color_.spectrum_[0];
-                buffer_.buffer_data_[x][y][1] = background_color_.spectrum_[1];
-                buffer_.buffer_data_[x][y][2] = background_color_.spectrum_[2];
-            }
+
+            buffer_.buffer_data_[x][y].spectrum_ /= sampler_.size();
         }
-    }
 
     t.stop();
-
-    std::clog << "finished!" << std::endl;
     std::clog << "Rendering time: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
+}
+
+Spectrum PathTracer::integrate_recursive( const Ray &ray,
+                                          int depth )
+{
+    IntersectionRecord intersection_record;
+    IntersectionRecord tmp_intersection_record;
+    std::size_t primitive_idx;
+    std::size_t num_primitives = scene_.primitives_.size();
+    Spectrum spectrum{ glm::vec3{ 0.0f, 0.0f, 0.0f } };
+
+    intersection_record.t_ = std::numeric_limits< float >::max();
+
+    for ( primitive_idx = 0; primitive_idx < num_primitives; primitive_idx++ )
+        if ( scene_.primitives_[primitive_idx]->intersect( ray, tmp_intersection_record ) )
+            if ( tmp_intersection_record.t_ < intersection_record.t_ )
+                intersection_record = tmp_intersection_record;
+
+    if ( intersection_record.t_ < std::numeric_limits< float >::max() )
+        spectrum.spectrum_ +=  intersection_record.material_.brdf_.spectrum_ * (intersection_record.t_ * 0.1f)  + intersection_record.material_.emitted_.spectrum_ ;
+    else
+        spectrum.spectrum_ += background_color_.spectrum_;
+
+    //if ( intersection_record.t_ < std::numeric_limits< float >::max() )
+    //{
+    //    Ray ray; // compute reflected ray
+    //    spectrum.spectrum_ += intersection_record.material_.emitted_.spectrum_ + intersection_record.material_.brdf_.spectrum_ * render_recursive( ray, depth + 1, xi ).spectrum_;
+    //}
+    //else
+    //    spectrum.spectrum_ += background_color_.spectrum_;
+    //*/
+
+    //return Spectrum{ glm::vec3{ 0.0f, 0.0f, 1.0f } };//spectrum;
+    return spectrum;
 }
 
 void PathTracer::printInfo( void ) const
@@ -82,5 +89,5 @@ void PathTracer::printInfo( void ) const
     std::clog << "PathTracer Renderer Information" << std::endl;
     std::clog << "--------------------------------" << std::endl;
 
-    Renderer::printInfo();
+    Integrator::printInfo();
 }

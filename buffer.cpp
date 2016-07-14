@@ -14,7 +14,11 @@ Buffer::Buffer( unsigned int h_resolution,
         v_resolution_{ v_resolution },
         spectrum_num_samples_{ spectrum_num_samples }
 {
-    buffer_data_.resize( h_resolution_, std::vector< std::vector < float > >( v_resolution_, std::vector< float >( spectrum_num_samples_)));
+    buffer_data_.resize( h_resolution_, std::vector< Spectrum >( v_resolution_ ) );
+
+    for ( std::size_t y = 0; y < v_resolution_; y++ )
+        for ( std::size_t x = 0; x < h_resolution_; x++ )
+            buffer_data_[x][y].spectrum_ = glm::vec3{ 0.0f, 0.0f, 0.0f };
 }
 
 Buffer::~Buffer( void )
@@ -61,13 +65,9 @@ void Buffer::save( const std::string &filename ) const
             //         from [0.0f, 1.0f] to [0.0f, 255.0f], then
             //         from [0.0f, 255.0f] to [0.5f, 255.5f], then
             //         from [0.5f, 255.5f] to [0, 255] with round to nearest.
-            rendering_file << static_cast< int >( clamp( buffer_data_[x][y][0] ) * 255.0f + 0.5f ) << " ";
-            rendering_file << static_cast< int >( clamp( buffer_data_[x][y][1] ) * 255.0f + 0.5f ) << " ";
-            rendering_file << static_cast< int >( clamp( buffer_data_[x][y][2] ) * 255.0f + 0.5f ) << " ";
-
-            //rendering_file << buffer_data_[x][y][0]<< " ";
-            //rendering_file << buffer_data_[x][y][1]<< " ";
-            //rendering_file << buffer_data_[x][y][2]<< " ";
+            rendering_file << static_cast< int >( clamp( buffer_data_[x][y].spectrum_[0] ) * 255.0f + 0.5f ) << " ";
+            rendering_file << static_cast< int >( clamp( buffer_data_[x][y].spectrum_[1] ) * 255.0f + 0.5f ) << " ";
+            rendering_file << static_cast< int >( clamp( buffer_data_[x][y].spectrum_[2] ) * 255.0f + 0.5f ) << " ";
         }
         //rendering_file << std::endl;
     }

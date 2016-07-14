@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "spectrum.h"
 
 class Buffer
 {
@@ -32,7 +33,7 @@ public:
 
     int spectrum_num_samples_ = 3;
 
-    std::vector< std::vector< std::vector< float > > > buffer_data_;
+    std::vector< std::vector< Spectrum > > buffer_data_;
 
 private:
     inline float clamp( float x ) const

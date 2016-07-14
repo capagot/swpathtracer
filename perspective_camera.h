@@ -22,7 +22,7 @@ public:
                        const glm::vec3 &look_at,
                        float fov_degrees );
 
-    Ray getRay( unsigned int x, unsigned int y ) const;
+    Ray getRay( const glm::vec2 &sample_coord ) const;
 
     void printInfo( void ) const;
 
@@ -30,15 +30,7 @@ public:
 
 private:
 
-    void setTopLeftPixelCenter( void );
-
-    glm::vec3 pixel_width_;
-
-    glm::vec3 pixel_height_;
-
-    glm::vec3 top_left_pixel_center;
-
-    float aspect_; // v_resolution_ / h_resolution_
+    void setTopLeftCorner( void );
 
     static const float kDegreesToRadians;
 };

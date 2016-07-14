@@ -21,6 +21,7 @@
 
 #include "triangle.h"
 #include "spectrum.h"
+#include "material.h"
 
 class Scene
 {
@@ -30,7 +31,7 @@ public:
 
     void load( void ); // TODO: remove this in the future.
 
-    int loadFromFile( const std::string &file_name );
+    int loadFromFile( const std::string &file_name, glm::vec3 &min_aabb, glm::vec3 &max_aabb );
 
     void printInfo( void );
 
@@ -41,7 +42,7 @@ public:
 
     std::vector< primitive_ptr > primitives_;
 
-    std::list< Spectrum > spectrum_;
+    std::list< Material > materials_;
 
 private:
 

@@ -20,7 +20,7 @@ public:
     Triangle( const glm::vec3 &v0,
               const glm::vec3 &v1,
               const glm::vec3 &v2,
-              const Spectrum &spectrum );
+              const Material &material );
 
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );

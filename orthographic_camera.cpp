@@ -31,9 +31,9 @@ OrthographicCamera::OrthographicCamera( unsigned int h_resolution,
     initTopLeftRay();
 }
 
-Ray OrthographicCamera::getRay( unsigned int x, unsigned int y ) const
+Ray OrthographicCamera::getRay( const glm::vec2 &sample_coord ) const
 {
-    return Ray{ top_left_pixel_center_ + pixel_width_ * static_cast< float >( x ) + pixel_height_ * static_cast< float >( y ),  // ray origin
+    return Ray{ top_left_pixel_center_ + pixel_width_ * sample_coord.x + pixel_height_ * sample_coord.y,  // ray origin
                 direction_ };  // ray direction
 }
 

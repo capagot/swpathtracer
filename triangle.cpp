@@ -12,8 +12,8 @@ const float Triangle::intersection_test_epsilon = 0.000001f;
 Triangle::Triangle( const glm::vec3 &v0,
                     const glm::vec3 &v1,
                     const glm::vec3 &v2,
-                    const Spectrum &spectrum ) :
-        Primitive{ spectrum },
+                    const Material &material ) :
+        Primitive{ material },
         v0_{ v0 },
         v1_{ v1 },
         v2_{ v2 }
@@ -92,7 +92,7 @@ bool Triangle::intersect( const Ray &ray,
 
     intersection_record.t_ = t;
     intersection_record.position_ = ray.origin_ + ray.direction_ * t;
-    intersection_record.spectrum_ = spectrum_;
+    intersection_record.material_ = material_;
 
     return true;
 }

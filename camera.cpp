@@ -21,6 +21,10 @@ Camera::Camera( unsigned int h_resolution,
 {
     // updated the camera's RHS orthonormal basis.
     onb_.setUpONB( up_vector_, direction_ );
+
+    aspect_ = static_cast< float >( h_resolution_) / v_resolution_;
+    pixel_width_ = 2.0f * onb_.u_ / static_cast< float >( h_resolution_ );
+    pixel_height_ = -2.0f * ( onb_.v_ / aspect_ ) / static_cast< float >( v_resolution_ );
 }
 
 Camera::~Camera( void )

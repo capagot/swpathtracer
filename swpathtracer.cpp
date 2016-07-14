@@ -9,32 +9,28 @@
 
 // TODO: put globals into a system-wide class (singleton?).
 
-float min_x = -1.0f;
-float max_x =  1.0f;
-float min_y = -0.5f;
-float max_y =  0.5f;
-
-glm::vec3 position{ 1.0f, 1.0f, 2.0f };
+glm::vec3 position{ 0.0f, 0.0f, 6.0f };
 glm::vec3 up_vector{ 0.0f, 1.0f, 0.0f };
 glm::vec3 look_at{ 0.0f, 0.0f, 0.0f };
 
-unsigned int image_h_resolution = 1024;
-unsigned int image_v_resolution = 1024;
-float camera_field_of_view = 90.0f;
+unsigned int image_h_resolution = 256;
+unsigned int image_v_resolution = 256;
+float camera_field_of_view = 55.0f;
 int spectrum_num_samples = 3;
 Spectrum background_color{ glm::vec3{ 0.0f, 0.0f, 0.2f } };
 
 int main( void )
 {
-    PerspectiveCamera perspective_camera( image_h_resolution,
-                                          image_v_resolution,
-                                          position,
-                                          up_vector,
-                                          look_at,
-                                          camera_field_of_view );
-    perspective_camera.printInfo();
+    PerspectiveCamera camera( image_h_resolution,
+                              image_v_resolution,
+                              position,
+                              up_vector,
+                              look_at,
+                              camera_field_of_view );
+    camera.printInfo();
 
 
+    /*
     OrthographicCamera orthographic_camera( image_h_resolution,
                                             image_v_resolution,
                                             min_x,
@@ -48,10 +44,19 @@ int main( void )
     orthographic_camera.printInfo();
     //*/
 
+    // TODO: put min and max into scene
+    glm::vec3 min;
+    glm::vec3 max;
     Scene scene{};
-    //scene.load();
-    scene.loadFromFile("models/tri_cube.obj");
-    //scene.loadFromFile("models/tri_monkey.obj");
+    scene.load();
+    //scene.loadFromFile( "models/tri_cube.obj", min, max );
+    scene.loadFromFile( "models/tri_monkey.obj", min, max );
+    //std::clog << "model aabb: [" << min.x << ", "
+    //                             << min.y << ", "
+    //                             << min.z << "] - ["
+    //                             << max.x << ", "
+    //                             << max.y << ", "
+    //                             << max.z << "]" << std::endl;
 
     std::clog << std::endl;
     scene.printInfo();
@@ -63,19 +68,29 @@ int main( void )
     std::clog << std::endl;
     rendering_buffer.printInfo();
 
-    PathTracer pt{ perspective_camera,
+    JitteredSampler sampler( 1 );
+    //UniformSampler sampler( 1 );
+    //RegularSampler sampler( 2 );
+
+    PathTracer pt( camera,
                    scene,
-                   rendering_buffer,
-                   background_color };
+                   background_color,
+                   5,
+                   Integrator:: MAX_DEPTH,
+                   sampler,
+                   rendering_buffer );
 
-    std::clog << std::endl;
-    pt.printInfo();
+    pt.integrate();
 
-    std::clog << std::endl;
-    pt.render();
+    //RenderingEngine re( camera,
+    //                    scene,
+    //                    pt,
+    //                    sampler,
+    //                    rendering_buffer );
+    //re.renderImage();
 
-    std::clog << std::endl;
     rendering_buffer.save( "output.ppm" );
+
 
     return EXIT_SUCCESS;
 }
