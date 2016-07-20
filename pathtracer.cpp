@@ -31,6 +31,8 @@ Spectrum PathTracer::integrate( void )
 
     #pragma omp parallel for schedule(dynamic, 1)
 
+    //std::clog << "\n";
+
     for ( std::size_t y = 0; y < camera_.v_resolution_; y++ )
         for ( std::size_t x = 0; x < camera_.h_resolution_; x++ )
         {
@@ -41,6 +43,8 @@ Spectrum PathTracer::integrate( void )
                 Ray ray( camera_.getRay( sampler_[samp] ) );
                 //buffer_.buffer_data_[x][y].spectrum_ += glm::vec3( (0.5f * ( sin( ( sampler_[samp].x*sampler_[samp].x + sampler_[samp].y*sampler_[samp].y ) / 100.0f ) ) ) );
                 buffer_.buffer_data_[x][y].spectrum_ += integrate_recursive( ray, 0 ).spectrum_;
+
+                //std::clog << sampler_[samp].x << " " << sampler_[samp].y << "\n";
             }
 
             buffer_.buffer_data_[x][y].spectrum_ /= sampler_.size();

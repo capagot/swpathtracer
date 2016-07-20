@@ -13,8 +13,8 @@ glm::vec3 position{ 0.0f, 0.0f, 6.0f };
 glm::vec3 up_vector{ 0.0f, 1.0f, 0.0f };
 glm::vec3 look_at{ 0.0f, 0.0f, 0.0f };
 
-unsigned int image_h_resolution = 256;
-unsigned int image_v_resolution = 256;
+unsigned int image_h_resolution = 512;
+unsigned int image_v_resolution = 512;
 float camera_field_of_view = 55.0f;
 int spectrum_num_samples = 3;
 Spectrum background_color{ glm::vec3{ 0.0f, 0.0f, 0.2f } };
@@ -68,9 +68,9 @@ int main( void )
     std::clog << std::endl;
     rendering_buffer.printInfo();
 
-    JitteredSampler sampler( 1 );
-    //UniformSampler sampler( 1 );
-    //RegularSampler sampler( 2 );
+    //UniformSampler sampler( 16 );
+    //RegularSampler sampler( 16 );
+    JitteredSampler sampler( 16 );
 
     PathTracer pt( camera,
                    scene,

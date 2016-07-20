@@ -133,8 +133,8 @@ public:
         for ( std::size_t subpixel_x_count = 0; subpixel_x_count < num_subpixels_x_ ; subpixel_x_count++ )
             for ( std::size_t subpixel_y_count = 0; subpixel_y_count < num_subpixels_y_ ; subpixel_y_count++ )
             {
-                samples_[thread_id][i] = glm::vec2{ pixel_coord.x + subpixel_x_count * subpixel_width_+ random_(),
-                                                    pixel_coord.y + subpixel_y_count * subpixel_height_+ random_() };
+                samples_[thread_id][i] = glm::vec2{ pixel_coord.x + subpixel_x_count * subpixel_width_+ subpixel_width_ * random_(),
+                                                    pixel_coord.y + subpixel_y_count * subpixel_height_ + subpixel_height_ * random_() };
                 i++;
             }
     }
