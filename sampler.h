@@ -45,7 +45,8 @@ class UniformSampler : public Sampler
 {
 public:
 
-    UniformSampler( std::size_t spp )
+    UniformSampler( RNG< std::uniform_real_distribution, float, std::mt19937 > &rng, std::size_t spp ) :
+        rng_( rng )
     {
         spp_ = spp;
         int num_threads = std::max( 1, omp_get_max_threads() );
@@ -57,12 +58,12 @@ public:
     {
         int thread_id = omp_get_thread_num();
         for( unsigned int i = 0; i < spp_; i++ )
-            samples_[thread_id][i] = glm::vec2{ pixel_coord.x + random_(), pixel_coord.y + random_() };
+            samples_[thread_id][i] = glm::vec2{ pixel_coord.x + rng_(), pixel_coord.y + rng_() };
     }
 
 private:
 
-    RNG< std::uniform_real_distribution, float, std::mt19937 > random_{ 0.0f, 1.0f };
+    RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
 };
 
 class RegularSampler : public Sampler
@@ -112,7 +113,8 @@ class JitteredSampler : public Sampler
 {
 public:
 
-    JitteredSampler( std::size_t spp )
+    JitteredSampler( RNG< std::uniform_real_distribution, float, std::mt19937 > &rng, std::size_t spp ) :
+        rng_( rng )
     {
         num_subpixels_x_ = static_cast< unsigned int >( ceil( sqrt( spp ) ) );
         num_subpixels_y_ = num_subpixels_x_;
@@ -133,20 +135,19 @@ public:
         for ( std::size_t subpixel_x_count = 0; subpixel_x_count < num_subpixels_x_ ; subpixel_x_count++ )
             for ( std::size_t subpixel_y_count = 0; subpixel_y_count < num_subpixels_y_ ; subpixel_y_count++ )
             {
-                samples_[thread_id][i] = glm::vec2{ pixel_coord.x + subpixel_x_count * subpixel_width_+ subpixel_width_ * random_(),
-                                                    pixel_coord.y + subpixel_y_count * subpixel_height_ + subpixel_height_ * random_() };
+                samples_[thread_id][i] = glm::vec2{ pixel_coord.x + subpixel_x_count * subpixel_width_+ subpixel_width_ * rng_(),
+                                                    pixel_coord.y + subpixel_y_count * subpixel_height_ + subpixel_height_ * rng_() };
                 i++;
             }
     }
 
 private:
 
-    RNG< std::uniform_real_distribution, float, std::mt19937 > random_{ 0.0f, 1.0f };
+    RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
     std::size_t num_subpixels_x_;       // number of subpixels along x axis
     std::size_t num_subpixels_y_;       // number of subpixels along y axis
     float subpixel_width_;              // width of the subpixel (1 / pixel_width)
     float subpixel_height_;             // height of the subpixel (1 / pixel_height)
-
 };
 
 #endif /* SAMPLER_H_ */

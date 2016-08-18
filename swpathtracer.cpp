@@ -68,9 +68,12 @@ int main( void )
     std::clog << std::endl;
     rendering_buffer.printInfo();
 
-    //UniformSampler sampler( 16 );
-    //RegularSampler sampler( 16 );
-    JitteredSampler sampler( 16 );
+    //only one instance of each PRNG engine is be kept during execution.
+    RNG< std::uniform_real_distribution, float, std::mt19937 > rng{ 0.0f, 1.0f };
+
+    //UniformSampler sampler( rng, 16 );
+    //RegularSampler sampler( 1 );
+    JitteredSampler sampler( rng, 16 );
 
     PathTracer pt( camera,
                    scene,

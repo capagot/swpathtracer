@@ -50,6 +50,8 @@ Spectrum PathTracer::integrate( void )
             buffer_.buffer_data_[x][y].spectrum_ /= sampler_.size();
         }
 
+    //exit(0);
+
     t.stop();
     std::clog << "Rendering time: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
 }
