@@ -32,5 +32,5 @@ $(EXECUTABLE): $(OBJECTS)
 .PHONY: clean
 
 clean:
-	rm *.o *.d	
+	rm *.o *.d	$(EXECUTABLE)
 
