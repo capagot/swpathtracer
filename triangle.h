@@ -19,7 +19,7 @@ public:
 
     Triangle( const glm::vec3 &v0,
               const glm::vec3 &v1,
-              const glm::vec3 &v2,
+              const glm::vec3 &v2,             
               const Material &material );
 
     bool intersect( const Ray &ray,
@@ -31,9 +31,11 @@ public:
 
     glm::vec3 v2_ = { 0.0f, 1.0f, 0.0f };
 
+    glm::vec3 normal_ = { 0.0f, 0.0f, 1.0f };
+
 private:
 
-    static const float intersection_test_epsilon;
+    static const float kIntersectionTestEpsilon_;
 };
 
 #endif /* TRIANGLE_H_ */

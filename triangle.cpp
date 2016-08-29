@@ -7,7 +7,7 @@
 
 #include "triangle.h"
 
-const float Triangle::intersection_test_epsilon = 0.000001f;
+const float Triangle::kIntersectionTestEpsilon_ = 0.000001f;
 
 Triangle::Triangle( const glm::vec3 &v0,
                     const glm::vec3 &v1,
@@ -16,7 +16,8 @@ Triangle::Triangle( const glm::vec3 &v0,
         Primitive{ material },
         v0_{ v0 },
         v1_{ v1 },
-        v2_{ v2 }
+        v2_{ v2 },
+        normal_{ glm::normalize( glm::cross( v1_ - v0_, v2_ - v0_ ) ) }
 { }
 
 bool Triangle::intersect( const Ray &ray,
@@ -37,11 +38,11 @@ bool Triangle::intersect( const Ray &ray,
 
     float det = glm::dot( edge1, pvec );
 
-//#define CULL_TEST
+#define CULL_TEST
 
 #ifdef CULL_TEST // culling branch
 
-    if ( det < Triangle::intersection_test_epsilon )
+    if ( det < Triangle::kIntersectionTestEpsilon_ )
         return false;
 
     glm::vec3 tvec{ ray.origin_ - v0_ };
@@ -68,7 +69,7 @@ bool Triangle::intersect( const Ray &ray,
 
 #else // non-culling branch
 
-    if ( det > -Triangle::intersection_test_epsilon && det < Triangle::intersection_test_epsilon )
+    if ( det > -Triangle::kIntersectionTestEpsilon_ && det < Triangle::kIntersectionTestEpsilon_ )
         return false;
 
     float inv_det = 1.0f / det;
@@ -92,7 +93,9 @@ bool Triangle::intersect( const Ray &ray,
 
     intersection_record.t_ = t;
     intersection_record.position_ = ray.origin_ + ray.direction_ * t;
+    intersection_record.normal_ = normal_;
     intersection_record.material_ = material_;
 
     return true;
 }
+

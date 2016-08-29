@@ -2,7 +2,10 @@
 #include <iostream>
 #include <omp.h>
 
-template< template< class > class DISTRIBUTION = std::uniform_real_distribution, class DATA = float, class ENGINE = std::mt19937 >
+#ifndef RANDOM_H_
+#define RANDOM_H_
+
+template< template< class > class DISTRIBUTION, class DATA, class ENGINE >
 class RNG
 {
 public:
@@ -26,3 +29,6 @@ public:
     std::vector< ENGINE > engines_{}; // one instance of the engine is kept for each OpenMP thread to avoid locks.
     DISTRIBUTION< DATA > distribution_;
 };
+
+#endif // RANDOM_H_
+

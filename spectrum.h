@@ -28,6 +28,10 @@ public:
     }
 
     glm::vec3 spectrum_ = { 0.0f, 0.0f, 0.0f };
+
+    glm::vec3 getDirection( const glm::vec3 &normal );
+
 };
 
 #endif /* SPECTRUM_H_ */
+

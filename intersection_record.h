@@ -17,7 +17,7 @@ struct IntersectionRecord
 {
     float t_;
     glm::vec3 position_;
-    //glm::vec3 normal_;
+    glm::vec3 normal_;
     //Spectrum spectrum_;
     Material material_;
 };

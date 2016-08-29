@@ -81,7 +81,8 @@ int main( void )
                    5,
                    Integrator:: MAX_DEPTH,
                    sampler,
-                   rendering_buffer );
+                   rendering_buffer,
+                   rng );
 
     pt.integrate();
 
@@ -94,6 +95,6 @@ int main( void )
 
     rendering_buffer.save( "output.ppm" );
 
-
     return EXIT_SUCCESS;
 }
+

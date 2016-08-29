@@ -9,6 +9,7 @@
 #define PATHTRACER_H_
 
 #include "integrator.h"
+#include "random.h"
 
 class PathTracer : private Integrator
 {
@@ -21,7 +22,8 @@ public:
                 unsigned int max_path_depth,
                 TracingStoppingCriterion tracing_stop_criterion_,
                 Sampler &sampler,
-                Buffer &buffer );
+                Buffer &buffer,
+                RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
 
     Spectrum integrate( void );
 
@@ -31,6 +33,9 @@ private:
 
     Spectrum integrate_recursive( const Ray &ray, int depth );
 
+    RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
+   
 };
 
 #endif /* PATHTRACER_H_ */
+

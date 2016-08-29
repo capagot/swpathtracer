@@ -14,14 +14,16 @@ PathTracer::PathTracer( Camera &camera,
                         unsigned int max_path_depth,
                         TracingStoppingCriterion tracing_stop_criterion_,
                         Sampler &sampler,
-                        Buffer &buffer ) :
+                        Buffer &buffer,
+                        RNG< std::uniform_real_distribution, float, std::mt19937 > &rng ) :
         Integrator{ camera,
                     scene,
                     background_color,
                     max_path_depth,
                     tracing_stop_criterion_,
                     sampler,
-                    buffer }
+                    buffer },
+        rng_( rng )
 { }
 
 Spectrum PathTracer::integrate( void )
@@ -73,12 +75,15 @@ Spectrum PathTracer::integrate_recursive( const Ray &ray,
                 intersection_record = tmp_intersection_record;
 
     if ( intersection_record.t_ < std::numeric_limits< float >::max() )
-        spectrum.spectrum_ +=  intersection_record.material_.brdf_.spectrum_ * (intersection_record.t_ * 0.1f)  + intersection_record.material_.emitted_.spectrum_ ;
+        //spectrum.spectrum_ +=  intersection_record.material_.brdf_.spectrum_ * (intersection_record.t_ * 0.1f)  + intersection_record.material_.emitted_.spectrum_ ;
+        spectrum.spectrum_ += glm::dot( intersection_record.normal_, -ray.direction_ );
     else
         spectrum.spectrum_ += background_color_.spectrum_;
 
     //if ( intersection_record.t_ < std::numeric_limits< float >::max() )
     //{
+         //spectrum.spectrum_ +=  glm::vec3{ 1.0f, 1.0f, 1.0f };
+        
     //    Ray ray; // compute reflected ray
     //    spectrum.spectrum_ += intersection_record.material_.emitted_.spectrum_ + intersection_record.material_.brdf_.spectrum_ * render_recursive( ray, depth + 1, xi ).spectrum_;
     //}
