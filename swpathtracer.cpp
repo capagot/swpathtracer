@@ -17,7 +17,7 @@ unsigned int image_h_resolution = 512;
 unsigned int image_v_resolution = 512;
 float camera_field_of_view = 55.0f;
 int spectrum_num_samples = 3;
-Spectrum background_color{ glm::vec3{ 0.0f, 0.0f, 0.2f } };
+Spectrum background_color{ glm::vec3{ 0.0f, 0.0f, 0.0f } };
 
 int main( void )
 {
@@ -73,7 +73,7 @@ int main( void )
 
     //UniformSampler sampler( rng, 16 );
     //RegularSampler sampler( 1 );
-    JitteredSampler sampler( rng, 16 );
+    JitteredSampler sampler( rng, 32 );
 
     PathTracer pt( camera,
                    scene,

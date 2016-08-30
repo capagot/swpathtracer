@@ -29,8 +29,11 @@ $(EXECUTABLE): $(OBJECTS)
 
 .cpp.o:
 
-.PHONY: clean
+.PHONY: clean distclean
 
 clean:
 	rm *.o *.d	
+
+distclean: clean
+	rm $(EXECUTABLE)
 

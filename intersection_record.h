@@ -10,7 +10,7 @@
 
 #include <glm/glm.hpp>
 
-//#include "spectrum.h"
+#include "spectrum.h"
 #include "material.h"
 
 struct IntersectionRecord
@@ -18,7 +18,7 @@ struct IntersectionRecord
     float t_;
     glm::vec3 position_;
     glm::vec3 normal_;
-    //Spectrum spectrum_;
+    Spectrum spectrum_;
     Material material_;
 };
 

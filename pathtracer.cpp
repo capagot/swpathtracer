@@ -74,24 +74,27 @@ Spectrum PathTracer::integrate_recursive( const Ray &ray,
             if ( tmp_intersection_record.t_ < intersection_record.t_ )
                 intersection_record = tmp_intersection_record;
 
+    /*
     if ( intersection_record.t_ < std::numeric_limits< float >::max() )
         //spectrum.spectrum_ +=  intersection_record.material_.brdf_.spectrum_ * (intersection_record.t_ * 0.1f)  + intersection_record.material_.emitted_.spectrum_ ;
         spectrum.spectrum_ += glm::dot( intersection_record.normal_, -ray.direction_ );
     else
         spectrum.spectrum_ += background_color_.spectrum_;
-
-    //if ( intersection_record.t_ < std::numeric_limits< float >::max() )
-    //{
-         //spectrum.spectrum_ +=  glm::vec3{ 1.0f, 1.0f, 1.0f };
-        
-    //    Ray ray; // compute reflected ray
-    //    spectrum.spectrum_ += intersection_record.material_.emitted_.spectrum_ + intersection_record.material_.brdf_.spectrum_ * render_recursive( ray, depth + 1, xi ).spectrum_;
-    //}
-    //else
-    //    spectrum.spectrum_ += background_color_.spectrum_;
     //*/
 
-    //return Spectrum{ glm::vec3{ 0.0f, 0.0f, 1.0f } };//spectrum;
+    if ( intersection_record.t_ < std::numeric_limits< float >::max() )
+    {
+        Ray new_ray{ intersection_record.position_, intersection_record.material_.brdf_.getDirection( intersection_record.normal_, rng_ ) };
+
+        if ( depth < 5 )
+            spectrum.spectrum_ += intersection_record.material_.emitted_.spectrum_ + intersection_record.material_.brdf_.spectrum_ * integrate_recursive( new_ray, depth + 1 ).spectrum_;
+        //else
+        //    spectrum.spectrum_ += background_color_.spectrum_;
+    }
+    else
+        spectrum.spectrum_ += background_color_.spectrum_;
+    //*/
+
     return spectrum;
 }
 

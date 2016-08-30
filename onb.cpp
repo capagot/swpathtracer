@@ -18,3 +18,21 @@ void ONB::setUpONB( const glm::vec3 &up,
     u_ =  glm::normalize( glm::cross( up, w_ ) );
     v_ =  glm::cross( w_, u_ );
 }
+
+void ONB::setUpFromV( const glm::vec3 &v )
+{
+    v_ = v;
+    
+    if( fabs( v_.x ) > fabs( v_.y ) )
+        w_ = glm::normalize( glm::vec3{ v_.z, 0.0f, -v_.x } );
+    else
+        w_ =  glm::normalize( glm::vec3{ 0.0f, -v_.z, v_.y } );
+
+    u_ = glm::cross( v_, w_ );
+
+    m_[0] = w_;
+    m_[1] = v_;
+    m_[2] = u_;
+
+}
+
