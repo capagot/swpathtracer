@@ -62,14 +62,14 @@ void Buffer::save( const std::string &filename ) const
         for ( unsigned int x = 0; x < h_resolution_; x++ )
         {
             // convert from real to [0.0f, 1.0f] with simple clamp, then
-            //         from [0.0f, 1.0f] to [0.0f, 255.0f], then
+            //         gamma compression with gamma = 1/2.2, then
+            //         from gamma compressed [0.0f, 1.0f] to [0.0f, 255.0f], then
             //         from [0.0f, 255.0f] to [0.5f, 255.5f], then
             //         from [0.5f, 255.5f] to [0, 255] with round to nearest.
-            rendering_file << static_cast< int >( clamp( buffer_data_[x][y].spectrum_[0] ) * 255.0f + 0.5f ) << " ";
-            rendering_file << static_cast< int >( clamp( buffer_data_[x][y].spectrum_[1] ) * 255.0f + 0.5f ) << " ";
-            rendering_file << static_cast< int >( clamp( buffer_data_[x][y].spectrum_[2] ) * 255.0f + 0.5f ) << " ";
+            rendering_file << static_cast< int >( pow( clamp( buffer_data_[x][y].spectrum_[0] ), 1/2.2 ) * 255.0f + 0.5f ) << " ";
+            rendering_file << static_cast< int >( pow( clamp( buffer_data_[x][y].spectrum_[1] ), 1/2.2 ) * 255.0f + 0.5f ) << " ";
+            rendering_file << static_cast< int >( pow( clamp( buffer_data_[x][y].spectrum_[2] ), 1/2.2 ) * 255.0f + 0.5f ) << " ";
         }
-        //rendering_file << std::endl;
     }
 
     rendering_file.close();

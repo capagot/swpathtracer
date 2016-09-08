@@ -8,6 +8,10 @@
 #ifndef PATHTRACER_H_
 #define PATHTRACER_H_
 
+#include <sstream>
+#include <iomanip>
+#include <cmath>
+
 #include "integrator.h"
 #include "random.h"
 
@@ -35,6 +39,12 @@ private:
 
     RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
    
+    // TODO: remove this
+    float clamp( float x ) const
+    {
+        return ( x < 0.0f ) ? 0.0f : ( x > 1.0f ) ? 1.0f : x;
+    };
+
 };
 
 #endif /* PATHTRACER_H_ */

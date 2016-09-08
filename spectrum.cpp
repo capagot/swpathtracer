@@ -32,8 +32,8 @@ glm::vec3 Spectrum::getDirection( const glm::vec3 &normal,
     float sqrt_sin_theta = sqrt( 1.0f - r1 * r1 );
 
     glm::vec3 dir = { cos( phi ) * sqrt_sin_theta,
-                      sin( phi ) * sqrt_sin_theta,
-                      r1 };
+                      r1,
+                      sin( phi ) * sqrt_sin_theta };
 
     // Transform the point from the tangencial space to the world space.
     dir = onb.m_ * dir;        

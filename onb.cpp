@@ -21,7 +21,7 @@ void ONB::setUpONB( const glm::vec3 &up,
 
 void ONB::setUpFromV( const glm::vec3 &v )
 {
-    v_ = v;
+    v_ = glm::normalize( v );
     
     if( fabs( v_.x ) > fabs( v_.y ) )
         w_ = glm::normalize( glm::vec3{ v_.z, 0.0f, -v_.x } );

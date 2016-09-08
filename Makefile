@@ -29,6 +29,8 @@ $(EXECUTABLE): $(OBJECTS)
 
 .cpp.o:
 
+-include $(OBJECTS:.o=.d)
+
 .PHONY: clean distclean
 
 clean:
