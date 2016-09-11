@@ -13,8 +13,8 @@ glm::vec3 position{ 0.0f, 0.0f, 6.0f };
 glm::vec3 up_vector{ 0.0f, 1.0f, 0.0f };
 glm::vec3 look_at{ 0.0f, 0.0f, 0.0f };
 
-unsigned int image_h_resolution = 64;
-unsigned int image_v_resolution = 64;
+unsigned int image_h_resolution = 512;
+unsigned int image_v_resolution = 512;
 float camera_field_of_view = 55.0f;
 int spectrum_num_samples = 3;
 Spectrum background_color{ glm::vec3{ 0.0f, 0.0f, 0.0f } };
@@ -48,10 +48,9 @@ int main( void )
     glm::vec3 min;
     glm::vec3 max;
     Scene scene{};
-    scene.load();
-    //scene.loadFromFile( "models/tri_cube.obj", min, max );
-    scene.loadFromFile( "models/tri_rect2.obj", min, max );
-    //scene.loadFromFile( "models/tri_monkey.obj", min, max );
+    //scene.load();
+    //scene.loadFromFile( "models/tallbox.obj", min, max );
+    scene.loadFromFile( "models/monkey.obj", min, max );
     //std::clog << "model aabb: [" << min.x << ", "
     //                             << min.y << ", "
     //                             << min.z << "] - ["
@@ -74,7 +73,7 @@ int main( void )
 
     //UniformSampler sampler( rng, 4 );
     //RegularSampler sampler( 1 );
-    JitteredSampler sampler( rng, 16 );
+    JitteredSampler sampler( rng, 2000 );
 
     PathTracer pt( camera,
                    scene,
