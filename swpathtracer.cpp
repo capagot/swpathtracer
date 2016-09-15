@@ -21,27 +21,31 @@ Spectrum background_color{ glm::vec3{ 0.0f, 0.0f, 0.0f } };
 
 int main( void )
 {
-    PerspectiveCamera camera( image_h_resolution,
-                              image_v_resolution,
-                              position,
+    Buffer rendering_buffer{ image_h_resolution,
+                             image_v_resolution,
+                             spectrum_num_samples };
+
+    std::clog << std::endl;
+    rendering_buffer.printInfo();
+
+    PerspectiveCamera camera( position,
                               up_vector,
                               look_at,
+                              static_cast< float >( rendering_buffer.h_resolution_ ) / rendering_buffer.v_resolution_,
                               camera_field_of_view );
     camera.printInfo();
-
+    //*/
 
     /*
-    OrthographicCamera orthographic_camera( image_h_resolution,
-                                            image_v_resolution,
-                                            min_x,
-                                            max_x,
-                                            min_y,
-                                            max_y,
-                                            position,
-                                            up_vector,
-                                            look_at );
+    OrthographicCamera camera( -2.5f,
+                                2.5f,
+                               -2.5f,
+                                2.5f,
+                               position,
+                               up_vector,
+                               look_at );
     std::clog << std::endl;
-    orthographic_camera.printInfo();
+    camera.printInfo();
     //*/
 
     // TODO: put min and max into scene
@@ -49,8 +53,8 @@ int main( void )
     glm::vec3 max;
     Scene scene{};
     //scene.load();
-    //scene.loadFromFile( "models/tallbox.obj", min, max );
-    scene.loadFromFile( "models/monkey.obj", min, max );
+    scene.loadFromFile( "models/tallbox.obj", min, max );
+    //scene.loadFromFile( "models/monkey.obj", min, max );
     //std::clog << "model aabb: [" << min.x << ", "
     //                             << min.y << ", "
     //                             << min.z << "] - ["
@@ -61,19 +65,12 @@ int main( void )
     std::clog << std::endl;
     scene.printInfo();
 
-    Buffer rendering_buffer{ image_h_resolution,
-                             image_v_resolution,
-                             spectrum_num_samples };
-
-    std::clog << std::endl;
-    rendering_buffer.printInfo();
-
     //only one instance of each PRNG engine is be kept during execution.
     RNG< std::uniform_real_distribution, float, std::mt19937 > rng{ 0.0f, 1.0f };
 
-    //UniformSampler sampler( rng, 4 );
-    //RegularSampler sampler( 1 );
-    JitteredSampler sampler( rng, 2000 );
+    //UniformSampler sampler( rng, 16 );
+    //RegularSampler sampler( 16 );
+    JitteredSampler sampler( rng, 400 );
 
     PathTracer pt( camera,
                    scene,

@@ -10,19 +10,20 @@
 ONB::ONB( void )
 { }
 
-void ONB::setUpONB( const glm::vec3 &up,
-                    const glm::vec3 &direction )
+void ONB::setFromUW( const glm::vec3 &u,
+                     const glm::vec3 &w )
 {
-    // right-hand ONB
-    w_ = -glm::normalize( direction );
-    u_ =  glm::normalize( glm::cross( up, w_ ) );
+    u_ = u;
+    w_ = w;
     v_ =  glm::cross( w_, u_ );
+
+    setBasisMatrix();
 }
 
-void ONB::setUpFromV( const glm::vec3 &v )
+void ONB::setFromV( const glm::vec3 &v )
 {
-    v_ = glm::normalize( v );
-    
+    v_ = v;
+
     if( fabs( v_.x ) > fabs( v_.y ) )
         w_ = glm::normalize( glm::vec3{ v_.z, 0.0f, -v_.x } );
     else
@@ -30,9 +31,12 @@ void ONB::setUpFromV( const glm::vec3 &v )
 
     u_ = glm::cross( v_, w_ );
 
-    m_[0] = w_;
-    m_[1] = v_;
-    m_[2] = u_;
-
+    setBasisMatrix();
 }
 
+void ONB::setBasisMatrix( void )
+{
+    m_[0] = u_; // sets the column 0 of m_.
+    m_[1] = v_; // sets the column 1 of m_.
+    m_[2] = w_; // sets the column 2 of m_.
+}

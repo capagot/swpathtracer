@@ -18,39 +18,15 @@ class Camera
 {
 public:
 
-    Camera( unsigned int h_resolution,
-            unsigned int v_resolution,
-            const glm::vec3 &position,
+    Camera( const glm::vec3 &position,
             const glm::vec3 &up_vector,
             const glm::vec3 &look_at );
 
     ~Camera( void );
 
-    //void setHResolution( unsigned int h_resolution );
-
-    //void setVResolution( unsigned int v_resolution );
-
-    //void setPosition( const glm::vec3 &position );
-
-    //void setDirection( const glm::vec3 &direction );
-
-    //void setUpVector( const glm::vec3 &up_vector );
-
-    virtual Ray getRay( const glm::vec2 &sample_coord ) const = 0;
+    virtual Ray getWorldSpaceRay( const glm::vec2 &sample_coord ) const = 0;
 
     void printInfo( void ) const;
-
-    unsigned int h_resolution_{ 512 };          // final image horizontal resolution in pixels.
-
-    unsigned int v_resolution_{ 512 };          // final image vertical resolution in pixels.
-
-    glm::vec3 pixel_width_;
-
-    glm::vec3 pixel_height_;
-
-    glm::vec3 top_left_corner_;
-
-    float aspect_; // v_resolution_ / h_resolution_
 
     glm::vec3 position_{ 0.0f, 0.0f, 0.0f };    // position of the camera in the universe space.
 

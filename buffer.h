@@ -37,20 +37,11 @@ public:
 
 private:
 
-
-
     float clamp( float x ) const
     {
         return ( x < 0.0f ) ? 0.0f : ( x > 1.0f ) ? 1.0f : x;
     }
-
-    // "Gamma compresses" the clamped float result
-    int toInt( float x ) const
-    {
-        return int( pow ( clamp( x ), 1.0f / 2.2f ) * 255.0f + 0.5f );
-        //return int( clamp( x ) * 255.0f + 0.5f );
-    }
-
 };
 
 #endif /* BUFFER_H_ */
+

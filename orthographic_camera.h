@@ -15,9 +15,7 @@ class OrthographicCamera : public Camera
 {
 public:
 
-    OrthographicCamera( unsigned int h_resolution,
-                        unsigned int v_resolution,
-                        const float min_x,
+    OrthographicCamera( const float min_x,
                         const float max_x,
                         const float min_y,
                         const float max_y,
@@ -25,13 +23,11 @@ public:
                         const glm::vec3 &up_vector,
                         const glm::vec3 &look_at );
 
-    Ray getRay( const glm::vec2 &sample_coord ) const;
+    Ray getWorldSpaceRay( const glm::vec2 &sample_coord ) const;
 
     void printInfo( void ) const;
 
 private:
-
-    void initTopLeftRay( void );
 
     float min_x_;
 
@@ -41,13 +37,6 @@ private:
 
     float max_y_;
 
-    float aspect_;
-
-    glm::vec3 top_left_pixel_center_;
-
-    glm::vec3 pixel_width_;
-
-    glm::vec3 pixel_height_;
 };
 
 #endif /* ORTHOGRAPHIC_CAMERA_H_ */

@@ -20,12 +20,12 @@ glm::vec3 Spectrum::getDirection( const glm::vec3 &normal,
 {
     ONB onb;
 
-    // Builds the tangencial reference frame from the input normal vector.
-    // The V (up) axis of the new reference frame will be aligned to the input normal.
-    onb.setUpFromV( normal ); 
+    // Builds a local tangential reference frame oriented according to the input 'normal' vector.
+    // (the 'v' axis (up) of the tangential space will be aligned to the 'normal' input vector).
+    onb.setFromV( normal );
 
-    // Generates a random point, with uniform distribution, over the hemisphere 
-    // in tangencial reference space.
+    // Generates the unitary vector 'dir', which points from the origin of the local tangential frame
+    // towards a random point uniformly distributed over the hemisphere centered at the origin.
     float r1 = rng();
     float r2 = rng();
     float phi = 2.0f * M_PI * r2;
@@ -35,9 +35,7 @@ glm::vec3 Spectrum::getDirection( const glm::vec3 &normal,
                       r1,
                       sin( phi ) * sqrt_sin_theta };
 
-    // Transform the point from the tangencial space to the world space.
-    dir = onb.m_ * dir;        
-
-    return dir;
+    // Transforms the 'dir' vector from the local tangential space into the space
+    // where the local space is defined.
+    return onb.m_ * dir;
 }
-

@@ -23,7 +23,8 @@ public:
             samples_.push_back( std::vector< glm::vec2 >() );
     }
 
-    virtual void generateSamplesCoords( const glm::vec2 &pixel_coord ) = 0;
+    //virtual void generateSamplesCoords( const glm::vec2 &pixel_coord ) = 0;
+    virtual void generateSamplesCoords( void ) = 0;
 
     glm::vec2 operator[]( std::size_t i ) const
     {
@@ -41,10 +42,14 @@ public:
     std::vector< std::vector< glm::vec2 > > samples_;
 };
 
+// Generate a set of (x, y) samples uniformly distributed, such that x and y are in the interval [-1, +1).
+// The number of samples is given by the 'spp_' data member.
 class UniformSampler : public Sampler
 {
 public:
 
+    // A separate sample storage buffer is instantiated for each thread, in order to avoid race condition
+    // during the sample generation stage.
     UniformSampler( RNG< std::uniform_real_distribution, float, std::mt19937 > &rng, std::size_t spp ) :
         rng_( rng )
     {
@@ -54,11 +59,12 @@ public:
             samples_[thread_count].resize( spp_ );
     }
 
-    void generateSamplesCoords( const glm::vec2 &pixel_coord )
+    //void generateSamplesCoords( const glm::vec2 &pixel_coord )
+    void generateSamplesCoords( void )
     {
         int thread_id = omp_get_thread_num();
         for( unsigned int i = 0; i < spp_; i++ )
-            samples_[thread_id][i] = glm::vec2{ pixel_coord.x + rng_(), pixel_coord.y + rng_() };
+            samples_[thread_id][i] = glm::vec2{ rng_() - 0.5f, rng_() - 0.5f };
     }
 
 private:
@@ -85,7 +91,8 @@ public:
             samples_[thread_count].resize( spp_ );
     }
 
-    void generateSamplesCoords( const glm::vec2 &pixel_coord )
+    //void generateSamplesCoords( const glm::vec2 &pixel_coord )
+    void generateSamplesCoords( void )
     {
         int thread_id = omp_get_thread_num();
         std::size_t i = 0;
@@ -93,8 +100,8 @@ public:
         for ( std::size_t subpixel_x_count = 0; subpixel_x_count < num_subpixels_x_ ; subpixel_x_count++ )
             for ( std::size_t subpixel_y_count = 0; subpixel_y_count < num_subpixels_y_ ; subpixel_y_count++ )
             {
-                samples_[thread_id][i] = glm::vec2{ pixel_coord.x + subpixel_x_count * subpixel_width_+ subpixel_half_width_,
-                                                    pixel_coord.y + subpixel_y_count * subpixel_height_+ subpixel_half_height_};
+                samples_[thread_id][i] = glm::vec2{ subpixel_x_count * subpixel_width_+ subpixel_half_width_ - 0.5f,
+                                                    subpixel_y_count * subpixel_height_+ subpixel_half_height_ - 0.5f };
                 i++;
             }
     }
@@ -127,7 +134,8 @@ public:
             samples_[thread_count].resize( spp_ );
     }
 
-    void generateSamplesCoords( const glm::vec2 &pixel_coord )
+    //void generateSamplesCoords( const glm::vec2 &pixel_coord )
+    void generateSamplesCoords( void )
     {
         int thread_id = omp_get_thread_num();
         std::size_t i = 0;
@@ -135,8 +143,8 @@ public:
         for ( std::size_t subpixel_x_count = 0; subpixel_x_count < num_subpixels_x_ ; subpixel_x_count++ )
             for ( std::size_t subpixel_y_count = 0; subpixel_y_count < num_subpixels_y_ ; subpixel_y_count++ )
             {
-                samples_[thread_id][i] = glm::vec2{ pixel_coord.x + subpixel_x_count * subpixel_width_+ subpixel_width_ * rng_(),
-                                                    pixel_coord.y + subpixel_y_count * subpixel_height_ + subpixel_height_ * rng_() };
+                samples_[thread_id][i] = glm::vec2{ subpixel_x_count * subpixel_width_+ subpixel_width_ * rng_() - 0.5f ,
+                                                    subpixel_y_count * subpixel_height_ + subpixel_height_ * rng_() - 0.5f };
                 i++;
             }
     }
@@ -151,3 +159,4 @@ private:
 };
 
 #endif /* SAMPLER_H_ */
+
