@@ -72,6 +72,6 @@ void Buffer::save( const std::string &filename ) const
 
     rendering_file.close();
 
-    std::clog << "finished!";
+    std::clog << "finished!\n";
 }
 

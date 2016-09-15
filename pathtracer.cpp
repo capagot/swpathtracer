@@ -77,7 +77,9 @@ glm::vec3 PathTracer::integrate( void )
             buffer_.buffer_data_[x][y] /= sampler_.size();
         }
     }
-
+    
+    std::clog << std::endl;
+    
     t.stop();
     std::clog << "Rendering time: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
 }
@@ -110,11 +112,11 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
             if ( glm::dot( intersection_record.normal_, -ray.direction_ ) < 0.0f )
                 intersection_record.normal_ = -intersection_record.normal_;
            
-            glm::vec3 new_dir = intersection_record.material_.getNewDirection( intersection_record.normal_, rng_ );
+            glm::vec3 new_dir = intersection_record.material_.bxdf_.getNewDirection( intersection_record.normal_, rng_ );
 
             Ray new_ray{ intersection_record.position_ + new_dir * 0.001f, new_dir };
 
-            spectrum = intersection_record.material_.emitted_ + intersection_record.material_.brdf_  *
+            spectrum = intersection_record.material_.emitted_ + intersection_record.material_.bxdf_.radiance_  *
                                                                 integrate_recursive( new_ray, ++depth ) *
                                                                 glm::dot( intersection_record.normal_, new_ray.direction_ ) * 2.0f;
         }

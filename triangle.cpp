@@ -12,7 +12,7 @@ const float Triangle::kIntersectionTestEpsilon_ = 0.000001f;
 Triangle::Triangle( const glm::vec3 &v0,
                     const glm::vec3 &v1,
                     const glm::vec3 &v2,
-                    const Lambertian &material ) :
+                    const Material &material ) :
         Primitive{ material },
         v0_{ v0 },
         v1_{ v1 },
@@ -24,7 +24,7 @@ Triangle::Triangle( const glm::vec3 &v0,
                     const glm::vec3 &v1,
                     const glm::vec3 &v2,
                     const glm::vec3 &normal,
-                    const Lambertian &material ) :
+                    const Material &material ) :
         Primitive{ material },
         v0_{ v0 },
         v1_{ v1 },

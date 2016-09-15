@@ -20,6 +20,7 @@
 
 #include "triangle.h"
 #include "material.h"
+#include "material2.h"
 
 class Scene
 {
@@ -37,7 +38,7 @@ public:
 
     std::vector< primitive_ptr > primitives_;
 
-    std::list< Lambertian > materials_;
+    std::list< Material > materials_;
 
 private:
 

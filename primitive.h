@@ -16,14 +16,14 @@ class Primitive
 {
 public:
 
-    Primitive( const Lambertian &material ) :
+    Primitive( const Material &material ) :
         material_( material )
     { }
 
     virtual bool intersect( const Ray &ray,
                             IntersectionRecord &intersection_record ) = 0;
 
-    const Lambertian &material_;
+    const Material &material_;
 };
 
 #endif /* PRIMITIVE_H_ */

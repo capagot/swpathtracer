@@ -13,8 +13,6 @@ public:
     RNG( DATA min, DATA max ) :
         distribution_{ min, max }
     {
-        std::clog << "RNG ctor called...\n";
-
         int num_threads = std::max( 1, omp_get_max_threads() );
         for( int thread_count = 0; thread_count < num_threads; thread_count++ )
             engines_.push_back( ENGINE( std::random_device{}() + thread_count ) );

@@ -7,14 +7,11 @@
 
 #include  "material.h"
 
-Lambertian::Lambertian( void ) :
-        brdf_{ glm::vec3{ 0.8f, 0.8f, 0.8f } },
-        emitted_{ glm::vec3{ 0.0f, 0.0f, 0.0f } }
+Lambertian::Lambertian( void )
 { }
 
-Lambertian::Lambertian( const glm::vec3 &brdf, const glm::vec3 &emitted ) :
-        brdf_{ brdf },
-        emitted_{ emitted }
+Lambertian::Lambertian( const glm::vec3 &radiance ) :
+    radiance_{ radiance }
 { }
 
 glm::vec3 Lambertian::getNewDirection( const glm::vec3 &normal,

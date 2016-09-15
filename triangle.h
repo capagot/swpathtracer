@@ -20,13 +20,13 @@ public:
     Triangle( const glm::vec3 &v0,
               const glm::vec3 &v1,
               const glm::vec3 &v2,             
-              const Lambertian &material );
+              const Material &material );
 
     Triangle( const glm::vec3 &v0,
               const glm::vec3 &v1,
               const glm::vec3 &v2,
               const glm::vec3 &normal,
-              const Lambertian &material );
+              const Material &material );
 
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );
