@@ -14,8 +14,6 @@
 
 #include "random.h"
 
-// TODO: The spectrum is restricted to 3 samples for a while.
-//       It will be expanded.
 class Spectrum
 {
 public:
@@ -31,8 +29,6 @@ public:
 
     glm::vec3 spectrum_ = { 0.0f, 0.0f, 0.0f };
 
-    glm::vec3 getDirection( const glm::vec3 &normal,
-                            RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
 };
 
 #endif /* SPECTRUM_H_ */

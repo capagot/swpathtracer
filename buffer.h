@@ -33,7 +33,7 @@ public:
 
     int spectrum_num_samples_ = 3;
 
-    std::vector< std::vector< Spectrum > > buffer_data_;
+    std::vector< std::vector< glm::vec3 > > buffer_data_;
 
 private:
 

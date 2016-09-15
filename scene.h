@@ -14,13 +14,11 @@
 #include <memory>
 #include <glm/glm.hpp>
 
-// assimp include files. These three are usually needed.
-#include "assimp/Importer.hpp"  //OO version Header!
-#include "assimp/scene.h" //#include "assimp/Scene.h"
-#include "assimp/postprocess.h" //#include "assimp/PostProcess.h"
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 
 #include "triangle.h"
-#include "spectrum.h"
 #include "material.h"
 
 class Scene
@@ -35,14 +33,11 @@ public:
 
     void printInfo( void );
 
-    // list of materials (BRDFs)
-    // list of light sources (separated??)
-
     typedef std::unique_ptr< Primitive > primitive_ptr;
 
     std::vector< primitive_ptr > primitives_;
 
-    std::list< Material > materials_;
+    std::list< Lambertian > materials_;
 
 private:
 
@@ -50,3 +45,4 @@ private:
 };
 
 #endif /* SCENE_H_ */
+

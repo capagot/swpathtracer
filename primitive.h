@@ -16,20 +16,15 @@ class Primitive
 {
 public:
 
-    //Primitive( const Spectrum &spectrum ) :
-    //    spectrum_( spectrum )
-    //{ }
-
-    Primitive( const Material &material ) :
+    Primitive( const Lambertian &material ) :
         material_( material )
     { }
 
     virtual bool intersect( const Ray &ray,
                             IntersectionRecord &intersection_record ) = 0;
 
-    // TODO: this must be changed to account for BRSFs ..
-    //const Spectrum &spectrum_;
-    const Material &material_;
+    const Lambertian &material_;
 };
 
 #endif /* PRIMITIVE_H_ */
+

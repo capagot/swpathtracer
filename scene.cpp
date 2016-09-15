@@ -14,7 +14,7 @@ void Scene::load ( void )
 {
     float s = 2.0f;
    
-    materials_.push_back( Material{ Spectrum{ glm::vec3{ 0.75f, 0.75f, 0.75f } }, Spectrum{ glm::vec3{ 0.0f, 0.0f, 0.0f } } } );
+    materials_.push_back( Lambertian{ glm::vec3{ 0.75f, 0.75f, 0.75f } , glm::vec3{ 0.0f, 0.0f, 0.0f } } );
 
     // back wall
     glm::vec3 a{-s, -s, -s };
@@ -50,7 +50,7 @@ void Scene::load ( void )
     primitives_.push_back( primitive_ptr( new Triangle{ j1, l1, k1, materials_.back() } ) );
 
     // left wall
-    materials_.push_back( Material{ Spectrum{ glm::vec3{ 0.75f, 0.25f, 0.25f } }, Spectrum{ glm::vec3{ 0.0f, 0.0f, 0.0f } } } );
+    materials_.push_back( Lambertian{ glm::vec3{ 0.75f, 0.25f, 0.25f }, glm::vec3{ 0.0f, 0.0f, 0.0f } } );
     glm::vec3 m{-s,  s, -s };
     glm::vec3 n{-s,  s,  s };
     glm::vec3 o{-s, -s, -s };
@@ -62,7 +62,7 @@ void Scene::load ( void )
     primitives_.push_back( primitive_ptr( new Triangle{ p, q, r, materials_.back() } ) );
 
     // right wall
-    materials_.push_back( Material{ Spectrum{ glm::vec3{ 0.25f, 0.25f, 0.75f } }, Spectrum{ glm::vec3{ 0.0f, 0.0f, 0.0f } } } );
+    materials_.push_back( Lambertian{ glm::vec3{ 0.25f, 0.25f, 0.75f }, glm::vec3{ 0.0f, 0.0f, 0.0f } } );
     glm::vec3 m1{ s,  s, -s };
     glm::vec3 n1{ s,  s,  s };
     glm::vec3 o1{ s, -s, -s };
@@ -75,7 +75,7 @@ void Scene::load ( void )
 
     // area light
     float ls = 0.5f;
-    materials_.push_back( Material{ Spectrum{ glm::vec3{ 0.0f, 0.0f, 0.0f } }, Spectrum{ glm::vec3{ 17.0f, 17.0f, 17.0f } } } );
+    materials_.push_back( Lambertian{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 17.0f, 17.0f, 17.0f } } );
     glm::vec3 t{ ls, s - 0.001f, -ls };
     glm::vec3 u{-ls, s - 0.001f, -ls };
     glm::vec3 v{ ls, s - 0.001f,  ls };
@@ -89,7 +89,7 @@ void Scene::load ( void )
     /*
     s = 0.75f;
 
-    materials_.push_back( Material{ Spectrum{ glm::vec3{ 0.0f, 0.75f, 0.0f } }, Spectrum{ glm::vec3{ 0.0f, 0.0f, 0.0f } } } ); // Dummy material
+    materials_.push_back( Lambertian{ glm::vec3{ 0.0f, 0.75f, 0.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f } } ); // Dummy material
 
     // front    
     glm::vec3 au{-s, -s+.5, -0.50f };
@@ -147,7 +147,7 @@ int Scene::loadFromFile( const std::string &file_name, glm::vec3 &min, glm::vec3
 
     if( assimp_scene_->HasMeshes() )
     {
-        materials_.push_back( Material{ Spectrum{ glm::vec3{ 0.75f, 0.75f, 0.75f } }, Spectrum{ glm::vec3{ 0.0f, 0.0f, 0.0f } } } ); // Dummy material
+        materials_.push_back( Lambertian{ glm::vec3{ 0.75f, 0.75f, 0.75f }, glm::vec3{ 0.0f, 0.0f, 0.0f } } ); // Dummy material
 
         for( unsigned int mesh_id = 0; mesh_id < assimp_scene_->mNumMeshes; mesh_id++ )
         {
@@ -203,3 +203,4 @@ void Scene::printInfo( void )
     std::clog << "-----------------" << std::endl;
     std::clog << " number of primitives ..........: " << primitives_.size() << std::endl;
 }
+

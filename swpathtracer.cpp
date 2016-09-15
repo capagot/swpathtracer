@@ -17,7 +17,7 @@ unsigned int image_h_resolution = 512;
 unsigned int image_v_resolution = 512;
 float camera_field_of_view = 55.0f;
 int spectrum_num_samples = 3;
-Spectrum background_color{ glm::vec3{ 0.0f, 0.0f, 0.0f } };
+glm::vec3 background_color{ glm::vec3{ 0.0f, 0.0f, 0.0f } };
 
 int main( void )
 {
@@ -70,7 +70,7 @@ int main( void )
 
     //UniformSampler sampler( rng, 16 );
     //RegularSampler sampler( 16 );
-    JitteredSampler sampler( rng, 400 );
+    JitteredSampler sampler( rng, 1600 );
 
     PathTracer pt( camera,
                    scene,
@@ -82,13 +82,6 @@ int main( void )
                    rng );
 
     pt.integrate();
-
-    //RenderingEngine re( camera,
-    //                    scene,
-    //                    pt,
-    //                    sampler,
-    //                    rendering_buffer );
-    //re.renderImage();
 
     rendering_buffer.save( "output.ppm" );
 

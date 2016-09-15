@@ -5,25 +5,28 @@
  *      Author: christian
  */
 
-#ifndef MATERIAL_H_
-#define MATERIAL_H_
+#ifndef LAMBERTIAN_H_
+#define LAMBERTIAN_H_
 
-#include  "spectrum.h"
+#include  "onb.h"
 #include  "ray.h"
+#include "random.h"
 
-class Material
+class Lambertian
 {
 public:
 
-    Material( void );
+    Lambertian( void );
 
-    Material( const Spectrum &brdf, const Spectrum &emitted );
+    Lambertian( const glm::vec3 &brdf, const glm::vec3 &emitted );
 
-    Ray getRayDirection( const glm::vec3 &normal, float r1, float r2 ) const;
+    glm::vec3 getNewDirection( const glm::vec3 &normal,
+                               RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
 
-    Spectrum brdf_;
+    glm::vec3 brdf_;
 
-    Spectrum emitted_;
+    // TODO: there is no emission in a lambertian surface!!! :P
+    glm::vec3 emitted_;
 };
 
-#endif /* MATERIAL_H_ */
+#endif /* LAMBERTIAN_H_ */

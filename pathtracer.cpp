@@ -10,7 +10,7 @@
 
 PathTracer::PathTracer( Camera &camera,
                         const Scene &scene,
-                        const Spectrum background_color,
+                        const glm::vec3 background_color,
                         unsigned int max_path_depth,
                         TracingStoppingCriterion tracing_stop_criterion_,
                         Sampler &sampler,
@@ -26,7 +26,7 @@ PathTracer::PathTracer( Camera &camera,
         rng_( rng )
 { }
 
-Spectrum PathTracer::integrate( void )
+glm::vec3 PathTracer::integrate( void )
 {
     Timer t;
     t.start();
@@ -46,30 +46,35 @@ Spectrum PathTracer::integrate( void )
 
         for ( std::size_t x = 0; x < buffer_.h_resolution_; x++ )
         {
-            // Generate a set of 2D sampling points with coordinates in the interval [-0.5f, +0.5f).
-            // The instantiated sampler will define the number and actual distribution (regular, uniform,...) of the points.
+            // Generate a set of 2D sampling points with coordinates in the interval
+            // [-0.5f, +0.5f). The instantiated sampler will define the number and
+            // actual distribution (regular, uniform,...) of the points.
             sampler_.generateSamplesCoords();
 
             for ( std::size_t samp = 0; samp < sampler_.size(); samp++ )
             {
-                // Transform a point from the continuous screen space into the normalized screen space (that ranges from -1.0 to +1.0 along 'x' and 'y').
-                // The value 0.5f is added to the pixel coordinates in screen space in order to have the pixel center as the reference for the sampling points distribution.               
+                // Transform a point from the continuous screen space into the 
+                // normalized screen space (that ranges from -1.0 to +1.0 along 'x'
+                // and 'y'). The value 0.5f is added to the pixel coordinates in
+                // screen space in order to have the pixel center as the reference
+                // for the sampling points distribution.               
                 glm::vec2 pixel_cam_space = glm::vec2{ 2.0f * ( x + 0.5f + sampler_[samp].x ) / buffer_.h_resolution_ - 1.0f,
                                                        2.0f * ( y + 0.5f + sampler_[samp].y ) / buffer_.v_resolution_ - 1.0f };
 
-                // Generates the primary ray in world space from the normalized screen coordinates.
+                // Generates the primary ray in world space from the normalized
+                // screen coordinates.
                 Ray ray{ camera_.getWorldSpaceRay( pixel_cam_space ) };
 
-		//float xx = x + 0.5f + sampler_[samp].x;
-		//float yy = y + 0.5f + sampler_[samp].y;
-                //buffer_.buffer_data_[x][y].spectrum_ += 0.5f * ( 1.0f + static_cast< float >( sin( ( xx * xx + yy * yy ) / 100.0f ) ) ); 
+                //float xx = x + 0.5f + sampler_[samp].x;
+                //float yy = y + 0.5f + sampler_[samp].y;
+                //buffer_.buffer_data_[x][y] += 0.5f * ( 1.0f + static_cast< float >( sin( ( xx * xx + yy * yy ) / 100.0f ) ) ); 
 
                 // Trace the ray path.
-                buffer_.buffer_data_[x][y].spectrum_ += integrate_recursive( ray, 0 ).spectrum_;
+                buffer_.buffer_data_[x][y] += integrate_recursive( ray, 0 );
             }
 
             // Compute the average radiance that falls onto the pixel (x,y).
-            buffer_.buffer_data_[x][y].spectrum_ /= sampler_.size();
+            buffer_.buffer_data_[x][y] /= sampler_.size();
         }
     }
 
@@ -77,13 +82,13 @@ Spectrum PathTracer::integrate( void )
     std::clog << "Rendering time: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
 }
 
-Spectrum PathTracer::integrate_recursive( const Ray &ray,
+glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
                                           int depth )
 {
     IntersectionRecord intersection_record;
     IntersectionRecord tmp_intersection_record;
     std::size_t num_primitives = scene_.primitives_.size();
-    Spectrum spectrum{ glm::vec3{ 0.0f, 0.0f, 0.0f } };
+    glm::vec3 spectrum{ 0.0f, 0.0f, 0.0f };
 
     intersection_record.t_ = std::numeric_limits< float >::max();
 
@@ -105,19 +110,19 @@ Spectrum PathTracer::integrate_recursive( const Ray &ray,
             if ( glm::dot( intersection_record.normal_, -ray.direction_ ) < 0.0f )
                 intersection_record.normal_ = -intersection_record.normal_;
            
-            glm::vec3 new_dir = intersection_record.material_.brdf_.getDirection( intersection_record.normal_, rng_ );
+            glm::vec3 new_dir = intersection_record.material_.getNewDirection( intersection_record.normal_, rng_ );
 
             Ray new_ray{ intersection_record.position_ + new_dir * 0.001f, new_dir };
 
-            spectrum.spectrum_ = intersection_record.material_.emitted_.spectrum_ +  intersection_record.material_.brdf_.spectrum_  *
-                                                                                     integrate_recursive( new_ray, ++depth ).spectrum_ *
-                                                                                     glm::dot( intersection_record.normal_, new_ray.direction_ ) * 2.0f;
+            spectrum = intersection_record.material_.emitted_ + intersection_record.material_.brdf_  *
+                                                                integrate_recursive( new_ray, ++depth ) *
+                                                                glm::dot( intersection_record.normal_, new_ray.direction_ ) * 2.0f;
         }
         else
-            spectrum.spectrum_ = background_color_.spectrum_;
+            spectrum = background_color_;
     }
     else
-        spectrum.spectrum_ = background_color_.spectrum_;
+        spectrum = background_color_;
 
     return spectrum;
 }

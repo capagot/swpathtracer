@@ -18,8 +18,8 @@ struct IntersectionRecord
     float t_;
     glm::vec3 position_;
     glm::vec3 normal_;
-    Spectrum spectrum_;
-    Material material_;
+    Lambertian material_;
 };
 
 #endif /* INTERSECTION_RECORD_H_ */
+
