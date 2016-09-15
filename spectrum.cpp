@@ -6,6 +6,7 @@
  */
 
 #include "spectrum.h"
+#include "onb.h"
 
 Spectrum::Spectrum( void )
 { }
@@ -13,3 +14,4 @@ Spectrum::Spectrum( void )
 Spectrum::Spectrum( const glm::vec3 &spectrum ) :
         spectrum_{ spectrum }
 { }
+

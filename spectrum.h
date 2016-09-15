@@ -12,8 +12,8 @@
 #include <vector>
 #include <glm/glm.hpp>
 
-// TODO: The spectrum is restricted to 3 samples for a while.
-//       It will be expanded.
+#include "random.h"
+
 class Spectrum
 {
 public:
@@ -28,6 +28,8 @@ public:
     }
 
     glm::vec3 spectrum_ = { 0.0f, 0.0f, 0.0f };
+
 };
 
 #endif /* SPECTRUM_H_ */
+

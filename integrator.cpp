@@ -9,7 +9,7 @@
 
 Integrator::Integrator( Camera &camera,
                         const Scene &scene,
-                        const Spectrum background_color,
+                        const glm::vec3 background_color,
                         unsigned int max_path_depth,
                         TracingStoppingCriterion tracing_stop_criterion_,
                         Sampler &sampler,
@@ -39,3 +39,4 @@ void Integrator::printInfo( void ) const
         break;
     }
 }
+

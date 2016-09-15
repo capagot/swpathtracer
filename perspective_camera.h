@@ -15,22 +15,21 @@ class PerspectiveCamera : public Camera
 {
 public:
 
-    PerspectiveCamera( unsigned int h_resolution,
-                       unsigned int v_resolution,
-                       const glm::vec3 &position,
+    PerspectiveCamera( const glm::vec3 &position,
                        const glm::vec3 &up_vector,
                        const glm::vec3 &look_at,
+                       float aspect,
                        float fov_degrees );
 
-    Ray getRay( const glm::vec2 &sample_coord ) const;
+    Ray getWorldSpaceRay( const glm::vec2 &sample_coord ) const;
 
     void printInfo( void ) const;
 
     float fov_degrees_ = 55.0f;
 
-private:
+    float aspect_ = 1.0f;
 
-    void setTopLeftCorner( void );
+private:
 
     static const float kDegreesToRadians;
 };

@@ -33,14 +33,15 @@ public:
 
     int spectrum_num_samples_ = 3;
 
-    std::vector< std::vector< Spectrum > > buffer_data_;
+    std::vector< std::vector< glm::vec3 > > buffer_data_;
 
 private:
-    inline float clamp( float x ) const
+
+    float clamp( float x ) const
     {
         return ( x < 0.0f ) ? 0.0f : ( x > 1.0f ) ? 1.0f : x;
     }
-
 };
 
 #endif /* BUFFER_H_ */
+

@@ -29,8 +29,13 @@ $(EXECUTABLE): $(OBJECTS)
 
 .cpp.o:
 
-.PHONY: clean
+-include $(OBJECTS:.o=.d)
+
+.PHONY: clean distclean
 
 clean:
 	rm *.o *.d	$(EXECUTABLE)
+
+distclean: clean
+	rm $(EXECUTABLE)
 

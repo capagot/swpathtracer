@@ -26,15 +26,15 @@ public:
 
     Integrator( Camera &camera,
                 const Scene &scene,
-                const Spectrum background_color,
+                const glm::vec3 background_color,
                 unsigned int max_path_depth,
                 TracingStoppingCriterion tracing_stop_criterion_,
                 Sampler &sampler,
                 Buffer &buffer );
 
-    virtual Spectrum integrate( void ) = 0;    // pure virtual member function. Will be implemented by each integrator.
+    virtual glm::vec3 integrate( void ) = 0;    // pure virtual member function. Will be implemented by each integrator.
 
-    //virtual Spectrum integrate_recursive( const Ray &ray, int depth ) = 0;
+    //virtual glm::vec3 integrate_recursive( const Ray &ray, int depth ) = 0;
 
     unsigned int getMaxPathDepth( void ) const;
 
@@ -47,7 +47,7 @@ protected:
 
     const Scene &scene_;
 
-    Spectrum background_color_;
+    glm::vec3 background_color_;
 
     unsigned int max_path_depth_;
 
@@ -59,3 +59,4 @@ protected:
 };
 
 #endif /* INTEGRATOR_H_ */
+
