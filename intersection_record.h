@@ -10,7 +10,7 @@
 
 #include <glm/glm.hpp>
 
-#include "material2.h"
+#include "material.h"
 
 struct IntersectionRecord
 {

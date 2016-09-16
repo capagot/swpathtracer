@@ -1,30 +1,21 @@
-/*
- * material.h
- *
- *  Created on: Jun 5, 2016
- *      Author: christian
- */
+#ifndef MATERIAL_H_
+#define MATERIAL_H_
 
-#ifndef LAMBERTIAN_H_
-#define LAMBERTIAN_H_
+#include "lambertian.h"
 
-#include "onb.h"
-#include "random.h"
-
-class Lambertian
+class Material
 {
 public:
 
-    Lambertian( void );
+    Material( void );
 
-    Lambertian( const glm::vec3 &radiance );
+    Material( const Lambertian &bxdf, 
+              const glm::vec3 &emitted );
 
-    glm::vec3 getNewDirection( const glm::vec3 &normal,
-                               RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
+    Lambertian bxdf_;
 
-    glm::vec3 radiance_ = glm::vec3{ 0.5f, 0.5f, 0.5f };
-
+    glm::vec3 emitted_;
 };
 
-#endif /* LAMBERTIAN_H_ */
+#endif /* MATERIAL_H_ */
 

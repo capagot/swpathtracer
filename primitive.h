@@ -1,16 +1,9 @@
-/*
- * primitive.h
- *
- *  Created on: May 14, 2016
- *      Author: christian
- */
-
 #ifndef PRIMITIVE_H_
 #define PRIMITIVE_H_
 
 #include "ray.h"
 #include "intersection_record.h"
-#include "material.h"
+#include "lambertian.h"
 
 class Primitive
 {

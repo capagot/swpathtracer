@@ -19,8 +19,8 @@
 #include "assimp/postprocess.h"
 
 #include "triangle.h"
+#include "lambertian.h"
 #include "material.h"
-#include "material2.h"
 
 class Scene
 {
