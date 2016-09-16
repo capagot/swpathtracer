@@ -26,7 +26,7 @@ PathTracer::PathTracer( Camera &camera,
         rng_( rng )
 { }
 
-glm::vec3 PathTracer::integrate( void )
+void PathTracer::integrate( void )
 {
     Timer t;
     t.start();
@@ -94,17 +94,12 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
 
     intersection_record.t_ = std::numeric_limits< float >::max();
 
-    int closest_primitive_idx = -1;
-
     if ( depth < 5 )
     {
         for ( std::size_t primitive_idx = 0; primitive_idx < num_primitives; primitive_idx++ )
             if ( scene_.primitives_[primitive_idx]->intersect( ray, tmp_intersection_record ) )
                 if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0f ) )
-                {
                     intersection_record = tmp_intersection_record;
-                    closest_primitive_idx = primitive_idx;
-                }
 
         if ( intersection_record.t_ < std::numeric_limits< float >::max() )
         {

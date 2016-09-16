@@ -187,7 +187,7 @@ int Scene::loadFromFile( const std::string &file_name, glm::vec3 &min, glm::vec3
                 glm::vec3 b{ vertex_ptr[1].x, vertex_ptr[1].y, vertex_ptr[1].z - 0.75f };
                 glm::vec3 c{ vertex_ptr[2].x, vertex_ptr[2].y, vertex_ptr[2].z - 0.75f };
 
-                primitives_.push_back( primitive_ptr( new Triangle{ a, b, c, materials_.back() } ) );
+                //primitives_.push_back( primitive_ptr( new Triangle{ a, b, c, materials_.back() } ) );
             }
         }
     }

@@ -70,7 +70,7 @@ int main( void )
 
     //UniformSampler sampler( rng, 16 );
     //RegularSampler sampler( 16 );
-    JitteredSampler sampler( rng, 1600 );
+    JitteredSampler sampler( rng, 400 );
 
     PathTracer pt( camera,
                    scene,

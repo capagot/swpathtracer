@@ -28,7 +28,7 @@ public:
                 Buffer &buffer,
                 RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
 
-    glm::vec3 integrate( void );
+    void integrate( void );
 
     void printInfo( void ) const;
 

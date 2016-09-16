@@ -25,13 +25,14 @@ public:
 
     void printInfo( void ) const;
 
-    float fov_degrees_ = 55.0f;
+    float aspect_;
 
-    float aspect_ = 1.0f;
+    float fov_degrees_;
 
 private:
 
-    static const float kDegreesToRadians;
+    static const float kDegreesToRadians_;
 };
 
 #endif /* PERSPECTIVE_CAMERA_H_ */
+

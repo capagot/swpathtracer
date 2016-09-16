@@ -34,7 +34,6 @@ public:
 
     std::size_t size( void )
     {
-        int thread_id = omp_get_thread_num();
         return spp_;
     }
 
