@@ -11,7 +11,6 @@
 #include <glm/glm.hpp>
 #include "primitive.h"
 #include "ray.h"
-#include "spectrum.h"
 
 class Triangle : public Primitive
 {

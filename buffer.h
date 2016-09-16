@@ -11,7 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "spectrum.h"
+#include <glm/glm.hpp>
 
 class Buffer
 {
