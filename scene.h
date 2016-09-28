@@ -26,18 +26,21 @@ class Scene
 {
 public:
 
-    Scene( void );
+    typedef std::unique_ptr< Primitive > primitive_ptr;
 
-    void load( void ); // TODO: remove this in the future.
+    Scene( void );
 
     int loadFromFile( const std::string &file_name, glm::vec3 &min_aabb, glm::vec3 &max_aabb );
 
-    void printInfo( void );
+    void pushPrimitive( Primitive *primitive );
 
-    typedef std::unique_ptr< Primitive > primitive_ptr;
+    void pushMaterial( const Material *material );
+
+    void printInfo( void );
 
     std::vector< primitive_ptr > primitives_;
 
+    // TODO: maybe I can use pointers here too.
     std::list< Material > materials_;
 
 private:

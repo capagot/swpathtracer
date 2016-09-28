@@ -61,7 +61,7 @@ void PathTracer::integrate( void )
                 glm::vec2 pixel_cam_space = glm::vec2{ 2.0f * ( x + 0.5f + sampler_[samp].x ) / buffer_.h_resolution_ - 1.0f,
                                                        2.0f * ( y + 0.5f + sampler_[samp].y ) / buffer_.v_resolution_ - 1.0f };
 
-                // Generates the primary ray in world space from the normalized
+                // Generate the primary ray in world space from the normalized
                 // screen coordinates.
                 Ray ray{ camera_.getWorldSpaceRay( pixel_cam_space ) };
 
@@ -85,7 +85,7 @@ void PathTracer::integrate( void )
 }
 
 glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
-                                          int depth )
+                                           unsigned int depth )
 {
     IntersectionRecord intersection_record;
     IntersectionRecord tmp_intersection_record;
@@ -94,26 +94,27 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
 
     intersection_record.t_ = std::numeric_limits< float >::max();
 
-    if ( depth < 5 )
+    if ( depth < max_path_depth_ )
     {
-        for ( std::size_t primitive_idx = 0; primitive_idx < num_primitives; primitive_idx++ )
-            if ( scene_.primitives_[primitive_idx]->intersect( ray, tmp_intersection_record ) )
+        for ( std::size_t primitive_id = 0; primitive_id < num_primitives; primitive_id++ )
+            if ( scene_.primitives_[primitive_id]->intersect( ray, tmp_intersection_record ) )
                 if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0f ) )
                     intersection_record = tmp_intersection_record;
 
         if ( intersection_record.t_ < std::numeric_limits< float >::max() )
         {
-            // flips the normal in the case of a backface in two sided rendering
+            // flip the normal in the case of a 'backface' in two sided rendering
             if ( glm::dot( intersection_record.normal_, -ray.direction_ ) < 0.0f )
                 intersection_record.normal_ = -intersection_record.normal_;
            
-            glm::vec3 new_dir = intersection_record.material_.bxdf_.getNewDirection( intersection_record.normal_, rng_ );
+            glm::vec3 new_dir = intersection_record.material_->bxdf_.getNewDirection( intersection_record.normal_, rng_ );
 
             Ray new_ray{ intersection_record.position_ + new_dir * 0.001f, new_dir };
 
-            spectrum = intersection_record.material_.emitted_ + intersection_record.material_.bxdf_.radiance_  *
-                                                                integrate_recursive( new_ray, ++depth ) *
-                                                                glm::dot( intersection_record.normal_, new_ray.direction_ ) * 2.0f;
+            spectrum = intersection_record.material_->emitted_ + 2.0f *
+                                                                 intersection_record.material_->bxdf_.radiance_  *
+                                                                 integrate_recursive( new_ray, ++depth ) *
+                                                                 glm::dot( intersection_record.normal_, new_ray.direction_ );
         }
         else
             spectrum = background_color_;
@@ -122,13 +123,5 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
         spectrum = background_color_;
 
     return spectrum;
-}
-
-void PathTracer::printInfo( void ) const
-{
-    std::clog << "PathTracer Renderer Information" << std::endl;
-    std::clog << "--------------------------------" << std::endl;
-
-    Integrator::printInfo();
 }
 

@@ -10,109 +10,14 @@
 Scene::Scene( void )
 { }
 
-void Scene::load ( void )
+void Scene::pushPrimitive( Primitive *primitive )
 {
-    float s = 2.0f;
-   
-    materials_.push_back( Material{ Lambertian{ glm::vec3{ 0.75f, 0.75f, 0.75f } }, glm::vec3{ 0.0f, 0.0f, 0.0f } } );
+    primitives_.push_back( primitive_ptr( primitive ) );
+}
 
-    // back wall
-    glm::vec3 a{-s, -s, -s };
-    glm::vec3 b{ s, -s, -s };
-    glm::vec3 c{ s,  s, -s };
-    primitives_.push_back( primitive_ptr( new Triangle{ a, b, c, materials_.back() } ) );
-
-    glm::vec3 f{ s,  s, -s };
-    glm::vec3 d{-s,  s, -s };
-    glm::vec3 e{-s, -s, -s };
-    primitives_.push_back( primitive_ptr( new Triangle{ d, e, f, materials_.back() } ) );
-
-    // top
-    glm::vec3 g{ s, s, -s };
-    glm::vec3 h{-s, s, -s };
-    glm::vec3 i{ s, s,  s };
-    primitives_.push_back( primitive_ptr( new Triangle{ g, i, h, materials_.back() } ) );
-
-    glm::vec3 j{-s, s, -s };
-    glm::vec3 k{ s, s,  s };
-    glm::vec3 l{-s, s,  s };
-    primitives_.push_back( primitive_ptr( new Triangle{ j, k, l, materials_.back() } ) );
-
-    // bottom
-    glm::vec3 g1{ s, -s, -s };
-    glm::vec3 h1{-s, -s, -s };
-    glm::vec3 i1{ s, -s,  s };
-    primitives_.push_back( primitive_ptr( new Triangle{ g1, h1, i1, materials_.back() } ) );
-
-    glm::vec3 j1{-s, -s, -s };
-    glm::vec3 k1{ s, -s,  s };
-    glm::vec3 l1{-s, -s,  s };
-    primitives_.push_back( primitive_ptr( new Triangle{ j1, l1, k1, materials_.back() } ) );
-
-    // left wall
-    materials_.push_back( Material{ Lambertian{ glm::vec3{ 0.75f, 0.25f, 0.25f } }, glm::vec3{ 0.0f, 0.0f, 0.0f } } );
-    glm::vec3 m{-s,  s, -s };
-    glm::vec3 n{-s,  s,  s };
-    glm::vec3 o{-s, -s, -s };
-    primitives_.push_back( primitive_ptr( new Triangle{ m, n, o, materials_.back() } ) );
-
-    glm::vec3 p{-s, -s, -s };
-    glm::vec3 q{-s,  s,  s };
-    glm::vec3 r{-s, -s,  s };
-    primitives_.push_back( primitive_ptr( new Triangle{ p, q, r, materials_.back() } ) );
-
-    // right wall
-    materials_.push_back( Material{ Lambertian{ glm::vec3{ 0.25f, 0.25f, 0.75f } }, glm::vec3{ 0.0f, 0.0f, 0.0f } } );
-    glm::vec3 m1{ s,  s, -s };
-    glm::vec3 n1{ s,  s,  s };
-    glm::vec3 o1{ s, -s, -s };
-    primitives_.push_back( primitive_ptr( new Triangle{ m1, o1, n1, materials_.back() } ) );
-
-    glm::vec3 p1{ s, -s, -s };
-    glm::vec3 q1{ s,  s,  s };
-    glm::vec3 r1{ s, -s,  s };
-    primitives_.push_back( primitive_ptr( new Triangle{ p1, r1, q1, materials_.back() } ) );
-
-    // area light
-    float ls = 0.5f;
-    materials_.push_back( Material{ Lambertian{ glm::vec3{ 0.0f, 0.0f, 0.0f } }, glm::vec3{ 17.0f, 17.0f, 17.0f } } );
-    glm::vec3 t{ ls, s - 0.001f, -ls };
-    glm::vec3 u{-ls, s - 0.001f, -ls };
-    glm::vec3 v{ ls, s - 0.001f,  ls };
-    primitives_.push_back( primitive_ptr( new Triangle{ t, v, u, materials_.back() } ) );
-
-    glm::vec3 t1{-ls, s - 0.001f, -ls };
-    glm::vec3 u1{ ls, s - 0.001f,  ls };
-    glm::vec3 v1{-ls, s - 0.001f,  ls };
-    primitives_.push_back( primitive_ptr( new Triangle{ t1, u1, v1, materials_.back() } ) );
-
-    /*
-    s = 0.75f;
-
-    materials_.push_back( Material{ Lambertian{ glm::vec3{ 0.0f, 0.75f, 0.0f } }, glm::vec3{ 0.0f, 0.0f, 0.0f } } ); // Dummy material
-
-    // front    
-    glm::vec3 au{-s, -s+.5, -0.50f };
-    glm::vec3 bu{ s, -s+.5, -0.50f };
-    glm::vec3 cu{ s,  s+.5, -0.50f };
-    primitives_.push_back( primitive_ptr( new Triangle{ au, bu, cu, materials_.back() } ) );
-
-    glm::vec3 fu{ s,  s+.5, -0.50 };
-    glm::vec3 du{-s,  s+.5, -0.50 };
-    glm::vec3 eu{-s, -s+.5, -0.50 };
-    primitives_.push_back( primitive_ptr( new Triangle{ du, eu, fu, materials_.back() } ) );
-    
-    // back
-    glm::vec3 a1u{-s, -s+.5, -1.5f };
-    glm::vec3 b1u{ s, -s+.5, -1.5f };
-    glm::vec3 c1u{ s,  s+.5, -1.5f };
-    primitives_.push_back( primitive_ptr( new Triangle{ a1u, c1u, b1u, materials_.back() } ) );
-
-    glm::vec3 f1u{ s,  s+.5, -1.5 };
-    glm::vec3 d1u{-s,  s+.5, -1.5 };
-    glm::vec3 e1u{-s, -s+.5, -1.5 };
-    primitives_.push_back( primitive_ptr( new Triangle{ d1u, f1u, e1u, materials_.back() } ) );
-    //*/
+void Scene::pushMaterial( const Material *material )
+{
+    materials_.push_back( *material );
 }
 
 // TODO: fix this to properly unwind function calls in the case of errors.
@@ -191,8 +96,6 @@ int Scene::loadFromFile( const std::string &file_name, glm::vec3 &min, glm::vec3
             }
         }
     }
-
-    load();
 
     return EXIT_SUCCESS;
 }

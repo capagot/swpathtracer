@@ -15,6 +15,8 @@ class OrthographicCamera : public Camera
 {
 public:
 
+    OrthographicCamera( void );
+
     OrthographicCamera( const float min_x,
                         const float max_x,
                         const float min_y,
@@ -26,8 +28,6 @@ public:
     Ray getWorldSpaceRay( const glm::vec2 &sample_coord ) const;
 
     void printInfo( void ) const;
-
-private:
 
     float min_x_;
 

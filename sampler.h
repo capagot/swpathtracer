@@ -23,7 +23,9 @@ public:
             samples_.push_back( std::vector< glm::vec2 >() );
     }
 
-    //virtual void generateSamplesCoords( const glm::vec2 &pixel_coord ) = 0;
+    virtual ~Sampler( void )
+    { };
+
     virtual void generateSamplesCoords( void ) = 0;
 
     glm::vec2 operator[]( std::size_t i ) const
@@ -58,7 +60,9 @@ public:
             samples_[thread_count].resize( spp_ );
     }
 
-    //void generateSamplesCoords( const glm::vec2 &pixel_coord )
+    ~UniformSampler( void )
+    { }
+
     void generateSamplesCoords( void )
     {
         int thread_id = omp_get_thread_num();
@@ -90,7 +94,9 @@ public:
             samples_[thread_count].resize( spp_ );
     }
 
-    //void generateSamplesCoords( const glm::vec2 &pixel_coord )
+    ~RegularSampler( void )
+    { }
+
     void generateSamplesCoords( void )
     {
         int thread_id = omp_get_thread_num();
@@ -133,7 +139,9 @@ public:
             samples_[thread_count].resize( spp_ );
     }
 
-    //void generateSamplesCoords( const glm::vec2 &pixel_coord )
+    ~JitteredSampler( void )
+    { }
+
     void generateSamplesCoords( void )
     {
         int thread_id = omp_get_thread_num();
@@ -158,4 +166,3 @@ private:
 };
 
 #endif /* SAMPLER_H_ */
-

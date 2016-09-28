@@ -15,6 +15,8 @@ class PerspectiveCamera : public Camera
 {
 public:
 
+    PerspectiveCamera( void );
+
     PerspectiveCamera( const glm::vec3 &position,
                        const glm::vec3 &up_vector,
                        const glm::vec3 &look_at,

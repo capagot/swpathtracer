@@ -7,6 +7,9 @@
 
 #include "orthographic_camera.h"
 
+OrthographicCamera::OrthographicCamera( void )
+{ }
+
 OrthographicCamera::OrthographicCamera( const float min_x,
                                         const float max_x,
                                         const float min_y,
@@ -32,7 +35,8 @@ Ray OrthographicCamera::getWorldSpaceRay( const glm::vec2 &sample_coord ) const
                       -( ( 1.0f - alpha_y ) * min_y_ + alpha_y * max_y_ ),
                        0.0f };
 
-    return Ray{ onb_.m_ * origin + position_, glm::normalize( onb_.m_* glm::vec3{ 0.0f, 0.0f, -1.0f } ) };
+    //return Ray{ onb_.m_ * origin + position_, glm::normalize( onb_.m_* glm::vec3{ 0.0f, 0.0f, -1.0f } ) };
+    return Ray{ onb_.getBasisMatrix() * origin + position_, glm::normalize( onb_.getBasisMatrix()* glm::vec3{ 0.0f, 0.0f, -1.0f } ) };
 }
 
 void OrthographicCamera::printInfo( void ) const

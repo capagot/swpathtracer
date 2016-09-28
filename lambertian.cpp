@@ -8,7 +8,7 @@ Lambertian::Lambertian( const glm::vec3 &radiance ) :
 { }
 
 glm::vec3 Lambertian::getNewDirection( const glm::vec3 &normal,
-                                       RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
+                                       RNG< std::uniform_real_distribution, float, std::mt19937 > &rng ) const
 {
     ONB onb;
 
@@ -29,5 +29,6 @@ glm::vec3 Lambertian::getNewDirection( const glm::vec3 &normal,
 
     // Transforms the 'dir' vector from the local tangential space into the space
     // where the local space is defined.
-    return onb.m_ * dir;
+    //return onb.m_ * dir;
+    return onb.getBasisMatrix() * dir;
 }

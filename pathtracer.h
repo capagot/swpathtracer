@@ -30,11 +30,10 @@ public:
 
     void integrate( void );
 
-    void printInfo( void ) const;
-
 private:
 
-    glm::vec3 integrate_recursive( const Ray &ray, int depth );
+    glm::vec3 integrate_recursive( const Ray &ray,
+                                   unsigned int depth );
 
     RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
 

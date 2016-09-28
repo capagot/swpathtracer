@@ -24,7 +24,12 @@ public:
     // Sets up an ONB from the normalized input vectors 'u' and 'w', that will be assumed to be aligned to
     // the vectors 'u' (up) and 'w' vectors of the ONB to be created.
     void setFromUW( const glm::vec3 &u,
-                      const glm::vec3 &w );
+                    const glm::vec3 &w );
+
+    glm::mat3x3 getBasisMatrix( void ) const
+    {
+        return m_;
+    }
 
     // The default ONB is the standard orthonormal basis.
     glm::vec3 u_ = { 1.0f, 0.0f, 0.0f };
@@ -33,14 +38,14 @@ public:
 
     glm::vec3 w_ = { 0.0f, 0.0f, 1.0f };
 
-    // The 'm_' matrix transforms a vector from the ONB to the "external" space (i.e. the space into which the ONB is defined).
-    // Also, 'm_' helps to keep the code shorter by avoiding the explicit use of dot products in the case of a change of basis.
-    glm::mat3x3 m_;
-
 private:
 
     // Builds 'm_' from 'u_', 'v_' and 'w_'.
     void setBasisMatrix( void );
+
+    // The 'm_' matrix transforms a vector from the ONB to the "external" space (i.e. the space into which the ONB is defined).
+    // Also, 'm_' helps to keep the code shorter by avoiding the explicit use of dot products in the case of a change of basis.
+    glm::mat3x3 m_;
 
 };
 

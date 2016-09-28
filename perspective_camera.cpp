@@ -9,6 +9,9 @@
 
 const float PerspectiveCamera::kDegreesToRadians_ = M_PI / 180.0f;
 
+PerspectiveCamera::PerspectiveCamera( void )
+{ }
+
 PerspectiveCamera::PerspectiveCamera( const glm::vec3 &position,
                                       const glm::vec3 &up_vector,
                                       const glm::vec3 &look_at,
@@ -27,7 +30,8 @@ Ray PerspectiveCamera::getWorldSpaceRay( const glm::vec2 &sample_coord ) const
                              -sample_coord.y * tan ( fov_degrees_ * 0.5f * PerspectiveCamera::kDegreesToRadians_ ),
                              -1.0f };
 
-    return Ray{ position_, glm::normalize( onb_.m_ * ray_local_dir ) };
+    //return Ray{ position_, glm::normalize( onb_.m_ * ray_local_dir ) };
+    return Ray{ position_, glm::normalize( onb_.getBasisMatrix() * ray_local_dir ) };
 }
 
 void PerspectiveCamera::printInfo( void ) const

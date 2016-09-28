@@ -9,15 +9,16 @@ class Primitive
 {
 public:
 
-    Primitive( const Material &material ) :
-        material_( material )
-    { }
+    Primitive( void );
+
+    Primitive( const Material *material );
+
+    virtual ~Primitive( void );
 
     virtual bool intersect( const Ray &ray,
                             IntersectionRecord &intersection_record ) = 0;
 
-    const Material &material_;
+    const Material *material_ = nullptr;
 };
 
 #endif /* PRIMITIVE_H_ */
-
