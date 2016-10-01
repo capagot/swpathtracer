@@ -1,10 +1,3 @@
-/*
- * scene.cpp
- *
- *  Created on: May 14, 2016
- *      Author: christian
- */
-
 #include "scene.h"
 
 Scene::Scene( void )
@@ -20,9 +13,10 @@ void Scene::pushMaterial( const Material *material )
     materials_.push_back( *material );
 }
 
-// TODO: fix this to properly unwind function calls in the case of errors.
-//       Actually, this has to be made for the entire program.
-int Scene::loadFromFile( const std::string &file_name, glm::vec3 &min, glm::vec3 &max )
+int Scene::loadMesh( const std::string &file_name,
+                     const Material &material,
+                     glm::vec3 &min,
+                     glm::vec3 &max )
 {
     // TODO: would Assimp handle file reading ??
     std::ifstream fin( file_name.c_str() );
@@ -52,7 +46,7 @@ int Scene::loadFromFile( const std::string &file_name, glm::vec3 &min, glm::vec3
 
     if( assimp_scene_->HasMeshes() )
     {
-        materials_.push_back( Material{ Lambertian{ glm::vec3{ 0.75f, 0.75f, 0.75f } }, glm::vec3{ 0.0f, 0.0f, 0.0f } } ); // Dummy material
+        materials_.push_back( material );
 
         for( unsigned int mesh_id = 0; mesh_id < assimp_scene_->mNumMeshes; mesh_id++ )
         {
@@ -62,7 +56,7 @@ int Scene::loadFromFile( const std::string &file_name, glm::vec3 &min, glm::vec3
             {
                 const aiVector3D *vertex_ptr = &mesh_ptr->mVertices[vertex_id];
 
-                // computes the model's aabb
+                // Compute the mesh's aabb min and max vertices.
                 if ( vertex_id == 0 )
                 {
                     min.x = std::min( std::min( vertex_ptr[0].x, vertex_ptr[1].x ), vertex_ptr[2].x );
@@ -84,15 +78,11 @@ int Scene::loadFromFile( const std::string &file_name, glm::vec3 &min, glm::vec3
                     max.z = std::max( std::max( std::max( vertex_ptr[0].z, vertex_ptr[1].z ), vertex_ptr[2].z ), max.z );
                 }
 
-                //glm::vec3 a{ vertex_ptr[0].x -0.75f, vertex_ptr[0].y - 2.0f, vertex_ptr[0].z - 0.25f };
-                //glm::vec3 b{ vertex_ptr[1].x -0.75f, vertex_ptr[1].y - 2.0f, vertex_ptr[1].z - 0.25f };
-                //glm::vec3 c{ vertex_ptr[2].x -0.75f, vertex_ptr[2].y - 2.0f, vertex_ptr[2].z - 0.25f };
+                glm::vec3 a{ vertex_ptr[0].x, vertex_ptr[0].y, vertex_ptr[0].z };
+                glm::vec3 b{ vertex_ptr[1].x, vertex_ptr[1].y, vertex_ptr[1].z };
+                glm::vec3 c{ vertex_ptr[2].x, vertex_ptr[2].y, vertex_ptr[2].z };
 
-                glm::vec3 a{ vertex_ptr[0].x, vertex_ptr[0].y, vertex_ptr[0].z - 0.75f };
-                glm::vec3 b{ vertex_ptr[1].x, vertex_ptr[1].y, vertex_ptr[1].z - 0.75f };
-                glm::vec3 c{ vertex_ptr[2].x, vertex_ptr[2].y, vertex_ptr[2].z - 0.75f };
-
-                //primitives_.push_back( primitive_ptr( new Triangle{ a, b, c, materials_.back() } ) );
+                primitives_.push_back( primitive_ptr( new Triangle{ a, b, c, &( materials_.back() ) } ) );
             }
         }
     }
@@ -100,10 +90,12 @@ int Scene::loadFromFile( const std::string &file_name, glm::vec3 &min, glm::vec3
     return EXIT_SUCCESS;
 }
 
-void Scene::printInfo( void )
+void Scene::printInfo( void ) const
 {
-    std::clog << "Scene Information" << std::endl;
-    std::clog << "-----------------" << std::endl;
-    std::clog << " number of primitives ..........: " << primitives_.size() << std::endl;
+    std::cout << "Scene: " << std::endl;
+    std::cout << "-------------------------------------------------------------------------------" << std::endl;
+    std::cout << "  # of primitives ..................: " << primitives_.size() << std::endl;
+    std::cout << "  # of materials ...................: " << materials_.size() << std::endl;
+    std::cout << "  acceleration structures ..........: none" << std::endl;
 }
 

@@ -7,13 +7,13 @@ LuaBind::LuaBind( const std::string &filename )
 
     if( luaL_loadfile( lua_state_, filename.c_str() ) )
     {
-        std::cerr << "Error loading lua script... exiting...\n";
+        std::cerr << "Lua load ERROR: [" <<  lua_state_ << "] " << lua_tostring( lua_state_, -1 ) << std::endl;
         exit( EXIT_FAILURE );
     }
 
     if( lua_pcall( lua_state_, 0, 0, 0 ) )
     {
-        std::cerr << "Error executing lua script... exiting...\n";
+        std::cerr << "Lua execution ERROR: [" <<  lua_state_ << "] " << lua_tostring( lua_state_, -1 ) << std::endl;
         exit( EXIT_FAILURE );
     }
 }
@@ -30,6 +30,7 @@ void LuaBind::loadFromScript( Camera **camera,
                               Buffer **rendering_buffer,
                               glm::vec3 &background_color,
                               std::size_t &max_path_depth,
+                              std::string &output_filename,
                               RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
 {
     lua_getglobal( lua_state_, "user variables" );
@@ -39,6 +40,7 @@ void LuaBind::loadFromScript( Camera **camera,
                  rendering_buffer,
                  background_color,
                  max_path_depth,
+                 output_filename,
                  rng );
     lua_pop( lua_state_, 1 );
 }
@@ -91,10 +93,12 @@ void LuaBind::getBuffer( Buffer **rendering_buffer )
 }
 
 void LuaBind::getGlobals( glm::vec3 &background_color,
-                          std::size_t &max_path_depth )
+                          std::size_t &max_path_depth,
+                          std::string &output_filename )
 {
     background_color = parseVec3( "background_color" );
     max_path_depth = parseScalar( "max_path_depth" );
+    output_filename = parseString( "output_filename" );
 }
 
 void LuaBind::getTriangle( Scene *scene )
@@ -108,27 +112,52 @@ void LuaBind::getTriangle( Scene *scene )
     scene->primitives_.push_back( Scene::primitive_ptr( new Triangle{ v[0], v[1], v[2], &(scene->materials_.back()) } ) );
 }
 
+void LuaBind::getSphere( Scene *scene )
+{
+    glm::vec3 center = parseVec3( "center" );
+    float radius = parseScalar( "radius" );
+    glm::vec3 color = parseVec3( "color" );
+    glm::vec3 emission = parseVec3( "emission" );
+    scene->materials_.push_back( Material{ Lambertian{ color }, emission } );
+    scene->primitives_.push_back( Scene::primitive_ptr( new Sphere{ center, radius, &(scene->materials_.back()) } ) );
+}
+
+void LuaBind::getMesh( Scene *scene )
+{
+    std::string filename = parseString( "filename" );
+    glm::vec3 color = parseVec3( "color" );
+    glm::vec3 emission = parseVec3( "emission" );
+    glm::vec3 min_aabb;
+    glm::vec3 max_aabb;
+
+    scene->loadMesh( filename,
+                     Material{ Lambertian{ color }, emission },
+                     min_aabb,
+                     max_aabb );
+}
+
 void LuaBind::getElements( Camera **camera,
                            Sampler **sampler,
                            Scene *scene,
                            Buffer **rendering_buffer,
                            glm::vec3 &background_color,
                            std::size_t &max_path_depth,
+                           std::string &output_filename,
                            RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
 {
-    lua_pushnil( lua_state_ );                                   // [0, 1]
+    lua_pushnil( lua_state_ );                                   // [pop 0, push 1]
 
-    while( lua_next( lua_state_, -2 ) )                          // [-1, 0|2]
+    while( lua_next( lua_state_, -2 ) )                          // [pop 1, push 0|2]
     {
         if( lua_istable( lua_state_, -1) )
         {
-            lua_pushstring( lua_state_, "object_type" );                // [-1, 0]
-            lua_gettable( lua_state_, -2 );                      // [-1, 1]
+            lua_pushstring( lua_state_, "object_type" );         // [pop 1, push 0]
+            lua_gettable( lua_state_, -2 );                      // [pop 1, push 1]
             if( lua_isstring( lua_state_, -1) )
             {
                 std::string object_type = lua_tostring( lua_state_, -1 );
 
-                lua_pop( lua_state_, 1 );                        // [-1, 0]
+                lua_pop( lua_state_, 1 );                        // [pop 1, push 0]
 
                 if( object_type == "camera" )
                     getCamera( camera );
@@ -138,11 +167,14 @@ void LuaBind::getElements( Camera **camera,
                     getBuffer( rendering_buffer );
                 if( object_type == "globals" )
                     getGlobals( background_color,
-                                max_path_depth );
+                                max_path_depth,
+                                output_filename );
                 if( object_type == "triangle" )
                     getTriangle( scene );
+                if( object_type == "sphere" )
+                    getSphere( scene );
                 if( object_type == "mesh" )
-                    std::clog << "m\n";
+                    getMesh( scene );
                 if( object_type == "union" )
                     getElements( camera,
                                  sampler,
@@ -150,15 +182,16 @@ void LuaBind::getElements( Camera **camera,
                                  rendering_buffer,
                                  background_color,
                                  max_path_depth,
+                                 output_filename,
                                  rng );
 
-                lua_pushnil( lua_state_ );
+                lua_pushnil( lua_state_ );                      // [pop 0, push 1]
             }
 
-            lua_pop( lua_state_, 1 );
+            lua_pop( lua_state_, 1 );                           // [pop 1, push 0]
         }
 
-        lua_pop( lua_state_, 1 );
+        lua_pop( lua_state_, 1 );                               // [pop 1, push 0]
     }
 }
 
@@ -219,7 +252,9 @@ void LuaBind::parseVertices( const std::string &s,
             v[i][j] = lua_tonumber( lua_state_, -1 );
             lua_pop( lua_state_, 1 );
         }
+
         lua_pop( lua_state_, 2 );
     }
+
     lua_pop( lua_state_, 2 );
 }

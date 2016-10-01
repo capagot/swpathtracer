@@ -1,10 +1,3 @@
-/*
- * buffer.cpp
- *
- *  Created on: Apr 22, 2016
- *      Author: christian
- */
-
 #include "buffer.h"
 
 Buffer::Buffer( unsigned int h_resolution,
@@ -24,23 +17,9 @@ Buffer::Buffer( unsigned int h_resolution,
 Buffer::~Buffer( void )
 { }
 
-void Buffer::printInfo( void ) const
-{
-    std::clog << "Rendering Buffer Information" << std::endl;
-    std::clog << "----------------------------" << std::endl;
-
-    std::clog << " h_resolution_ ..................: " << h_resolution_ << std::endl;
-    std::clog << " v_resolution_ ..................: " << v_resolution_ << std::endl;
-    std::clog << " spectrum_num_samples_ ..........: " << spectrum_num_samples_ << std::endl;
-
-    std::size_t buffer_byte_size = spectrum_num_samples_ * sizeof( float ) * h_resolution_ * v_resolution_;
-
-    std::clog << " buffer total byte size .........: " << buffer_byte_size << std::endl;
-}
-
 void Buffer::save( const std::string &filename ) const
 {
-    std::clog << "Buffer saving started... ";
+    std::clog << "\n\nBuffer saving started... ";
 
     std::ofstream rendering_file;
 
@@ -73,5 +52,27 @@ void Buffer::save( const std::string &filename ) const
     rendering_file.close();
 
     std::clog << "finished!\n";
+}
+
+void Buffer::printInfo( void ) const
+{
+    std::cout << "Buffer:" << std::endl;
+    std::cout << "-------------------------------------------------------------------------------" << std::endl;
+    std::cout << "  resolution .......................: " << h_resolution_ 
+                                              <<  " x " 
+                                              << v_resolution_ 
+                                              << " ( " << h_resolution_ * v_resolution_ << " ) pixels" << std::endl;
+    std::cout << "  pixel format .....................: RGB" << std::endl;
+    std::cout << "  color component representation ...: float" << std::endl;
+    std::cout << "  gamma compression factor .........: 1 / 2.2 ( ~" << std::fixed << std::setw( 4 ) 
+                                                                     << std::setprecision( 2 )
+                                                                     << 1.0f / 2.2f << " )" << std::endl;
+    std::size_t buffer_byte_size = spectrum_num_samples_ * sizeof( float ) * h_resolution_ * v_resolution_;
+    std::clog << "  total byte size ..................: " << buffer_byte_size << " bytes" 
+                                                          << " ( ~" 
+                                                          << std::fixed << std::setw( 6 )
+                                                          << std::setprecision( 2 )
+                                                          << buffer_byte_size / 1024.0f / 1024.0f << " MiB )"
+                                                          << std::endl;
 }
 

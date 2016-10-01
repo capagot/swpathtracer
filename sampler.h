@@ -39,7 +39,10 @@ public:
         return spp_;
     }
 
+    virtual void printInfo( void ) const = 0;
+
     std::size_t spp_;
+
     std::vector< std::vector< glm::vec2 > > samples_;
 };
 
@@ -68,6 +71,14 @@ public:
         int thread_id = omp_get_thread_num();
         for( unsigned int i = 0; i < spp_; i++ )
             samples_[thread_id][i] = glm::vec2{ rng_() - 0.5f, rng_() - 0.5f };
+    }
+
+    void printInfo( void ) const
+    {
+        std::cout << "Sampler: " << std::endl;
+        std::cout << "-------------------------------------------------------------------------------" << std::endl;
+        std::cout << "  type .............................: uniform" << std::endl;
+        std::cout << "  samples per pixel ................: " << samples_[0].size() << std::endl;
     }
 
 private:
@@ -109,6 +120,14 @@ public:
                                                     subpixel_y_count * subpixel_height_+ subpixel_half_height_ - 0.5f };
                 i++;
             }
+    }
+
+    void printInfo( void ) const
+    {
+        std::cout << "Sampler: " << std::endl;
+        std::cout << "-------------------------------------------------------------------------------" << std::endl;
+        std::cout << "  type .............................: regular" << std::endl;
+        std::cout << "  samples per pixel ................: " << samples_[0].size() << std::endl;
     }
 
 private:
@@ -156,6 +175,14 @@ public:
             }
     }
 
+    void printInfo( void ) const
+    {
+        std::cout << "Sampler: " << std::endl;
+        std::cout << "-------------------------------------------------------------------------------" << std::endl;
+        std::cout << "  type .............................: jittered" << std::endl;
+        std::cout << "  samples per pixel ................: " << samples_[0].size() << std::endl;
+    }
+
 private:
 
     RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
@@ -166,3 +193,4 @@ private:
 };
 
 #endif /* SAMPLER_H_ */
+

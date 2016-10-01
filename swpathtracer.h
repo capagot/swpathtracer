@@ -7,6 +7,7 @@
 #include "buffer.h"
 #include "pathtracer.h"
 #include "lua_bind.h"
+#include "cmdlineparser.h"
 
 #endif /* SWPATHTRACER_H_ */
 

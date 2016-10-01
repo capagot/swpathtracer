@@ -44,8 +44,6 @@ void OrthographicCamera::printInfo( void ) const
     std::clog << "Orthographic Camera Information" << std::endl;
     std::clog << "-------------------------------" << std::endl;
 
-    Camera::printInfo();
-
     std::clog << " [ min_x_ , max_x_ ] ...........: [" << min_x_ << ", " << max_x_ << "]" << std::endl;
     std::clog << " [ min_y_ , max_y_ ] ...........: [" << min_y_ << ", " << max_y_ << "]" << std::endl;
 }

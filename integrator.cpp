@@ -23,20 +23,4 @@ Integrator::Integrator( Camera &camera,
         buffer_( buffer )
 { }
 
-void Integrator::printInfo( void ) const
-{
-    std::clog << " max_path_depth_ ...............: " << max_path_depth_ << std::endl;
-
-    std::clog << " tracing_stop_criterion_ .......: ";
-
-    switch( tracing_stop_criterion_ )
-    {
-    case MAX_DEPTH:
-        std::clog << "MAX_DEPTH" << std::endl;
-        break;
-    case RUSSIAN_ROULETTE:
-        std::clog << "RUSSIAN_ROULETTE" << std::endl;
-        break;
-    }
-}
 

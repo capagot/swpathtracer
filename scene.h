@@ -1,10 +1,3 @@
-/*
- * scene.h
- *
- *  Created on: May 13, 2016
- *      Author: christian
- */
-
 #ifndef SCENE_H_
 #define SCENE_H_
 
@@ -19,6 +12,7 @@
 #include "assimp/postprocess.h"
 
 #include "triangle.h"
+#include "sphere.h"
 #include "lambertian.h"
 #include "material.h"
 
@@ -30,17 +24,21 @@ public:
 
     Scene( void );
 
-    int loadFromFile( const std::string &file_name, glm::vec3 &min_aabb, glm::vec3 &max_aabb );
-
     void pushPrimitive( Primitive *primitive );
 
     void pushMaterial( const Material *material );
 
-    void printInfo( void );
+    int loadMesh( const std::string &file_name,
+                  const Material &material,
+                  glm::vec3 &min_aabb,
+                  glm::vec3 &max_aabb );
+
+
+    void printInfo( void ) const;
 
     std::vector< primitive_ptr > primitives_;
 
-    // TODO: maybe I can use pointers here too.
+    // TODO: use pointers here too???
     std::list< Material > materials_;
 
 private:

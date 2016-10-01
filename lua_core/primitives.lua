@@ -8,11 +8,6 @@ function sphere( self )
     return self
 end
 
-function meshfile( self )
-    self.object_type = "meshfile"
-    return self
-end
-
 function union( self )
     self.object_type = "union"
     return self

@@ -1,10 +1,3 @@
-/*
- * integrator.h
- *
- *  Created on: May 13, 2016
- *      Author: christian
- */
-
 #ifndef INTEGRATOR_H_
 #define INTEGRATOR_H_
 
@@ -32,15 +25,11 @@ public:
                 Sampler &sampler,
                 Buffer &buffer );
 
-    virtual void integrate( void ) = 0;    // pure virtual member function. Will be implemented by each integrator.
-
-    //virtual glm::vec3 integrate_recursive( const Ray &ray, int depth ) = 0;
+    virtual void integrate( void ) = 0;
 
     unsigned int getMaxPathDepth( void ) const;
 
     TracingStoppingCriterion getTracingStopCriterion( void ) const;
-
-    void printInfo( void ) const;
 
 protected:
     const Camera &camera_;
@@ -59,4 +48,3 @@ protected:
 };
 
 #endif /* INTEGRATOR_H_ */
-

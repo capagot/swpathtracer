@@ -27,6 +27,7 @@ public:
                          Buffer **rendering_buffer,
                          glm::vec3 &background_color,
                          std::size_t &max_path_depth,
+                         std::string &output_filename,
                          RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
 
 private:
@@ -41,9 +42,14 @@ private:
     void getBuffer( Buffer **rendering_buffer );
 
     void getGlobals( glm::vec3 &background_color,
-                     std::size_t &max_path_depth );
+                     std::size_t &max_path_depth,
+                     std::string &output_filename );
 
     void getTriangle( Scene *scene );
+
+    void getSphere( Scene *scene );
+
+    void getMesh( Scene *scene );
 
     void getElements( Camera **camera,
                       Sampler **sampler,
@@ -51,6 +57,7 @@ private:
                       Buffer **rendering_buffer,
                       glm::vec3 &background_color,
                       std::size_t &max_path_depth,
+                      std::string &output_filename,
                       RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
 
     std::string parseString( const std::string &s_input );

@@ -1,14 +1,8 @@
-/*
- * buffer.h
- *
- *  Created on: Apr 22, 2016
- *      Author: christian
- */
-
 #ifndef BUFFER_H_
 #define BUFFER_H_
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <glm/glm.hpp>
@@ -23,9 +17,9 @@ public:
 
     ~Buffer( void );
 
-    void printInfo( void ) const;
-
     void save( const std::string &filename ) const;
+
+    void printInfo( void ) const;
 
     unsigned int h_resolution_ = 512;
 

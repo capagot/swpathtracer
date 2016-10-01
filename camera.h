@@ -1,14 +1,8 @@
-/*
- * camera.h
- *
- *  Created on: Apr 10, 2016
- *      Author: christian
- */
-
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
 #include <iostream>
+#include <iomanip>
 
 #include <glm/glm.hpp>
 #include "onb.h"
@@ -34,7 +28,7 @@ public:
 
     virtual Ray getWorldSpaceRay( const glm::vec2 &sample_coord ) const = 0;
 
-    void printInfo( void ) const;
+    virtual void printInfo( void ) const = 0;
 
 //private:
 

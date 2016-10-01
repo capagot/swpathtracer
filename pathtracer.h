@@ -1,10 +1,3 @@
-/*
- * pathtracer.h
- *
- *  Created on: Apr 24, 2016
- *      Author: christian
- */
-
 #ifndef PATHTRACER_H_
 #define PATHTRACER_H_
 
@@ -30,12 +23,23 @@ public:
 
     void integrate( void );
 
+    void printInfoPreRendering( void ) const;
+
+    void printInfoPostRendering( void ) const;
+
 private:
 
     glm::vec3 integrate_recursive( const Ray &ray,
-                                   unsigned int depth );
+                                   unsigned int depth,
+                                   int thread_id );
 
     RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
+
+    std::vector< unsigned long int > num_rays_{};
+
+    std::vector< unsigned long int > num_intersection_tests_{};
+
+    std::vector< unsigned long int > num_intersections_{};
 
 };
 

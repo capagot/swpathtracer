@@ -1,10 +1,3 @@
-/*
- * pathtracer.cpp
- *
- *  Created on: Apr 24, 2016
- *      Author: christian
- */
-
 #include "pathtracer.h"
 #include "timer.h"
 
@@ -24,10 +17,19 @@ PathTracer::PathTracer( Camera &camera,
                     sampler,
                     buffer },
         rng_( rng )
-{ }
+{
+    int num_threads = std::max( 1, omp_get_max_threads() );
+    for( int thread_id = 0; thread_id < num_threads; thread_id++ )
+    {
+        num_rays_.push_back( 0 );
+        num_intersection_tests_.push_back( 0 );
+        num_intersections_.push_back( 0 );
+    }
+}
 
 void PathTracer::integrate( void )
 {
+    // TODO: make t (time) a data member
     Timer t;
     t.start();
 
@@ -35,12 +37,13 @@ void PathTracer::integrate( void )
 
     for ( std::size_t y = 0; y < buffer_.v_resolution_; y++ )
     {
-        std::stringstream progress_stream;
-        progress_stream << "\rRendering ("
-                        << sampler_.size()
+        std::stringstream progress_stream;        
+        progress_stream << "\r  progress .........................: "
                         << std::fixed << std::setw( 6 ) << std::setprecision( 2 )
-                        << " spp) : " << 100.0f * y / ( buffer_.v_resolution_ - 1 )
+                        << 100.0f * y / ( buffer_.v_resolution_ - 1 )
                         << "%";
+
+        int thread_id = omp_get_thread_num();
 
         std::clog << progress_stream.str();
 
@@ -70,7 +73,7 @@ void PathTracer::integrate( void )
                 //buffer_.buffer_data_[x][y] += 0.5f * ( 1.0f + static_cast< float >( sin( ( xx * xx + yy * yy ) / 100.0f ) ) ); 
 
                 // Trace the ray path.
-                buffer_.buffer_data_[x][y] += integrate_recursive( ray, 0 );
+                buffer_.buffer_data_[x][y] += integrate_recursive( ray, 0, thread_id );
             }
 
             // Compute the average radiance that falls onto the pixel (x,y).
@@ -81,11 +84,12 @@ void PathTracer::integrate( void )
     std::clog << std::endl;
     
     t.stop();
-    std::clog << "Rendering time: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
+    std::clog << "  total rendering time .............: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
 }
 
 glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
-                                           unsigned int depth )
+                                           unsigned int depth,
+                                           int thread_id )
 {
     IntersectionRecord intersection_record;
     IntersectionRecord tmp_intersection_record;
@@ -96,10 +100,20 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
 
     if ( depth < max_path_depth_ )
     {
+        num_rays_[ thread_id ]++ ;
+
         for ( std::size_t primitive_id = 0; primitive_id < num_primitives; primitive_id++ )
+        {
+            num_intersection_tests_[ thread_id ]++;
+
             if ( scene_.primitives_[primitive_id]->intersect( ray, tmp_intersection_record ) )
+            {
+                num_intersections_[ thread_id ]++;
+
                 if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0f ) )
                     intersection_record = tmp_intersection_record;
+            }
+        }
 
         if ( intersection_record.t_ < std::numeric_limits< float >::max() )
         {
@@ -113,7 +127,7 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
 
             spectrum = intersection_record.material_->emitted_ + 2.0f *
                                                                  intersection_record.material_->bxdf_.radiance_  *
-                                                                 integrate_recursive( new_ray, ++depth ) *
+                                                                 integrate_recursive( new_ray, ++depth, thread_id ) *
                                                                  glm::dot( intersection_record.normal_, new_ray.direction_ );
         }
         else
@@ -125,3 +139,32 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
     return spectrum;
 }
 
+void PathTracer::printInfoPreRendering( void ) const
+{
+    std::cout << "  # of threads .....................: " << omp_get_max_threads() << std::endl;
+    std::cout << "  rendering algorithm ..............: brute force path tracing" << std::endl;
+}
+
+void PathTracer::printInfoPostRendering( void ) const
+{
+    unsigned long int num_rays = 0;
+    unsigned long int num_intersection_tests = 0;
+    unsigned long int num_intersections = 0;
+
+    for ( unsigned int thread_id = 0; thread_id < num_rays_.size(); thread_id++ )
+    {
+        num_rays += num_rays_[thread_id];
+        num_intersection_tests += num_intersection_tests_[thread_id];
+        num_intersections += num_intersections_[thread_id];
+    }
+
+    std::cout << "  total # of rays ..................: " << num_rays << std::endl;
+    std::cout << "  total # of intersection tests ....: " << num_intersection_tests << std::endl;
+    std::cout << "  total # of intersections .........: " << num_intersections
+                                                          << " ( ~"
+                                                          << std::fixed << std::setw( 6 )
+                                                          << std::setprecision( 2 )
+                                                          << static_cast< float >( num_intersections ) / num_intersection_tests * 100.0f
+                                                          << "% )"
+                                                          << std::endl;
+}

@@ -45,15 +45,3 @@ void Camera::setLookAt( const glm::vec3 &look_at )
     onb_.setFromUW( glm::normalize( glm::cross( up_, -direction_ ) ), -direction_ );
 }
 
-void Camera::printInfo( void ) const
-{
-    std::clog << " position_ .....................: [" << position_[0] << ", "
-                                                       << position_[1] << ", "
-                                                       << position_[2] << "]" << std::endl;
-    std::clog << " up_vector_ ....................: [" << up_[0] << ", "
-                                                       << up_[1] << ", "
-                                                       << up_[2] << "]" << std::endl;
-    std::clog << " direction_ ....................: [" << direction_[0] << ", "
-                                                       << direction_[1] << ", "
-                                                       << direction_[2] << "]" << std::endl;
-}

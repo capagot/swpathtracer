@@ -1,10 +1,3 @@
-/*
- * perspectivecamera.h
- *
- *  Created on: Apr 22, 2016
- *      Author: christian
- */
-
 #ifndef PERSPECTIVE_CAMERA_H_
 #define PERSPECTIVE_CAMERA_H_
 
