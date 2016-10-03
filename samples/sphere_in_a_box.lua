@@ -13,9 +13,22 @@ Camera = camera{
     fov      = 40
 }
 
+--[[
+Camera = camera{
+    type     = "orthographic",
+    position = { 0, 0, 8 },
+    up       = { 0, 1, 0 }, 
+    look_at  = { 0, 0, 0 },
+    minx   = -2, 
+    maxx   = 2, 
+    miny   = -2, 
+    maxy   = 2, 
+}
+--]]
+
 s = sampler{
     type = "jittered",
-    spp = 1600
+    spp = 200
 }
 
 b = buffer{
