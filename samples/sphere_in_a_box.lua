@@ -28,7 +28,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 200
+    spp = 20000
 }
 
 b = buffer{
