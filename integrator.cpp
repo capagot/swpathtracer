@@ -1,15 +1,8 @@
-/*
- * integrator.cpp
- *
- *  Created on: May 13, 2016
- *      Author: christian
- */
-
 #include "integrator.h"
 
 Integrator::Integrator( Camera &camera,
                         const Scene &scene,
-                        const glm::vec3 background_color,
+                        const glm::dvec3 background_color,
                         unsigned int max_path_depth,
                         TracingStoppingCriterion tracing_stop_criterion_,
                         Sampler &sampler,
@@ -22,5 +15,4 @@ Integrator::Integrator( Camera &camera,
         sampler_( sampler ),
         buffer_( buffer )
 { }
-
 

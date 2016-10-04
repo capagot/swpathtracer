@@ -1,10 +1,3 @@
-/*
- * sampler.h
- *
- *  Created on: Jul 5, 2016
- *      Author: christian
- */
-
 #ifndef SAMPLER_H_
 #define SAMPLER_H_
 
@@ -20,7 +13,7 @@ public:
     {
         int num_threads = std::max( 1, omp_get_max_threads() );
         for( int thread_count = 0; thread_count < num_threads; thread_count++ )
-            samples_.push_back( std::vector< glm::vec2 >() );
+            samples_.push_back( std::vector< glm::dvec2 >() );
     }
 
     virtual ~Sampler( void )
@@ -28,7 +21,7 @@ public:
 
     virtual void generateSamplesCoords( void ) = 0;
 
-    glm::vec2 operator[]( std::size_t i ) const
+    glm::dvec2 operator[]( std::size_t i ) const
     {
         int thread_id = omp_get_thread_num();
         return samples_[thread_id][i];
@@ -43,7 +36,7 @@ public:
 
     std::size_t spp_;
 
-    std::vector< std::vector< glm::vec2 > > samples_;
+    std::vector< std::vector< glm::dvec2 > > samples_;
 };
 
 // Generate a set of (x, y) samples uniformly distributed, such that x and y are in the interval [-1, +1).
@@ -54,7 +47,7 @@ public:
 
     // A separate sample storage buffer is instantiated for each thread, in order to avoid race condition
     // during the sample generation stage.
-    UniformSampler( RNG< std::uniform_real_distribution, float, std::mt19937 > &rng, std::size_t spp ) :
+    UniformSampler( RNG< std::uniform_real_distribution, double, std::mt19937 > &rng, std::size_t spp ) :
         rng_( rng )
     {
         spp_ = spp;
@@ -70,7 +63,7 @@ public:
     {
         int thread_id = omp_get_thread_num();
         for( unsigned int i = 0; i < spp_; i++ )
-            samples_[thread_id][i] = glm::vec2{ rng_() - 0.5f, rng_() - 0.5f };
+            samples_[thread_id][i] = glm::dvec2{ rng_() - 0.5, rng_() - 0.5 };
     }
 
     void printInfo( void ) const
@@ -83,7 +76,7 @@ public:
 
 private:
 
-    RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
+    RNG< std::uniform_real_distribution, double, std::mt19937 > rng_;
 };
 
 class RegularSampler : public Sampler
@@ -95,10 +88,10 @@ public:
         num_subpixels_x_ = static_cast< unsigned int >( ceil( sqrt( spp ) ) );
         num_subpixels_y_ = num_subpixels_x_;
         spp_ = num_subpixels_y_ * num_subpixels_x_;
-        subpixel_width_ = 1.0f / num_subpixels_x_;
-        subpixel_height_ = 1.0f / num_subpixels_y_;
-        subpixel_half_width_ = subpixel_width_ * 0.5f;
-        subpixel_half_height_ = subpixel_height_ * 0.5f;
+        subpixel_width_ = 1.0 / num_subpixels_x_;
+        subpixel_height_ = 1.0 / num_subpixels_y_;
+        subpixel_half_width_ = subpixel_width_ * 0.5;
+        subpixel_half_height_ = subpixel_height_ * 0.5;
 
         int num_threads = std::max( 1, omp_get_max_threads() );
         for( int thread_count = 0; thread_count < num_threads; thread_count++ )
@@ -116,8 +109,8 @@ public:
         for ( std::size_t subpixel_x_count = 0; subpixel_x_count < num_subpixels_x_ ; subpixel_x_count++ )
             for ( std::size_t subpixel_y_count = 0; subpixel_y_count < num_subpixels_y_ ; subpixel_y_count++ )
             {
-                samples_[thread_id][i] = glm::vec2{ subpixel_x_count * subpixel_width_+ subpixel_half_width_ - 0.5f,
-                                                    subpixel_y_count * subpixel_height_+ subpixel_half_height_ - 0.5f };
+                samples_[thread_id][i] = glm::dvec2{ subpixel_x_count * subpixel_width_+ subpixel_half_width_ - 0.5,
+                                                    subpixel_y_count * subpixel_height_+ subpixel_half_height_ - 0.5 };
                 i++;
             }
     }
@@ -134,24 +127,24 @@ private:
 
     std::size_t num_subpixels_x_;       // number of subpixels along x axis
     std::size_t num_subpixels_y_;       // number of subpixels along y axis
-    float subpixel_width_;              // width of the subpixel (1 / pixel_width)
-    float subpixel_height_;             // height of the subpixel (1 / pixel_height)
-    float subpixel_half_width_;         // ( width of the subpixel ) / 2
-    float subpixel_half_height_;        // ( height of the subpixel ) / 2
+    double subpixel_width_;              // width of the subpixel (1 / pixel_width)
+    double subpixel_height_;             // height of the subpixel (1 / pixel_height)
+    double subpixel_half_width_;         // ( width of the subpixel ) / 2
+    double subpixel_half_height_;        // ( height of the subpixel ) / 2
 };
 
 class JitteredSampler : public Sampler
 {
 public:
 
-    JitteredSampler( RNG< std::uniform_real_distribution, float, std::mt19937 > &rng, std::size_t spp ) :
+    JitteredSampler( RNG< std::uniform_real_distribution, double, std::mt19937 > &rng, std::size_t spp ) :
         rng_( rng )
     {
         num_subpixels_x_ = static_cast< unsigned int >( ceil( sqrt( spp ) ) );
         num_subpixels_y_ = num_subpixels_x_;
         spp_ = num_subpixels_y_ * num_subpixels_x_;
-        subpixel_width_ = 1.0f / num_subpixels_x_;
-        subpixel_height_ = 1.0f / num_subpixels_y_;
+        subpixel_width_ = 1.0 / num_subpixels_x_;
+        subpixel_height_ = 1.0 / num_subpixels_y_;
 
         int num_threads = std::max( 1, omp_get_max_threads() );
         for( int thread_count = 0; thread_count < num_threads; thread_count++ )
@@ -169,8 +162,8 @@ public:
         for ( std::size_t subpixel_x_count = 0; subpixel_x_count < num_subpixels_x_ ; subpixel_x_count++ )
             for ( std::size_t subpixel_y_count = 0; subpixel_y_count < num_subpixels_y_ ; subpixel_y_count++ )
             {
-                samples_[thread_id][i] = glm::vec2{ subpixel_x_count * subpixel_width_+ subpixel_width_ * rng_() - 0.5f ,
-                                                    subpixel_y_count * subpixel_height_ + subpixel_height_ * rng_() - 0.5f };
+                samples_[thread_id][i] = glm::dvec2{ subpixel_x_count * subpixel_width_+ subpixel_width_ * rng_() - 0.5,
+                                                    subpixel_y_count * subpixel_height_ + subpixel_height_ * rng_() - 0.5 };
                 i++;
             }
     }
@@ -185,11 +178,11 @@ public:
 
 private:
 
-    RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
+    RNG< std::uniform_real_distribution, double, std::mt19937 > rng_;
     std::size_t num_subpixels_x_;       // number of subpixels along x axis
     std::size_t num_subpixels_y_;       // number of subpixels along y axis
-    float subpixel_width_;              // width of the subpixel (1 / pixel_width)
-    float subpixel_height_;             // height of the subpixel (1 / pixel_height)
+    double subpixel_width_;              // width of the subpixel (1 / pixel_width)
+    double subpixel_height_;             // height of the subpixel (1 / pixel_height)
 };
 
 #endif /* SAMPLER_H_ */

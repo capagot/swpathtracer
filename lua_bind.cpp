@@ -28,10 +28,10 @@ void LuaBind::loadFromScript( Camera **camera,
                               Sampler **sampler,
                               Scene *scene,
                               Buffer **rendering_buffer,
-                              glm::vec3 &background_color,
+                              glm::dvec3 &background_color,
                               std::size_t &max_path_depth,
                               std::string &output_filename,
-                              RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
+                              RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     lua_getglobal( lua_state_, "user variables" );
     getElements( camera,
@@ -71,7 +71,7 @@ void LuaBind::getCamera( Camera **camera )
 }
 
 void LuaBind::getSampler( Sampler **sampler,
-                          RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
+                          RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     std::size_t spp = parseScalar( "spp" );
 
@@ -92,7 +92,7 @@ void LuaBind::getBuffer( Buffer **rendering_buffer )
     (*rendering_buffer) = new Buffer( h_res, v_res, 3 );
 }
 
-void LuaBind::getGlobals( glm::vec3 &background_color,
+void LuaBind::getGlobals( glm::dvec3 &background_color,
                           std::size_t &max_path_depth,
                           std::string &output_filename )
 {
@@ -103,21 +103,21 @@ void LuaBind::getGlobals( glm::vec3 &background_color,
 
 void LuaBind::getTriangle( Scene *scene )
 {
-    glm::vec3 v[3];
+    glm::dvec3 v[3];
 
     parseVertices( "vertices", v );
-    glm::vec3 color = parseVec3( "color" );
-    glm::vec3 emission = parseVec3( "emission" );
+    glm::dvec3 color = parseVec3( "color" );
+    glm::dvec3 emission = parseVec3( "emission" );
     scene->materials_.push_back( Material{ Lambertian{ color }, emission } );
     scene->primitives_.push_back( Scene::primitive_ptr( new Triangle{ v[0], v[1], v[2], &(scene->materials_.back()) } ) );
 }
 
 void LuaBind::getSphere( Scene *scene )
 {
-    glm::vec3 center = parseVec3( "center" );
-    float radius = parseScalar( "radius" );
-    glm::vec3 color = parseVec3( "color" );
-    glm::vec3 emission = parseVec3( "emission" );
+    glm::dvec3 center = parseVec3( "center" );
+    double radius = parseScalar( "radius" );
+    glm::dvec3 color = parseVec3( "color" );
+    glm::dvec3 emission = parseVec3( "emission" );
     scene->materials_.push_back( Material{ Lambertian{ color }, emission } );
     scene->primitives_.push_back( Scene::primitive_ptr( new Sphere{ center, radius, &(scene->materials_.back()) } ) );
 }
@@ -125,10 +125,10 @@ void LuaBind::getSphere( Scene *scene )
 void LuaBind::getMesh( Scene *scene )
 {
     std::string filename = parseString( "filename" );
-    glm::vec3 color = parseVec3( "color" );
-    glm::vec3 emission = parseVec3( "emission" );
-    glm::vec3 min_aabb;
-    glm::vec3 max_aabb;
+    glm::dvec3 color = parseVec3( "color" );
+    glm::dvec3 emission = parseVec3( "emission" );
+    glm::dvec3 min_aabb;
+    glm::dvec3 max_aabb;
 
     scene->loadMesh( filename,
                      Material{ Lambertian{ color }, emission },
@@ -140,10 +140,10 @@ void LuaBind::getElements( Camera **camera,
                            Sampler **sampler,
                            Scene *scene,
                            Buffer **rendering_buffer,
-                           glm::vec3 &background_color,
+                           glm::dvec3 &background_color,
                            std::size_t &max_path_depth,
                            std::string &output_filename,
-                           RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
+                           RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     lua_pushnil( lua_state_ );                                   // [pop 0, push 1]
 
@@ -205,9 +205,9 @@ std::string LuaBind::parseString( const std::string &s_input )
     return s_output;
 }
 
-float LuaBind::parseScalar( const std::string &s )
+double LuaBind::parseScalar( const std::string &s )
 {
-    float v;
+    double v;
     lua_pushstring( lua_state_, s.c_str() );
     lua_gettable( lua_state_, -2 );
     v = lua_tonumber( lua_state_, -1 );
@@ -215,9 +215,9 @@ float LuaBind::parseScalar( const std::string &s )
     return v;
 }
 
-glm::vec3 LuaBind::parseVec3( const std::string &s )
+glm::dvec3 LuaBind::parseVec3( const std::string &s )
 {
-    glm::vec3 v;
+    glm::dvec3 v;
 
     lua_pushstring( lua_state_, s.c_str() );
     lua_gettable( lua_state_, -2 );
@@ -235,7 +235,7 @@ glm::vec3 LuaBind::parseVec3( const std::string &s )
 }
 
 void LuaBind::parseVertices( const std::string &s,
-                             glm::vec3 v[3] )
+                             glm::dvec3 v[3] )
 {
     lua_pushstring( lua_state_, s.c_str() );
     lua_gettable( lua_state_, -2 );
@@ -258,3 +258,4 @@ void LuaBind::parseVertices( const std::string &s,
 
     lua_pop( lua_state_, 2 );
 }
+

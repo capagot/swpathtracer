@@ -1,10 +1,3 @@
-/*
- * triangle.h
- *
- *  Created on: Apr 10, 2016
- *      Author: christian
- */
-
 #ifndef TRIANGLE_H_
 #define TRIANGLE_H_
 
@@ -18,31 +11,32 @@ public:
 
     Triangle( void );
 
-    Triangle( const glm::vec3 &v0,
-              const glm::vec3 &v1,
-              const glm::vec3 &v2,             
+    Triangle( const glm::dvec3 &v0,
+              const glm::dvec3 &v1,
+              const glm::dvec3 &v2,             
               const Material *material );
 
-    Triangle( const glm::vec3 &v0,
-              const glm::vec3 &v1,
-              const glm::vec3 &v2,
-              const glm::vec3 &normal,
+    Triangle( const glm::dvec3 &v0,
+              const glm::dvec3 &v1,
+              const glm::dvec3 &v2,
+              const glm::dvec3 &normal,
               const Material *material );
 
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );
 
-    glm::vec3 v0_ = { 0.0f, 0.0f, 0.0f };
+    glm::dvec3 v0_ = { 0.0, 0.0, 0.0 };
 
-    glm::vec3 v1_ = { 1.0f, 0.0f, 0.0f };
+    glm::dvec3 v1_ = { 1.0, 0.0, 0.0 };
 
-    glm::vec3 v2_ = { 0.0f, 1.0f, 0.0f };
+    glm::dvec3 v2_ = { 0.0, 1.0, 0.0 };
 
-    glm::vec3 normal_ = { 0.0f, 0.0f, 1.0f };
+    glm::dvec3 normal_ = { 0.0, 0.0, 1.0 };
 
 private:
 
-    static const float kIntersectionTestEpsilon_;
+    static const double kIntersectionTestEpsilon_;
 };
 
 #endif /* TRIANGLE_H_ */
+

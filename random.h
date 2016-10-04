@@ -29,3 +29,4 @@ public:
 };
 
 #endif // RANDOM_H_
+

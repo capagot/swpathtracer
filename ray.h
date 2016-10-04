@@ -1,10 +1,3 @@
-/*
- * ray.h
- *
- *  Created on: Apr 10, 2016
- *      Author: christian
- */
-
 #ifndef RAY_H_
 #define RAY_H_
 
@@ -16,12 +9,13 @@ public:
 
     Ray( void );
 
-    Ray( const glm::vec3 &origin,
-         const glm::vec3 &direction );
+    Ray( const glm::dvec3 &origin,
+         const glm::dvec3 &direction );
 
-    glm::vec3 origin_{ 0.0f, 0.0f, 0.0f };
+    glm::dvec3 origin_{ 0.0, 0.0, 0.0 };
 
-    glm::vec3 direction_{ 0.0f, 0.0f, -1.0f };
+    glm::dvec3 direction_{ 0.0, 0.0, -1.0 };
 };
 
 #endif /* RAY_H_ */
+

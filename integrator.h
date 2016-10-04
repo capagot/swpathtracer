@@ -19,7 +19,7 @@ public:
 
     Integrator( Camera &camera,
                 const Scene &scene,
-                const glm::vec3 background_color,
+                const glm::dvec3 background_color,
                 unsigned int max_path_depth,
                 TracingStoppingCriterion tracing_stop_criterion_,
                 Sampler &sampler,
@@ -36,7 +36,7 @@ protected:
 
     const Scene &scene_;
 
-    glm::vec3 background_color_;
+    glm::dvec3 background_color_;
 
     unsigned int max_path_depth_;
 
@@ -48,3 +48,4 @@ protected:
 };
 
 #endif /* INTEGRATOR_H_ */
+

@@ -9,18 +9,18 @@ Camera = camera{
     position = { 0, 0, 8 },
     up       = { 0, 1, 0 }, 
     look_at  = { 0, 0, 0 },
-    aspect   = 1, 
+    aspect   = 1024 / 768, 
     fov      = 55
 }
 
 s = sampler{
     type = "jittered",
-    spp = 400
+    spp = 64
 }
 
 b = buffer{
-    hres = 512,
-    vres = 512
+    hres = 1024,
+    vres = 768
 }
 
 g = globals{

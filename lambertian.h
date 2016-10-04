@@ -10,12 +10,12 @@ public:
 
     Lambertian( void );
 
-    Lambertian( const glm::vec3 &radiance );
+    Lambertian( const glm::dvec3 &radiance );
 
-    glm::vec3 getNewDirection( const glm::vec3 &normal,
-                               RNG< std::uniform_real_distribution, float, std::mt19937 > &rng ) const;
+    glm::dvec3 getNewDirection( const glm::dvec3 &normal,
+                                RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) const;
 
-    glm::vec3 radiance_ = glm::vec3{ 0.5f, 0.5f, 0.5f };
+    glm::dvec3 radiance_ = glm::dvec3{ 0.5, 0.5, 0.5 };
 
 };
 

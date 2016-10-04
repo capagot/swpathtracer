@@ -1,20 +1,13 @@
-/*
- * triangle.cpp
- *
- *  Created on: Apr 10, 2016
- *      Author: christian
- */
-
 #include "triangle.h"
 
-const float Triangle::kIntersectionTestEpsilon_ = 0.000001f;
+const double Triangle::kIntersectionTestEpsilon_ = 0.000001;
 
 Triangle::Triangle( void )
 { }
 
-Triangle::Triangle( const glm::vec3 &v0,
-                    const glm::vec3 &v1,
-                    const glm::vec3 &v2,
+Triangle::Triangle( const glm::dvec3 &v0,
+                    const glm::dvec3 &v1,
+                    const glm::dvec3 &v2,
                     const Material *material ) :
         Primitive{ material },
         v0_{ v0 },
@@ -23,10 +16,10 @@ Triangle::Triangle( const glm::vec3 &v0,
         normal_{ glm::normalize( glm::cross( v1_ - v0_, v2_ - v0_ ) ) }
 { }
 
-Triangle::Triangle( const glm::vec3 &v0,
-                    const glm::vec3 &v1,
-                    const glm::vec3 &v2,
-                    const glm::vec3 &normal,
+Triangle::Triangle( const glm::dvec3 &v0,
+                    const glm::dvec3 &v1,
+                    const glm::dvec3 &v2,
+                    const glm::dvec3 &normal,
                     const Material *material ) :
         Primitive{ material },
         v0_{ v0 },
@@ -47,11 +40,11 @@ bool Triangle::intersect( const Ray &ray,
      *     Pages 21-28
      */
 
-    glm::vec3 edge1 = v1_ - v0_;
-    glm::vec3 edge2 = v2_ - v0_;
-    glm::vec3 pvec = glm::cross( ray.direction_, edge2 );
+    glm::dvec3 edge1 = v1_ - v0_;
+    glm::dvec3 edge2 = v2_ - v0_;
+    glm::dvec3 pvec = glm::cross( ray.direction_, edge2 );
 
-    float det = glm::dot( edge1, pvec );
+    double det = glm::dot( edge1, pvec );
 
 //#define CULL_TEST
 
@@ -60,23 +53,23 @@ bool Triangle::intersect( const Ray &ray,
     if ( det < Triangle::kIntersectionTestEpsilon_ )
         return false;
 
-    glm::vec3 tvec{ ray.origin_ - v0_ };
+    glm::dvec3 tvec{ ray.origin_ - v0_ };
 
-    float u = glm::dot( tvec, pvec );
+    double u = glm::dot( tvec, pvec );
 
-    if ( ( u < 0.0f ) || ( u > det ) )
+    if ( ( u < 0.0 ) || ( u > det ) )
         return false;
 
-    glm::vec3 qvec{ glm::cross( tvec, edge1 ) };
+    glm::dvec3 qvec{ glm::cross( tvec, edge1 ) };
 
-    float v = glm::dot( ray.direction_, qvec );
+    double v = glm::dot( ray.direction_, qvec );
 
-    if ( ( v < 0.0f ) || ( ( u + v ) > det ) )
+    if ( ( v < 0.0 ) || ( ( u + v ) > det ) )
         return false;
 
-    float t = glm::dot( edge2, qvec );
+    double t = glm::dot( edge2, qvec );
 
-    float inv_det = 1.0f / det;
+    double inv_det = 1.0 / det;
 
     t *= inv_det;
     u *= inv_det;
@@ -87,23 +80,23 @@ bool Triangle::intersect( const Ray &ray,
     if ( ( det > -Triangle::kIntersectionTestEpsilon_ ) && ( det < Triangle::kIntersectionTestEpsilon_ ) )
         return false;
 
-    float inv_det = 1.0f / det;
+    double inv_det = 1.0 / det;
 
-    glm::vec3 tvec{ ray.origin_ - v0_ };
+    glm::dvec3 tvec{ ray.origin_ - v0_ };
 
-    float u = glm::dot( tvec, pvec ) * inv_det;
+    double u = glm::dot( tvec, pvec ) * inv_det;
 
-    if ( ( u < 0.0f ) || ( u > 1.0f ) )
+    if ( ( u < 0.0 ) || ( u > 1.0 ) )
         return false;
 
-    glm::vec3 qvec{ glm::cross( tvec, edge1 ) };
+    glm::dvec3 qvec{ glm::cross( tvec, edge1 ) };
 
-    float v = glm::dot( ray.direction_, qvec ) * inv_det;
+    double v = glm::dot( ray.direction_, qvec ) * inv_det;
 
-    if ( ( v < 0.0f ) || ( ( u + v ) > 1.0f ) )
+    if ( ( v < 0.0 ) || ( ( u + v ) > 1.0 ) )
         return false;
 
-    float t = glm::dot( edge2, qvec ) * inv_det;
+    double t = glm::dot( edge2, qvec ) * inv_det;
 #endif
 
     intersection_record.t_ = t;
@@ -113,3 +106,4 @@ bool Triangle::intersect( const Ray &ray,
 
     return true;
 }
+

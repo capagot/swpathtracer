@@ -1,18 +1,11 @@
-/*
- * camera.cpp
- *
- *  Created on: Apr 10, 2016
- *      Author: christian
- */
-
 #include "camera.h"
 
 Camera::Camera( void )
 { }
 
-Camera::Camera( const glm::vec3 &position,
-                const glm::vec3 &up,
-                const glm::vec3 &look_at ) :
+Camera::Camera( const glm::dvec3 &position,
+                const glm::dvec3 &up,
+                const glm::dvec3 &look_at ) :
         up_{ up },
         look_at_{ look_at },
         position_{ position },
@@ -25,20 +18,20 @@ Camera::Camera( const glm::vec3 &position,
 Camera::~Camera( void )
 { }
 
-void Camera::setPosition( const glm::vec3 &position )
+void Camera::setPosition( const glm::dvec3 &position )
 {
     position_ = position;
     direction_ = glm::normalize( look_at_ - position_ );
     onb_.setFromUW( glm::normalize( glm::cross( up_, -direction_ ) ), -direction_ );
 }
 
-void Camera::setUp( const glm::vec3 &up )
+void Camera::setUp( const glm::dvec3 &up )
 {
     up_ = up;
     onb_.setFromUW( glm::normalize( glm::cross( up_, -direction_ ) ), -direction_ );
 }
 
-void Camera::setLookAt( const glm::vec3 &look_at )
+void Camera::setLookAt( const glm::dvec3 &look_at )
 {
     look_at_ = look_at;
     direction_ = glm::normalize( look_at_ - position_ );

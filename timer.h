@@ -1,10 +1,3 @@
-/*
- * timer.h
- *
- *  Created on: May 29, 2016
- *      Author: christian
- */
-
 #ifndef TIMER_H_
 #define TIMER_H_
 
@@ -35,3 +28,4 @@ private:
 };
 
 #endif /* TIMER_H_ */
+

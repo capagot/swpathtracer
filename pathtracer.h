@@ -14,12 +14,12 @@ public:
 
     PathTracer( Camera &camera,
                 const Scene &scene,
-                const glm::vec3 background_color,
+                const glm::dvec3 background_color,
                 unsigned int max_path_depth,
                 TracingStoppingCriterion tracing_stop_criterion_,
                 Sampler &sampler,
                 Buffer &buffer,
-                RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
+                RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
     void integrate( void );
 
@@ -29,11 +29,11 @@ public:
 
 private:
 
-    glm::vec3 integrate_recursive( const Ray &ray,
+    glm::dvec3 integrate_recursive( const Ray &ray,
                                    unsigned int depth,
                                    int thread_id );
 
-    RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;
+    RNG< std::uniform_real_distribution, double, std::mt19937 > rng_;
 
     std::vector< unsigned long int > num_rays_{};
 

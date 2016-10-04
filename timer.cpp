@@ -1,10 +1,3 @@
-/*
- * timer.cpp
- *
- *  Created on: May 29, 2016
- *      Author: christian
- */
-
 #include "timer.h"
 
 void Timer::start( void )
@@ -50,3 +43,4 @@ __syscall_slong_t Timer::getElapsedNanoSeconds( void ) const
 {
     return elapsed_time_.tv_nsec;
 }
+

@@ -30,8 +30,8 @@ public:
 
     int loadMesh( const std::string &file_name,
                   const Material &material,
-                  glm::vec3 &min_aabb,
-                  glm::vec3 &max_aabb );
+                  glm::dvec3 &min_aabb,
+                  glm::dvec3 &max_aabb );
 
 
     void printInfo( void ) const;

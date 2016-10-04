@@ -15,7 +15,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 400
+    spp = 1600
 }
 
 b = buffer{
@@ -28,8 +28,6 @@ g = globals{
     max_path_depth = 5,
     output_filename = "smallpt_diffuse.ppm"
 }
-
-local a = 2
 
 -- top
 s1 = sphere{

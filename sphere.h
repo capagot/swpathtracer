@@ -1,10 +1,3 @@
-/*
- * sphere.h
- *
- *  Created on: Sep 28, 2016
- *      Author: christian
- */
-
 #ifndef SPHERE_H_
 #define SPHERE_H_
 
@@ -18,21 +11,22 @@ public:
 
     Sphere( void );
 
-    Sphere( const glm::vec3 &center,
-            float radius,
+    Sphere( const glm::dvec3 &center,
+            double radius,
             const Material *material );
 
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );
 
-    glm::vec3 center_ = { 0.0f, 0.0f, 0.0f };
+    glm::dvec3 center_ = { 0.0, 0.0, 0.0 };
 
-    float radius_= 1.0f;
+    double radius_= 1.0;
 
 private:
 
     // TODO: this is replicated for each primitive... avoid that!
-    static const float kIntersectionTestEpsilon_;
+    static const double kIntersectionTestEpsilon_;
 };
 
 #endif /* SPHERE_H_ */
+

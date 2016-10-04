@@ -1,10 +1,3 @@
-/*
- * hitrecord.h
- *
- *  Created on: Apr 10, 2016
- *      Author: christian
- */
-
 #ifndef INTERSECTION_RECORD_H_
 #define INTERSECTION_RECORD_H_
 
@@ -14,9 +7,9 @@
 
 struct IntersectionRecord
 {
-    float t_;
-    glm::vec3 position_;
-    glm::vec3 normal_;
+    double t_;
+    glm::dvec3 position_;
+    glm::dvec3 normal_;
     const Material *material_ = nullptr;
 };
 

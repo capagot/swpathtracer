@@ -53,3 +53,4 @@ struct option CmdLineParser::long_options[] = {
     { 0, 0, 0, 0 } };
 
 #endif /* CMDLINEPARSER_H_ */
+

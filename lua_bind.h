@@ -25,10 +25,10 @@ public:
                          Sampler **sampler,
                          Scene *scene,
                          Buffer **rendering_buffer,
-                         glm::vec3 &background_color,
+                         glm::dvec3 &background_color,
                          std::size_t &max_path_depth,
                          std::string &output_filename,
-                         RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
+                         RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
 private:
 
@@ -37,11 +37,11 @@ private:
     void getCamera( Camera **camera );
 
     void getSampler( Sampler **sampler,
-                     RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
+                     RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
     void getBuffer( Buffer **rendering_buffer );
 
-    void getGlobals( glm::vec3 &background_color,
+    void getGlobals( glm::dvec3 &background_color,
                      std::size_t &max_path_depth,
                      std::string &output_filename );
 
@@ -55,19 +55,19 @@ private:
                       Sampler **sampler,
                       Scene *scene,
                       Buffer **rendering_buffer,
-                      glm::vec3 &background_color,
+                      glm::dvec3 &background_color,
                       std::size_t &max_path_depth,
                       std::string &output_filename,
-                      RNG< std::uniform_real_distribution, float, std::mt19937 > &rng );
+                      RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
     std::string parseString( const std::string &s_input );
 
-    float parseScalar( const std::string &s );
+    double parseScalar( const std::string &s );
 
-    glm::vec3 parseVec3( const std::string &s );
+    glm::dvec3 parseVec3( const std::string &s );
 
     void parseVertices( const std::string &s,
-                        glm::vec3 *v );
+                        glm::dvec3 *v );
 
 };
 

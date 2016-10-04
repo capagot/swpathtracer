@@ -3,12 +3,12 @@
 Lambertian::Lambertian( void )
 { }
 
-Lambertian::Lambertian( const glm::vec3 &radiance ) :
+Lambertian::Lambertian( const glm::dvec3 &radiance ) :
     radiance_{ radiance }
 { }
 
-glm::vec3 Lambertian::getNewDirection( const glm::vec3 &normal,
-                                       RNG< std::uniform_real_distribution, float, std::mt19937 > &rng ) const
+glm::dvec3 Lambertian::getNewDirection( const glm::dvec3 &normal,
+                                        RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) const
 {
     ONB onb;
 
@@ -18,12 +18,12 @@ glm::vec3 Lambertian::getNewDirection( const glm::vec3 &normal,
 
     // Generates the unitary vector 'dir', which points from the origin of the local tangential frame
     // towards a random point uniformly distributed over the hemisphere centered at the origin.
-    float r1 = rng();
-    float r2 = rng();
-    float phi = 2.0f * M_PI * r2;
-    float sqrt_sin_theta = sqrt( 1.0f - r1 * r1 );
+    double r1 = rng();
+    double r2 = rng();
+    double phi = 2.0 * M_PI * r2;
+    double sqrt_sin_theta = sqrt( 1.0 - r1 * r1 );
 
-    glm::vec3 dir = { cos( phi ) * sqrt_sin_theta,
+    glm::dvec3 dir = { cos( phi ) * sqrt_sin_theta,
                       r1,
                       sin( phi ) * sqrt_sin_theta };
 
@@ -32,3 +32,4 @@ glm::vec3 Lambertian::getNewDirection( const glm::vec3 &normal,
     //return onb.m_ * dir;
     return onb.getBasisMatrix() * dir;
 }
+

@@ -10,11 +10,11 @@ public:
     Material( void );
 
     Material( const Lambertian &bxdf, 
-              const glm::vec3 &emitted );
+              const glm::dvec3 &emitted );
 
     Lambertian bxdf_;
 
-    glm::vec3 emitted_;
+    glm::dvec3 emitted_;
 };
 
 #endif /* MATERIAL_H_ */

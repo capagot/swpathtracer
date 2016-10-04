@@ -1,15 +1,15 @@
 #include "perspective_camera.h"
 
-const float PerspectiveCamera::kDegreesToRadians_ = M_PI / 180.0f;
+const double PerspectiveCamera::kDegreesToRadians_ = M_PI / 180.0;
 
 PerspectiveCamera::PerspectiveCamera( void )
 { }
 
-PerspectiveCamera::PerspectiveCamera( const glm::vec3 &position,
-                                      const glm::vec3 &up_vector,
-                                      const glm::vec3 &look_at,
-                                      float aspect,
-                                      float fov_degrees ) :
+PerspectiveCamera::PerspectiveCamera( const glm::dvec3 &position,
+                                      const glm::dvec3 &up_vector,
+                                      const glm::dvec3 &look_at,
+                                      double aspect,
+                                      double fov_degrees ) :
         Camera::Camera{ position,
                         up_vector,
                         look_at },
@@ -17,11 +17,11 @@ PerspectiveCamera::PerspectiveCamera( const glm::vec3 &position,
         fov_degrees_{ fov_degrees }
 { }
 
-Ray PerspectiveCamera::getWorldSpaceRay( const glm::vec2 &sample_coord ) const
+Ray PerspectiveCamera::getWorldSpaceRay( const glm::dvec2 &sample_coord ) const
 {
-    glm::vec3 ray_local_dir{  sample_coord.x * aspect_ * tan ( fov_degrees_ * 0.5f * PerspectiveCamera::kDegreesToRadians_ ),
-                             -sample_coord.y * tan ( fov_degrees_ * 0.5f * PerspectiveCamera::kDegreesToRadians_ ),
-                             -1.0f };
+    glm::dvec3 ray_local_dir{  sample_coord.x * aspect_ * tan ( fov_degrees_ * 0.5 * PerspectiveCamera::kDegreesToRadians_ ),
+                             -sample_coord.y * tan ( fov_degrees_ * 0.5 * PerspectiveCamera::kDegreesToRadians_ ),
+                             -1.0 };
 
     return Ray{ position_, glm::normalize( onb_.getBasisMatrix() * ray_local_dir ) };
 }

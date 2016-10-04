@@ -10,23 +10,23 @@ public:
 
     PerspectiveCamera( void );
 
-    PerspectiveCamera( const glm::vec3 &position,
-                       const glm::vec3 &up_vector,
-                       const glm::vec3 &look_at,
-                       float aspect,
-                       float fov_degrees );
+    PerspectiveCamera( const glm::dvec3 &position,
+                       const glm::dvec3 &up_vector,
+                       const glm::dvec3 &look_at,
+                       double aspect,
+                       double fov_degrees );
 
-    Ray getWorldSpaceRay( const glm::vec2 &sample_coord ) const;
+    Ray getWorldSpaceRay( const glm::dvec2 &sample_coord ) const;
 
     void printInfo( void ) const;
 
-    float aspect_;
+    double aspect_;
 
-    float fov_degrees_;
+    double fov_degrees_;
 
 private:
 
-    static const float kDegreesToRadians_;
+    static const double kDegreesToRadians_;
 };
 
 #endif /* PERSPECTIVE_CAMERA_H_ */
