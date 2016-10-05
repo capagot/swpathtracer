@@ -4,11 +4,11 @@ Sphere::Sphere( void )
 { }
 
 Sphere::Sphere( const glm::dvec3 &center,
-        double radius,
-        const Material *material ) :
-        Primitive{ material },
-        center_{ center },
-        radius_{ radius }
+                double radius,
+                const Material *material ) :
+                Primitive{ material },
+                center_{ center },
+                radius_{ radius }
 { }
 
 bool Sphere::intersect( const Ray &ray,
@@ -46,4 +46,3 @@ bool Sphere::intersect( const Ray &ray,
 
     return true;
 }
-

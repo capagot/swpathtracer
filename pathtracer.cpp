@@ -89,8 +89,8 @@ void PathTracer::integrate( void )
 }
 
 glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
-                                           unsigned int depth,
-                                           int thread_id )
+                                            unsigned int depth,
+                                            int thread_id )
 {
     IntersectionRecord intersection_record;
     IntersectionRecord tmp_intersection_record;
