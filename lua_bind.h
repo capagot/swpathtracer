@@ -6,10 +6,12 @@
 
 #include "lua.hpp"
 #include <glm/glm.hpp>
+
 #include "camera.h"
 #include "perspective_camera.h"
 #include "orthographic_camera.h"
 #include "sampler.h"
+#include "primitive.h"
 #include "scene.h"
 #include "buffer.h"
 

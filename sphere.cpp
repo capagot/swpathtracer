@@ -1,7 +1,7 @@
 #include "sphere.h"
 
 Sphere::Sphere( void )
-{ }
+{}
 
 Sphere::Sphere( const glm::dvec3 &center,
                 double radius,
@@ -9,7 +9,7 @@ Sphere::Sphere( const glm::dvec3 &center,
                 Primitive{ material },
                 center_{ center },
                 radius_{ radius }
-{ }
+{}
 
 bool Sphere::intersect( const Ray &ray,
                         IntersectionRecord &intersection_record  )
@@ -45,4 +45,15 @@ bool Sphere::intersect( const Ray &ray,
     intersection_record.material_ = material_;
 
     return true;
+}
+
+AABB Sphere::getAABB( void ) const
+{
+    AABB aabb;
+
+    aabb.min_ = center_ - radius_;
+    aabb.max_ = center_ + radius_;
+    aabb.centroid_ = center_;
+
+    return aabb;
 }

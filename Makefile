@@ -2,7 +2,7 @@ EXECUTABLE = swpathtracer
 
 CXX = g++
 
-CXXFLAGS = -std=c++11 -Wall -Wextra -pedantic -fopenmp
+CXXFLAGS = -std=c++11 -Wall -Wextra -Wpedantic -fopenmp
 
 ifeq ($(DEBUG), 1)
 CXXFLAGS += -DDEBUG -O0 -g3
@@ -12,11 +12,13 @@ endif
 
 CPPFLAGS += -MMD \
 			-I/home/christian/work/common/glm-0.9.7.0 \
-			-I/usr/include/lua5.2
+			-I/usr/include/lua5.2 \
+			-I/usr/local/include
 
 LDFLAGS = -L/usr/lib/gcc/x86_64-linux-gnu/4.8 \
 		  -L/usr/lib/x86_64-linux-gnu \
-		  -L/usr/lib 
+		  -L/usr/lib \
+	      -L/usr/local/lib
 
 LDLIBS = -lgomp -lassimp -llua5.2
 

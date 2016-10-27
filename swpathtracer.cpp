@@ -2,6 +2,10 @@
 
 int main( int num_args, char **arg_vector )
 {
+    // DEBUG
+    //omp_set_dynamic( 0 );     // Explicitly disable dynamic teams
+    //omp_set_num_threads( 1 );
+
     // Create only one instance of the RNG engine per thread. No more instances
     // are created during the execution of the program.
     RNG< std::uniform_real_distribution, double, std::mt19937 > rng{ 0.0, 1.0 };
@@ -30,6 +34,8 @@ int main( int num_args, char **arg_vector )
                          rng);
 
 
+    scene.buildBVH();
+
     std::cout << "Input: " << std::endl;
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
     std::cout << "  file name ........................: " << cmdlineparser.getInputScriptFilename() << std::endl;
@@ -38,20 +44,22 @@ int main( int num_args, char **arg_vector )
     camera->printInfo();
 
     std::cout << std::endl;
-    sampler->printInfo();    
+    sampler->printInfo();
 
     std::cout << std::endl;
     std::cout << "Globals: " << std::endl;
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
-    std::cout << "  background color .................: [" << background_color[0] << ", " 
+    std::cout << "  background color .................: [" << background_color[0] << ", "
                                                            << background_color[1] << ", "
                                                            << background_color[2] << "]" << std::endl;
-    std::cout << "  path tracing term. criterion .....: maximum depth" << std::endl; 
-    std::cout << "  max. path depth ..................: " << max_path_depth << std::endl; 
-    std::cout << "  output file name .................: " << output_filename << std::endl; 
+    std::cout << "  path tracing term. criterion .....: maximum depth" << std::endl;
+    std::cout << "  max. path depth ..................: " << max_path_depth << std::endl;
+    std::cout << "  output file name .................: " << output_filename << std::endl;
 
     std::cout << std::endl;
     scene.printInfo();
+
+    //exit(0);
 
     std::cout << std::endl;
     rendering_buffer->printInfo();
@@ -72,12 +80,12 @@ int main( int num_args, char **arg_vector )
 
     pt.printInfoPreRendering();
 
-    // Renders the final image. 
+    // Renders the final image.
     pt.integrate();
 
     pt.printInfoPostRendering();
 
-    // Gamma-compress and save the final image to a .ppm file. 
+    // Gamma-compress and save the final image to a .ppm file.
     rendering_buffer->save( output_filename );
 
     // This is ugly!
@@ -103,4 +111,3 @@ int main( int num_args, char **arg_vector )
 
     return EXIT_SUCCESS;
 }
-

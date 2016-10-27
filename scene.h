@@ -15,12 +15,11 @@
 #include "sphere.h"
 #include "lambertian.h"
 #include "material.h"
+#include "bvh.h"
 
 class Scene
 {
 public:
-
-    typedef std::unique_ptr< Primitive > primitive_ptr;
 
     Scene( void );
 
@@ -33,18 +32,25 @@ public:
                   glm::dvec3 &min_aabb,
                   glm::dvec3 &max_aabb );
 
+    void buildBVH( void );
+
+    bool intersect( const Ray &ray,
+                    IntersectionRecord &intersection_record,
+                    long unsigned int &num_intersection_tests_,
+                    long unsigned int &num_intersections_ ) const;
 
     void printInfo( void ) const;
 
-    std::vector< primitive_ptr > primitives_;
+    std::vector< Primitive::PrimitiveUniquePtr > primitives_;
 
     // TODO: use pointers here too???
     std::list< Material > materials_;
 
 private:
 
-    const aiScene* assimp_scene_ = nullptr;
+    const aiScene *assimp_scene_ = nullptr;
+
+    const BVH *bvh_ = nullptr;
 };
 
 #endif /* SCENE_H_ */
-

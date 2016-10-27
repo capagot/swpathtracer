@@ -5,7 +5,7 @@ Scene::Scene( void )
 
 void Scene::pushPrimitive( Primitive *primitive )
 {
-    primitives_.push_back( primitive_ptr( primitive ) );
+    primitives_.push_back( Primitive::PrimitiveUniquePtr( primitive ) );
 }
 
 void Scene::pushMaterial( const Material *material )
@@ -82,12 +82,57 @@ int Scene::loadMesh( const std::string &file_name,
                 glm::dvec3 v1{ vertex_ptr[1].x, vertex_ptr[1].y, vertex_ptr[1].z };
                 glm::dvec3 v2{ vertex_ptr[2].x, vertex_ptr[2].y, vertex_ptr[2].z };
 
-                primitives_.push_back( primitive_ptr( new Triangle{ v0, v1, v2, &( materials_.back() ) } ) );
+                primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v0, v1, v2, &( materials_.back() ) } ) );
             }
         }
     }
 
     return EXIT_SUCCESS;
+}
+
+void Scene::buildBVH( void )
+{
+    // TODO: delete the BVH
+    bvh_ = new BVH( primitives_ );
+
+    bvh_->dump();
+}
+
+bool Scene::intersect( const Ray &ray,
+                       IntersectionRecord &intersection_record,
+                       long unsigned int &num_intersection_tests_,
+                       long unsigned int &num_intersections_ ) const
+{
+    bool intersection_result = false;
+    IntersectionRecord tmp_intersection_record;
+    std::size_t num_primitives = primitives_.size();
+
+    for ( std::size_t primitive_id = 0; primitive_id < num_primitives; primitive_id++ )
+    {
+        num_intersection_tests_++;
+
+        if ( primitives_[primitive_id]->intersect( ray, tmp_intersection_record ) )
+        {
+            num_intersections_++;
+
+            if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
+            {
+                intersection_record = tmp_intersection_record;
+                intersection_result = true;
+            }
+        }
+    }
+    //*/
+
+
+    /*
+    intersection_result = bvh_->intersect( ray,
+                                           intersection_record,
+                                           num_intersection_tests_,
+                                           num_intersections_ );
+    //*/
+
+    return intersection_result;
 }
 
 void Scene::printInfo( void ) const
@@ -98,4 +143,3 @@ void Scene::printInfo( void ) const
     std::cout << "  # of materials ...................: " << materials_.size() << std::endl;
     std::cout << "  acceleration structures ..........: none" << std::endl;
 }
-

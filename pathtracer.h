@@ -35,11 +35,11 @@ private:
 
     RNG< std::uniform_real_distribution, double, std::mt19937 > rng_;
 
-    std::vector< unsigned long int > num_rays_{};
+    std::vector< long unsigned int > num_rays_;
 
-    std::vector< unsigned long int > num_intersection_tests_{};
+    std::vector< long unsigned int > num_intersection_tests_;
 
-    std::vector< unsigned long int > num_intersections_{};
+    std::vector< long unsigned int > num_intersections_;
 
 };
 

@@ -18,6 +18,8 @@ public:
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );
 
+    AABB getAABB( void ) const;
+
     glm::dvec3 center_ = { 0.0, 0.0, 0.0 };
 
     double radius_= 1.0;

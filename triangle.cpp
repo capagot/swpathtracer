@@ -3,7 +3,7 @@
 const double Triangle::kIntersectionTestEpsilon_ = 0.000001;
 
 Triangle::Triangle( void )
-{ }
+{}
 
 Triangle::Triangle( const glm::dvec3 &v0,
                     const glm::dvec3 &v1,
@@ -14,7 +14,7 @@ Triangle::Triangle( const glm::dvec3 &v0,
         v1_{ v1 },
         v2_{ v2 },
         normal_{ glm::normalize( glm::cross( v1_ - v0_, v2_ - v0_ ) ) }
-{ }
+{}
 
 Triangle::Triangle( const glm::dvec3 &v0,
                     const glm::dvec3 &v1,
@@ -26,7 +26,7 @@ Triangle::Triangle( const glm::dvec3 &v0,
         v1_{ v1 },
         v2_{ v2 },
         normal_{ normal }
-{ }
+{}
 
 bool Triangle::intersect( const Ray &ray,
                           IntersectionRecord &intersection_record  )
@@ -107,3 +107,12 @@ bool Triangle::intersect( const Ray &ray,
     return true;
 }
 
+AABB Triangle::getAABB( void ) const
+{
+    AABB aabb;
+
+    aabb.min_ = glm::min( glm::min( v0_, v1_ ), v2_ );
+    aabb.max_ = glm::max( glm::max( v0_, v1_ ), v2_ );
+    aabb.centroid_ = ( 1.0 / 3.0 ) * ( v0_ + v1_ + v2_ );
+    return aabb;
+}

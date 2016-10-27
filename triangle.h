@@ -25,6 +25,8 @@ public:
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );
 
+    AABB getAABB( void ) const;
+
     glm::dvec3 v0_ = { 0.0, 0.0, 0.0 };
 
     glm::dvec3 v1_ = { 1.0, 0.0, 0.0 };
