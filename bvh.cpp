@@ -34,7 +34,7 @@ bool BVH::intersect( const Ray &ray,
                      long unsigned int &num_intersection_tests_,
                      long unsigned int &num_intersections_ ) const
 {
-    return traverse( root_node_, ray, intersection_record );
+    return traverse( root_node_, ray, intersection_record, "-" );
 }
 
 BVH::~BVH( void )
@@ -187,11 +187,15 @@ void BVH::splitNode( BVHNode **node,
 
 bool BVH::traverse( const BVHNode *node,
                     const Ray &ray,
-                    IntersectionRecord &intersection_record ) const
+                    IntersectionRecord &intersection_record,
+                    std::string path_str ) const
 {
     bool primitive_intersect = false;
 
-    if  ( ( node ) && ( node->aabb_.intersect( ray ) ) )
+    // DEBUG
+    //std::cerr << ">>> " << path_str << "\n";
+
+    if ( ( node ) && ( node->aabb_.intersect( ray ) ) )
     {
         if ( ( !node->left_ ) && ( !node->right_ ) ) // is a leaf node
         {
@@ -199,7 +203,7 @@ bool BVH::traverse( const BVHNode *node,
 
             for ( std::size_t primitive_id = node->first_; primitive_id <= node->last_; primitive_id++ )
             {
-                if ( primitives_[primitive_id]->intersect( ray, tmp_intersection_record ) )
+                if ( primitives_[s_[primitive_id].primitive_id_]->intersect( ray, tmp_intersection_record ) )
                 {
                     if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
                     {
@@ -211,10 +215,10 @@ bool BVH::traverse( const BVHNode *node,
         }
         else
         {
-            if ( traverse( node->left_, ray, intersection_record ) )
+            if ( traverse( node->left_, ray, intersection_record, path_str + "L" ) )
                 primitive_intersect = true;
 
-            if ( traverse( node->right_, ray, intersection_record ) )
+            if ( traverse( node->right_, ray, intersection_record, path_str + "R" ) )
                 primitive_intersect = true;
         }
     }
@@ -283,6 +287,47 @@ void BVH::dump( void ) const
 
                 std::cerr << " " << node->aabb_.min_.x << " " << node->aabb_.min_.y << " " << node->aabb_.min_.z;
                 std::cerr << " " << node->aabb_.max_.x << " " << node->aabb_.max_.y << " " << node->aabb_.max_.z;
+                std::cerr << "\n";
+
+                if ( node->left_ )
+                    queue.push( node->left_ );
+                if ( node->right_ )
+                    queue.push( node->right_ );
+            }
+            else
+                if ( !queue.empty() )
+                {
+                    queue.push( nullptr );
+                    std::cerr << "\n";
+                    depth++;
+                }
+        }
+    }
+}
+
+void BVH::dumpPrimitives( void ) const
+{
+    std::queue< BVHNode* > queue;
+    BVHNode *node = nullptr;
+    int depth = 0;
+
+    if ( root_node_ )
+    {
+        queue.push( root_node_ );
+        queue.push( nullptr );
+
+        while( !queue.empty() )
+        {
+            node = queue.front();
+            queue.pop();
+
+            if ( node )
+            {
+                for ( long unsigned int i = node->first_; i <= node->last_; i++  )
+                {
+                    primitives_[i]->printData();
+                }
+
                 std::cerr << "\n";
 
                 if ( node->left_ )

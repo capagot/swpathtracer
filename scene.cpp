@@ -95,7 +95,10 @@ void Scene::buildBVH( void )
     // TODO: delete the BVH
     bvh_ = new BVH( primitives_ );
 
-    bvh_->dump();
+    //bvh_->dump();
+
+    //bvh_->dumpPrimitives();
+
 }
 
 bool Scene::intersect( const Ray &ray,
@@ -107,6 +110,7 @@ bool Scene::intersect( const Ray &ray,
     IntersectionRecord tmp_intersection_record;
     std::size_t num_primitives = primitives_.size();
 
+    /*
     for ( std::size_t primitive_id = 0; primitive_id < num_primitives; primitive_id++ )
     {
         num_intersection_tests_++;
@@ -125,7 +129,7 @@ bool Scene::intersect( const Ray &ray,
     //*/
 
 
-    /*
+
     intersection_result = bvh_->intersect( ray,
                                            intersection_record,
                                            num_intersection_tests_,

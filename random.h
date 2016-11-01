@@ -16,7 +16,8 @@ public:
         int num_threads = std::max( 1, omp_get_max_threads() );
         for( int thread_count = 0; thread_count < num_threads; thread_count++ )
             engines_.push_back( ENGINE( std::random_device{}() + thread_count ) );
-    } 
+            //engines_.push_back( ENGINE( 1 ) );
+    }
 
     DATA operator()()
     {
@@ -29,4 +30,3 @@ public:
 };
 
 #endif // RANDOM_H_
-

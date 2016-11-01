@@ -47,6 +47,8 @@ public:
 
     void dump( void ) const;
 
+    void dumpPrimitives( void ) const;
+
     ~BVH( void );
 
 private:
@@ -85,7 +87,8 @@ private:
 
     bool traverse( const BVHNode *node,
                    const Ray &ray,
-                   IntersectionRecord &intersection_record ) const;
+                   IntersectionRecord &intersection_record,
+                   std::string path_str ) const;
 
     BVHNode *root_node_ = nullptr;
 

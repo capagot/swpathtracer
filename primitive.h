@@ -25,8 +25,9 @@ public:
 
     virtual AABB getAABB( void ) const = 0;
 
+    virtual void printData( void ) const = 0;
+
     const Material *material_ = nullptr;
 };
 
 #endif /* PRIMITIVE_H_ */
-

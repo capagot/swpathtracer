@@ -116,3 +116,6 @@ AABB Triangle::getAABB( void ) const
     aabb.centroid_ = ( 1.0 / 3.0 ) * ( v0_ + v1_ + v2_ );
     return aabb;
 }
+
+void Triangle::printData( void ) const
+{}
