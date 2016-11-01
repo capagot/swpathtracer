@@ -21,6 +21,12 @@ class Scene
 {
 public:
 
+    enum AccelerationStructure
+    {
+        NONE,
+        BVH_SAH
+    };
+
     Scene( void );
 
     void pushPrimitive( Primitive *primitive );
@@ -32,7 +38,7 @@ public:
                   glm::dvec3 &min_aabb,
                   glm::dvec3 &max_aabb );
 
-    void buildBVH( void );
+    void buildAccelerationStructure( void );
 
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record,
@@ -46,11 +52,17 @@ public:
     // TODO: use pointers here too???
     std::list< Material > materials_;
 
+    // TODO: move this to private section
+    AccelerationStructure acceleration_structure_ = AccelerationStructure::NONE;
+
 private:
+
+    void buildBVH( void );
 
     const aiScene *assimp_scene_ = nullptr;
 
     const BVH *bvh_ = nullptr;
+
 };
 
 #endif /* SCENE_H_ */

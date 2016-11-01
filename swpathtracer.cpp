@@ -17,6 +17,7 @@ int main( int num_args, char **arg_vector )
     glm::dvec3 background_color;
     std::size_t max_path_depth;
     std::string output_filename;
+    Scene::AccelerationStructure scene_acceleration_data_structure;
 
     CmdLineParser cmdlineparser( num_args, arg_vector );
 
@@ -31,10 +32,8 @@ int main( int num_args, char **arg_vector )
                          background_color,
                          max_path_depth,
                          output_filename,
+                         scene_acceleration_data_structure,
                          rng);
-
-
-    scene.buildBVH();
 
     std::cout << "Input: " << std::endl;
     std::cout << "-------------------------------------------------------------------------------" << std::endl;

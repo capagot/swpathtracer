@@ -31,6 +31,7 @@ void LuaBind::loadFromScript( Camera **camera,
                               glm::dvec3 &background_color,
                               std::size_t &max_path_depth,
                               std::string &output_filename,
+                              Scene::AccelerationStructure &scene_acceleration_data_structure,
                               RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     lua_getglobal( lua_state_, "user variables" );
@@ -41,8 +42,13 @@ void LuaBind::loadFromScript( Camera **camera,
                  background_color,
                  max_path_depth,
                  output_filename,
+                 scene_acceleration_data_structure,
                  rng );
     lua_pop( lua_state_, 1 );
+
+    // TODO: refactor this!!!!
+    scene.acceleration_structure_ = scene_acceleration_data_structure;
+    scene.buildAccelerationStructure();
 }
 
 void LuaBind::getCamera( Camera **camera )
@@ -94,11 +100,17 @@ void LuaBind::getBuffer( Buffer **rendering_buffer )
 
 void LuaBind::getGlobals( glm::dvec3 &background_color,
                           std::size_t &max_path_depth,
-                          std::string &output_filename )
+                          std::string &output_filename,
+                          Scene::AccelerationStructure &scene_acceleration_data_structure )
 {
     background_color = parseVec3( "background_color" );
     max_path_depth = parseScalar( "max_path_depth" );
     output_filename = parseString( "output_filename" );
+    std::string acelleration_structure = parseString( "acceleration_data_structure" );
+
+    scene_acceleration_data_structure = Scene::AccelerationStructure::NONE;
+    if ( acelleration_structure == "bvh-sah" )
+        scene_acceleration_data_structure = Scene::AccelerationStructure::BVH_SAH;
 }
 
 void LuaBind::getTriangle( Scene *scene )
@@ -143,6 +155,7 @@ void LuaBind::getElements( Camera **camera,
                            glm::dvec3 &background_color,
                            std::size_t &max_path_depth,
                            std::string &output_filename,
+                           Scene::AccelerationStructure &scene_acceleration_data_structure,
                            RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     lua_pushnil( lua_state_ );                                   // [pop 0, push 1]
@@ -168,7 +181,8 @@ void LuaBind::getElements( Camera **camera,
                 if( object_type == "globals" )
                     getGlobals( background_color,
                                 max_path_depth,
-                                output_filename );
+                                output_filename,
+                                scene_acceleration_data_structure );
                 if( object_type == "triangle" )
                     getTriangle( scene );
                 if( object_type == "sphere" )
@@ -183,6 +197,7 @@ void LuaBind::getElements( Camera **camera,
                                  background_color,
                                  max_path_depth,
                                  output_filename,
+                                 scene_acceleration_data_structure,
                                  rng );
 
                 lua_pushnil( lua_state_ );                      // [pop 0, push 1]
@@ -258,4 +273,3 @@ void LuaBind::parseVertices( const std::string &s,
 
     lua_pop( lua_state_, 2 );
 }
-

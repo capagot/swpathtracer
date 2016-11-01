@@ -90,15 +90,10 @@ int Scene::loadMesh( const std::string &file_name,
     return EXIT_SUCCESS;
 }
 
-void Scene::buildBVH( void )
+void Scene::buildAccelerationStructure( void )
 {
-    // TODO: delete the BVH
-    bvh_ = new BVH( primitives_ );
-
-    //bvh_->dump();
-
-    //bvh_->dumpPrimitives();
-
+    if ( acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH )
+        buildBVH();
 }
 
 bool Scene::intersect( const Ray &ray,
@@ -110,31 +105,32 @@ bool Scene::intersect( const Ray &ray,
     IntersectionRecord tmp_intersection_record;
     std::size_t num_primitives = primitives_.size();
 
-    /*
-    for ( std::size_t primitive_id = 0; primitive_id < num_primitives; primitive_id++ )
+    switch( acceleration_structure_ )
     {
-        num_intersection_tests_++;
-
-        if ( primitives_[primitive_id]->intersect( ray, tmp_intersection_record ) )
+    case AccelerationStructure::NONE:
+        for ( std::size_t primitive_id = 0; primitive_id < num_primitives; primitive_id++ )
         {
-            num_intersections_++;
+            num_intersection_tests_++;
 
-            if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
+            if ( primitives_[primitive_id]->intersect( ray, tmp_intersection_record ) )
             {
-                intersection_record = tmp_intersection_record;
-                intersection_result = true;
+                num_intersections_++;
+
+                if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
+                {
+                    intersection_record = tmp_intersection_record;
+                    intersection_result = true;
+                }
             }
         }
+        break;
+    case AccelerationStructure::BVH_SAH:
+        intersection_result = bvh_->intersect( ray,
+                                               intersection_record,
+                                               num_intersection_tests_,
+                                               num_intersections_ );
+        break;
     }
-    //*/
-
-
-
-    intersection_result = bvh_->intersect( ray,
-                                           intersection_record,
-                                           num_intersection_tests_,
-                                           num_intersections_ );
-    //*/
 
     return intersection_result;
 }
@@ -145,5 +141,25 @@ void Scene::printInfo( void ) const
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
     std::cout << "  # of primitives ..................: " << primitives_.size() << std::endl;
     std::cout << "  # of materials ...................: " << materials_.size() << std::endl;
-    std::cout << "  acceleration structures ..........: none" << std::endl;
+    std::cout << "  acceleration structure ...........: ";
+
+    if ( acceleration_structure_ == Scene::AccelerationStructure::NONE )
+        std::cout << "none";
+    else
+        if ( acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH )
+            std::cout << "BVH-SAH";
+            
+    std::cout << std::endl;
+    std::cout << std::endl;
+}
+
+void Scene::buildBVH( void )
+{
+    // TODO: delete the BVH
+    bvh_ = new BVH( primitives_ );
+
+    //bvh_->dump();
+
+    //bvh_->dumpPrimitives();
+
 }

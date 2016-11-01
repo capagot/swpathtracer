@@ -30,6 +30,7 @@ public:
                          glm::dvec3 &background_color,
                          std::size_t &max_path_depth,
                          std::string &output_filename,
+                         Scene::AccelerationStructure &scene_acceleration_data_structure,
                          RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
 private:
@@ -45,7 +46,8 @@ private:
 
     void getGlobals( glm::dvec3 &background_color,
                      std::size_t &max_path_depth,
-                     std::string &output_filename );
+                     std::string &output_filename,
+                     Scene::AccelerationStructure &scene_acceleration_data_structure );
 
     void getTriangle( Scene *scene );
 
@@ -60,6 +62,7 @@ private:
                       glm::dvec3 &background_color,
                       std::size_t &max_path_depth,
                       std::string &output_filename,
+                      Scene::AccelerationStructure &scene_acceleration_data_structure,
                       RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
     std::string parseString( const std::string &s_input );
@@ -74,4 +77,3 @@ private:
 };
 
 #endif /* LUA_BIND_H_ */
-
