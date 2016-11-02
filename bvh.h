@@ -1,6 +1,7 @@
 #ifndef BVH_H_
 #define BVH_H_
 
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <deque>
@@ -13,11 +14,13 @@ class BVH
 {
 public:
 
-    // TODO: refactor this: there is no need to keep precomputed stuff that wont be used anywhere else!!
-    struct BVHPrimitive
+    struct BVHNode
     {
-        std::size_t primitive_id_;
-        AABB aabb_;
+        std::size_t first_;                       // index of the first primitive
+        std::size_t last_;                        // number of primitives into this node (whose index start at "first_").
+        AABB aabb_;                               // AABB represeted by the current node.
+        BVHNode *left_ = nullptr;                 // Pointer to the left child node (if the current node is a inner node).
+        BVHNode *right_ = nullptr;                // Pointer to right inner node (if the current node is a inner node).
     };
 
     struct PrimitiveAABBArea
@@ -27,15 +30,10 @@ public:
         AABB aabb_;
         double left_area_;
         double right_area_;
-    };
 
-    struct BVHNode
-    {
-        std::size_t first_;
-        std::size_t last_;
-        AABB aabb_;                               // AABB represeted by the current node.
-        BVHNode *left_ = nullptr;                 // Pointer to the left child node (if the current node is a inner node).
-        BVHNode *right_ = nullptr;                // Pointer to right inner node (if the current node is a inner node).
+        AABB left_aabb_;
+        AABB right_aabb_;
+
     };
 
     BVH( const std::vector< Primitive::PrimitiveUniquePtr > &primitives );
@@ -47,8 +45,6 @@ public:
 
     void dump( void ) const;
 
-    void dumpPrimitives( void ) const;
-
     ~BVH( void );
 
 private:
@@ -58,6 +54,7 @@ private:
         static bool sortInX( const PrimitiveAABBArea &lhs, const PrimitiveAABBArea &rhs )
         {
             return lhs.centroid_.x < rhs.centroid_.x;
+            //return primitives_[ lhs.primitive_id_ ]->getAABB().centroid_.x < primitives_[ rhs.primitive_id_ ]->getAABB().centroid_.x;
         }
 
         static bool sortInY( const PrimitiveAABBArea &lhs, const PrimitiveAABBArea &rhs )
@@ -70,8 +67,6 @@ private:
             return lhs.centroid_.z < rhs.centroid_.z;
         }
     };
-
-    double area( const std::deque< PrimitiveAABBArea > &s ) const;
 
     double SAH( std::size_t s1_size,
                 double s1_area,
@@ -96,10 +91,12 @@ private:
 
     double cost_intersec_aabb_ = 0.2;
 
-    std::deque< BVHPrimitive > s_;
+    std::deque< long unsigned int > primitive_id_;
 
     // TODO: refactor this!
     const std::vector< Primitive::PrimitiveUniquePtr > &primitives_;
+
+    static std::size_t primitives_inserted_;
 };
 
 #endif /* BVH_H_ */

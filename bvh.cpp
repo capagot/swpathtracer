@@ -1,12 +1,14 @@
 #include "bvh.h"
 
+std::size_t BVH::primitives_inserted_ = 0;
+
 BVH::BVH( const std::vector< Primitive::PrimitiveUniquePtr > &primitives ) :
         primitives_( primitives )
 {
     if ( primitives_.size() > 0 )
     {
         std::deque< PrimitiveAABBArea > s( primitives_.size() );
-        s_.resize( primitives_.size() );
+        primitive_id_.resize( primitives_.size() );
 
         AABB root_aabb;
 
@@ -40,21 +42,6 @@ bool BVH::intersect( const Ray &ray,
 BVH::~BVH( void )
 {}
 
-double BVH::area( const std::deque< PrimitiveAABBArea > &s ) const
-{
-    if ( s.size() == 0 )
-        return std::numeric_limits< double >::infinity();
-    else
-    {
-        AABB acc_aabb = s[0].aabb_;
-
-        for( std::size_t i = 1; i < s.size(); i++ )
-            acc_aabb = acc_aabb + s[i].aabb_;
-
-        return acc_aabb.getArea();
-    }
-}
-
 double BVH::SAH( std::size_t s1_size,
                  double s1_area,
                  std::size_t s2_size,
@@ -85,10 +72,9 @@ void BVH::splitNode( BVHNode **node,
     (*node)->left_ = nullptr;
     (*node)->right_ = nullptr;
 
-    std::deque< PrimitiveAABBArea > s1;
-    std::deque< PrimitiveAABBArea > s2;
+    std::deque< PrimitiveAABBArea > s_aux;
 
-    double best_cost = cost_intersec_tri_ * ( last - first + 1 );
+    double best_cost = cost_intersec_tri_ * ( last + 1 - first );
     int best_axis = -1;
     int best_event = -1;
 
@@ -107,33 +93,39 @@ void BVH::splitNode( BVHNode **node,
             break;
         }
 
-        // Sweep from left
-        s1.clear();
-        s2 = std::deque< PrimitiveAABBArea >( s.begin() + first, s.begin() + last + 1 );
-
+        s_aux = std::deque< PrimitiveAABBArea >( s.begin() + first, s.begin() + last + 1 );
         for ( std::size_t i = first; i <= last; i++ )
         {
-            s[i].left_area_ = area( s1 );
-            s1.push_back( s2.front() );
-            s2.pop_front();
+            if ( i == first )
+            {
+                s[i].left_area_ = std::numeric_limits< double >::infinity();
+                s_aux[0].left_aabb_ = s_aux[0].aabb_;
+            }
+            else
+            {
+                s[i].left_area_ = s_aux[ i - first - 1 ].left_aabb_.getArea();
+                s_aux[ i - first ].left_aabb_ = s_aux[ i - first ].aabb_ + s_aux[ i - first - 1 ].left_aabb_;
+            }
         }
-
-        // Sweep from right
-        s1 = std::deque< PrimitiveAABBArea >( s.begin() + first, s.begin() + last + 1 );
-        s2.clear();
 
         for ( long int i = last; i >= static_cast< long int >( first ); i-- )
         {
-            s[i].right_area_ = area( s2 );
+            if ( i == static_cast< long int >( last ) )
+            {
+                s[i].right_area_ = std::numeric_limits< double >::infinity();
+                s_aux[ last - first ].right_aabb_ = s_aux[ last - first ].aabb_;
+            }
+            else
+            {
+                s[i].right_area_ = s_aux[ i - first  + 1 ].right_aabb_.getArea();
+                s_aux[ i - first ].right_aabb_ = s_aux[ i - first ].aabb_ + s_aux[ i - first + 1 ].right_aabb_;
+            }
 
-            double this_cost = SAH( s1.size(),
+            double this_cost = SAH( i - first + 1,
                                     s[ ( i + 1 ) % ( s.size() + 1 ) ].left_area_, // Fixes an indexing problem from the original paper.
-                                    s2.size(),
+                                    last - i,
                                     s[i].right_area_,
                                     s_area );
-
-            s2.push_front( s1.back() );
-            s1.pop_back();
 
             if ( this_cost < best_cost )
             {
@@ -146,17 +138,26 @@ void BVH::splitNode( BVHNode **node,
 
     if ( best_axis == -1 ) // This is a leaf node
     {
+        primitives_inserted_ += last - first + 1;
+        std::stringstream progress_stream;
+        progress_stream << "\r  BVH progress .........................: "
+                        << std::fixed << std::setw( 6 )
+                        << std::setprecision( 2 )
+                        << 100.0 * static_cast< float >( primitives_inserted_ ) / ( primitives_.size() - 1 )
+                        << "%";
+        std::clog << progress_stream.str();
+
         for ( long unsigned int i = first; i <= last; i++ )
         {
-            s_[i].primitive_id_ = s[i].primitive_id_;
+            primitive_id_[i] = s[i].primitive_id_;
 
             if ( i == first )
                 (*node)->aabb_ = s[i].aabb_;
             else
             {
+                // TODO: AABBs are already constructed before the evaluation of the SAH function!
                 // build the AABB of the leaf node
-                (*node)->aabb_.min_ = glm::min( (*node)->aabb_.min_, s[i].aabb_.min_ );
-                (*node)->aabb_.max_ = glm::max( (*node)->aabb_.max_, s[i].aabb_.max_ );
+                (*node)->aabb_ = (*node)->aabb_ + s[i].aabb_;
             }
         }
     }
@@ -179,9 +180,9 @@ void BVH::splitNode( BVHNode **node,
         splitNode( &(*node)->left_, s, first, best_event, s_area );
         splitNode( &(*node)->right_, s, best_event + 1, last, s_area );
 
+        // TODO: AABBs are already constructed before the evaluation of the SAH function!
         // build the AABB of the inner node
-        (*node)->aabb_.min_ = glm::min( (*node)->left_->aabb_.min_, (*node)->right_->aabb_.min_ );
-        (*node)->aabb_.max_ = glm::max( (*node)->left_->aabb_.max_, (*node)->right_->aabb_.max_ );
+        (*node)->aabb_ = (*node)->left_->aabb_ + (*node)->right_->aabb_;
     }
 }
 
@@ -192,9 +193,6 @@ bool BVH::traverse( const BVHNode *node,
 {
     bool primitive_intersect = false;
 
-    // DEBUG
-    //std::cerr << ">>> " << path_str << "\n";
-
     if ( ( node ) && ( node->aabb_.intersect( ray ) ) )
     {
         if ( ( !node->left_ ) && ( !node->right_ ) ) // is a leaf node
@@ -203,7 +201,7 @@ bool BVH::traverse( const BVHNode *node,
 
             for ( std::size_t primitive_id = node->first_; primitive_id <= node->last_; primitive_id++ )
             {
-                if ( primitives_[s_[primitive_id].primitive_id_]->intersect( ray, tmp_intersection_record ) )
+                if ( primitives_[primitive_id_[primitive_id]]->intersect( ray, tmp_intersection_record ) )
                 {
                     if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
                     {
@@ -224,42 +222,6 @@ bool BVH::traverse( const BVHNode *node,
     }
 
     return primitive_intersect;
-
-    /*
-    bool intersection_result = false;
-
-    if ( ( !node->left_ ) && ( !node->right_ ) ) // is a leaf node
-    {
-        IntersectionRecord tmp_intersection_record;
-
-        for ( std::size_t primitive_id = node->first_; primitive_id <= node->last_; primitive_id++ )
-        {
-            if ( primitives_[primitive_id]->intersect( ray, tmp_intersection_record ) )
-            {
-                if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
-                {
-                    intersection_record = tmp_intersection_record;
-                    intersection_result = true;
-                }
-            }
-        }
-    }
-    else
-    {
-        assert( node->left_ );
-        assert( node->right_ );
-
-        if ( node->left_->aabb_.intersect( ray ) )
-            if ( traverse( node->left_, ray, intersection_record ) )
-                intersection_result = true;
-
-        if ( node->right_->aabb_.intersect( ray ) )
-            if ( traverse( node->right_, ray, intersection_record ) )
-                intersection_result = true;
-    }
-
-    return intersection_result;
-    //*/
 }
 
 void BVH::dump( void ) const
@@ -281,54 +243,13 @@ void BVH::dump( void ) const
             if ( node )
             {
                 if ( ( !node->left_ ) && ( !node->right_ ) )
-                    std::cerr << "l";
+                    std::cout << "l";
                 else
-                    std::cerr << "i";
+                    std::cout << "i";
 
-                std::cerr << " " << node->aabb_.min_.x << " " << node->aabb_.min_.y << " " << node->aabb_.min_.z;
-                std::cerr << " " << node->aabb_.max_.x << " " << node->aabb_.max_.y << " " << node->aabb_.max_.z;
-                std::cerr << "\n";
-
-                if ( node->left_ )
-                    queue.push( node->left_ );
-                if ( node->right_ )
-                    queue.push( node->right_ );
-            }
-            else
-                if ( !queue.empty() )
-                {
-                    queue.push( nullptr );
-                    std::cerr << "\n";
-                    depth++;
-                }
-        }
-    }
-}
-
-void BVH::dumpPrimitives( void ) const
-{
-    std::queue< BVHNode* > queue;
-    BVHNode *node = nullptr;
-    int depth = 0;
-
-    if ( root_node_ )
-    {
-        queue.push( root_node_ );
-        queue.push( nullptr );
-
-        while( !queue.empty() )
-        {
-            node = queue.front();
-            queue.pop();
-
-            if ( node )
-            {
-                for ( long unsigned int i = node->first_; i <= node->last_; i++  )
-                {
-                    primitives_[i]->printData();
-                }
-
-                std::cerr << "\n";
+                std::cout << " " << node->aabb_.min_.x << " " << node->aabb_.min_.y << " " << node->aabb_.min_.z;
+                std::cout << " " << node->aabb_.max_.x << " " << node->aabb_.max_.y << " " << node->aabb_.max_.z;
+                std::cout << "\n";
 
                 if ( node->left_ )
                     queue.push( node->left_ );
@@ -339,7 +260,7 @@ void BVH::dumpPrimitives( void ) const
                 if ( !queue.empty() )
                 {
                     queue.push( nullptr );
-                    std::cerr << "\n";
+                    std::cout << "\n";
                     depth++;
                 }
         }

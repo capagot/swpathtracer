@@ -148,7 +148,7 @@ void Scene::printInfo( void ) const
     else
         if ( acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH )
             std::cout << "BVH-SAH";
-            
+
     std::cout << std::endl;
     std::cout << std::endl;
 }
