@@ -3,6 +3,15 @@
 Scene::Scene( void )
 { }
 
+Scene::~Scene( void )
+{
+    if ( bvh_ )
+    {
+        delete bvh_;
+        bvh_ = nullptr;
+    }
+}
+
 void Scene::pushPrimitive( Primitive *primitive )
 {
     primitives_.push_back( Primitive::PrimitiveUniquePtr( primitive ) );
@@ -93,7 +102,10 @@ int Scene::loadMesh( const std::string &file_name,
 void Scene::buildAccelerationStructure( void )
 {
     if ( acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH )
+    {
         buildBVH();
+        std::clog << std::endl;
+    }
 }
 
 bool Scene::intersect( const Ray &ray,
@@ -135,7 +147,7 @@ bool Scene::intersect( const Ray &ray,
     return intersection_result;
 }
 
-void Scene::printInfo( void ) const
+void Scene::printInfoPreAccelerationStructure( void ) const
 {
     std::cout << "Scene: " << std::endl;
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
@@ -149,17 +161,15 @@ void Scene::printInfo( void ) const
         if ( acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH )
             std::cout << "BVH-SAH";
 
-    std::cout << std::endl;
-    std::cout << std::endl;
+    std::cout << std::endl << std::flush;
 }
+
+// TODO: print statistics genearted during the creation of the acceleration structure
+void Scene::printInfoPostAccelerationStructure( void ) const
+{}
 
 void Scene::buildBVH( void )
 {
-    // TODO: delete the BVH
     bvh_ = new BVH( primitives_ );
-
     //bvh_->dump();
-
-    //bvh_->dumpPrimitives();
-
 }

@@ -29,6 +29,8 @@ public:
 
     Scene( void );
 
+    ~Scene( void );
+
     void pushPrimitive( Primitive *primitive );
 
     void pushMaterial( const Material *material );
@@ -45,7 +47,9 @@ public:
                     long unsigned int &num_intersection_tests_,
                     long unsigned int &num_intersections_ ) const;
 
-    void printInfo( void ) const;
+    void printInfoPreAccelerationStructure( void ) const;
+
+    void printInfoPostAccelerationStructure( void ) const;
 
     std::vector< Primitive::PrimitiveUniquePtr > primitives_;
 

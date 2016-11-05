@@ -1,10 +1,11 @@
 #include "bvh.h"
 
-std::size_t BVH::primitives_inserted_ = 0;
-
 BVH::BVH( const std::vector< Primitive::PrimitiveUniquePtr > &primitives ) :
         primitives_( primitives )
 {
+    Timer t;
+    t.start();
+
     if ( primitives_.size() > 0 )
     {
         std::deque< PrimitiveAABBArea > s( primitives_.size() );
@@ -29,6 +30,18 @@ BVH::BVH( const std::vector< Primitive::PrimitiveUniquePtr > &primitives ) :
 
         splitNode( &root_node_, s, 0, s.size() - 1, root_aabb.getArea() );
     }
+
+    t.stop();
+    std::cout << "  total BVH construction time ......: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec.";
+}
+
+BVH::~BVH( void )
+{
+    if ( root_node_ )
+    {
+        delete root_node_;
+        root_node_ = nullptr;
+    }
 }
 
 bool BVH::intersect( const Ray &ray,
@@ -36,11 +49,8 @@ bool BVH::intersect( const Ray &ray,
                      long unsigned int &num_intersection_tests_,
                      long unsigned int &num_intersections_ ) const
 {
-    return traverse( root_node_, ray, intersection_record, "-" );
+    return traverse( root_node_, ray, intersection_record, num_intersection_tests_, num_intersections_ );
 }
-
-BVH::~BVH( void )
-{}
 
 double BVH::SAH( std::size_t s1_size,
                  double s1_area,
@@ -138,12 +148,13 @@ void BVH::splitNode( BVHNode **node,
 
     if ( best_axis == -1 ) // This is a leaf node
     {
+        //TODO: place the progress in the right place o the screen.
         primitives_inserted_ += last - first + 1;
         std::stringstream progress_stream;
-        progress_stream << "\r  BVH progress .........................: "
+        progress_stream << "\r  BVH building progress ............: "
                         << std::fixed << std::setw( 6 )
                         << std::setprecision( 2 )
-                        << 100.0 * static_cast< float >( primitives_inserted_ ) / ( primitives_.size() - 1 )
+                        << 100.0 * static_cast< float >( primitives_inserted_ ) / primitives_.size()
                         << "%";
         std::clog << progress_stream.str();
 
@@ -186,38 +197,52 @@ void BVH::splitNode( BVHNode **node,
     }
 }
 
+// TODO: test for null child before recursive call.
+//       remove the debug string parameter.
 bool BVH::traverse( const BVHNode *node,
                     const Ray &ray,
                     IntersectionRecord &intersection_record,
-                    std::string path_str ) const
+                    long unsigned int &num_intersection_tests_,
+                    long unsigned int &num_intersections_ ) const
 {
     bool primitive_intersect = false;
 
-    if ( ( node ) && ( node->aabb_.intersect( ray ) ) )
+    if ( node )
     {
-        if ( ( !node->left_ ) && ( !node->right_ ) ) // is a leaf node
-        {
-            IntersectionRecord tmp_intersection_record;
+        num_intersection_tests_++;
 
-            for ( std::size_t primitive_id = node->first_; primitive_id <= node->last_; primitive_id++ )
+        if ( node->aabb_.intersect( ray ) )
+        {
+            num_intersections_++;
+
+            if ( ( !node->left_ ) && ( !node->right_ ) ) // is a leaf node
             {
-                if ( primitives_[primitive_id_[primitive_id]]->intersect( ray, tmp_intersection_record ) )
+                IntersectionRecord tmp_intersection_record;
+
+                for ( std::size_t primitive_id = node->first_; primitive_id <= node->last_; primitive_id++ )
                 {
-                    if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
+                    num_intersection_tests_++;
+
+                    if ( primitives_[primitive_id_[primitive_id]]->intersect( ray, tmp_intersection_record ) )
                     {
-                        intersection_record = tmp_intersection_record;
-                        primitive_intersect = true;
+                        num_intersections_++;
+
+                        if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
+                        {
+                            intersection_record = tmp_intersection_record;
+                            primitive_intersect = true;
+                        }
                     }
                 }
             }
-        }
-        else
-        {
-            if ( traverse( node->left_, ray, intersection_record, path_str + "L" ) )
-                primitive_intersect = true;
+            else
+            {
+                if ( traverse( node->left_, ray, intersection_record, num_intersection_tests_, num_intersections_ ) )
+                    primitive_intersect = true;
 
-            if ( traverse( node->right_, ray, intersection_record, path_str + "R" ) )
-                primitive_intersect = true;
+                if ( traverse( node->right_, ray, intersection_record, num_intersection_tests_, num_intersections_ ) )
+                    primitive_intersect = true;
+            }
         }
     }
 

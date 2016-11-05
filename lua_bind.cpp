@@ -48,7 +48,6 @@ void LuaBind::loadFromScript( Camera **camera,
 
     // TODO: refactor this!!!!
     scene->acceleration_structure_ = scene_acceleration_data_structure;
-    scene->buildAccelerationStructure();
 }
 
 void LuaBind::getCamera( Camera **camera )

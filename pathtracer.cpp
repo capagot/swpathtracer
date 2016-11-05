@@ -120,20 +120,6 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
                                                                  glm::dot( intersection_record.normal_, new_ray.direction_ );
         }
     }
-    //*/
-
-    /*
-    if ( scene_.intersect( ray,
-                           intersection_record,
-                           num_intersection_tests_[ thread_id ],
-                           num_intersections_[ thread_id ] ) )
-    {
-        if ( glm::dot( intersection_record.normal_, -ray.direction_ ) < 0.0 )
-            intersection_record.normal_ = -intersection_record.normal_;
-
-        spectrum = glm::dvec3{ 1.0, 0.0, 0.0 };
-    }
-    //*/
     
     return spectrum;
 }

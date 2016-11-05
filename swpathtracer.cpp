@@ -56,9 +56,10 @@ int main( int num_args, char **arg_vector )
     std::cout << "  output file name .................: " << output_filename << std::endl;
 
     std::cout << std::endl;
-    scene.printInfo();
 
-    //exit(0);
+    scene.printInfoPreAccelerationStructure();
+    scene.buildAccelerationStructure();
+    scene.printInfoPostAccelerationStructure();
 
     std::cout << std::endl;
     rendering_buffer->printInfo();
@@ -78,10 +79,7 @@ int main( int num_args, char **arg_vector )
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
 
     pt.printInfoPreRendering();
-
-    // Renders the final image.
-    pt.integrate();
-
+    pt.integrate();                 // Renders the final image.
     pt.printInfoPostRendering();
 
     // Gamma-compress and save the final image to a .ppm file.
