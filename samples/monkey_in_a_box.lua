@@ -4,23 +4,26 @@ package.path = package.path .. ';./lua_core/?.lua'
 require "core"
 
 -------------------------------------------------------------------------------
+local image_width = 512
+local image_height = image_width
+
 Camera = camera{
     type     = "perspective",
     position = { 0, 0, 8 },
     up       = { 0, 1, 0 }, 
     look_at  = { 0, 0, 0 },
-    aspect   = 1024 / 768, 
-    fov      = 55
+    aspect   = image_width / image_height, 
+    fov      = 40
 }
 
 s = sampler{
     type = "jittered",
-    spp = 64
+    spp = 3200
 }
 
 b = buffer{
-    hres = 1024,
-    vres = 768
+    hres = image_width,
+    vres = image_height
 }
 
 g = globals{
