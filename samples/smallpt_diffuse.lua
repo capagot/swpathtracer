@@ -4,29 +4,34 @@ package.path = package.path .. ';./lua_core/?.lua'
 require "core"
 
 -------------------------------------------------------------------------------
+
+local image_x_res = 1024
+local image_y_res = 768
+
 Camera = camera{
     type     = "perspective",
     position = { 50, 52, 295.6 },
-    up       = { 0, 1, 0 }, 
+    up       = { 0, 1, 0 },
     look_at  = { 50, -0.042612 + 52, -1 + 295.6 },
-    aspect   = 1024 / 768, 
+    aspect   = image_x_res / image_y_res,
     fov      = 30
 }
 
 s = sampler{
     type = "jittered",
-    spp = 1600
+    spp = 200
 }
 
 b = buffer{
-    hres = 1024,
-    vres = 768
+    hres = image_x_res,
+    vres = image_y_res
 }
 
 g = globals{
     background_color = { 0, 0, 0 },
     max_path_depth = 5,
-    output_filename = "smallpt_diffuse.ppm"
+    output_filename = "smallpt_diffuse.ppm",
+    acceleration_data_structure = "none" -- rendering faster without BVH
 }
 
 -- top
@@ -53,7 +58,7 @@ s3 = sphere{
     emission = { 0, 0, 0 }
 }
 
--- left 
+-- left
 s4 = sphere{
     center = { 1e5 + 1, 40.8, 81.6 },
     radius = 1e5,
@@ -91,4 +96,3 @@ sphere2 = sphere{
     color = { 0.75, 0.75, 0.75 },
     emission = { 0, 0, 0 }
 }
-

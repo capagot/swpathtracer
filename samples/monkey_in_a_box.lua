@@ -9,24 +9,25 @@ Camera = camera{
     position = { 0, 0, 8 },
     up       = { 0, 1, 0 }, 
     look_at  = { 0, 0, 0 },
-    aspect   = 1024 / 768, 
+    aspect   = 1, 
     fov      = 55
 }
 
 s = sampler{
     type = "jittered",
-    spp = 64
+    spp = 200
 }
 
 b = buffer{
-    hres = 1024,
-    vres = 768
+    hres = 800,
+    vres = 800
 }
 
 g = globals{
     background_color = { 0, 0, 0 },
-    max_path_depth = 5,
-    output_filename = "monkey_in_a_box.ppm"
+    max_path_depth = 5,    
+    output_filename = "monkey_in_a_box.ppm",
+    acceleration_data_structure = "bvh-sah"
 }
 
 local a = 2

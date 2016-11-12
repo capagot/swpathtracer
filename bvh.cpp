@@ -148,7 +148,6 @@ void BVH::splitNode( BVHNode **node,
 
     if ( best_axis == -1 ) // This is a leaf node
     {
-        //TODO: place the progress in the right place o the screen.
         primitives_inserted_ += last - first + 1;
         std::stringstream progress_stream;
         progress_stream << "\r  BVH building progress ............: "
