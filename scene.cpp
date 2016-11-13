@@ -3,9 +3,18 @@
 Scene::Scene( void )
 { }
 
+Scene::~Scene( void )
+{
+    if ( bvh_ )
+    {
+        delete bvh_;
+        bvh_ = nullptr;
+    }
+}
+
 void Scene::pushPrimitive( Primitive *primitive )
 {
-    primitives_.push_back( primitive_ptr( primitive ) );
+    primitives_.push_back( Primitive::PrimitiveUniquePtr( primitive ) );
 }
 
 void Scene::pushMaterial( const Material *material )
@@ -82,7 +91,7 @@ int Scene::loadMesh( const std::string &file_name,
                 glm::dvec3 v1{ vertex_ptr[1].x, vertex_ptr[1].y, vertex_ptr[1].z };
                 glm::dvec3 v2{ vertex_ptr[2].x, vertex_ptr[2].y, vertex_ptr[2].z };
 
-                primitives_.push_back( primitive_ptr( new Triangle{ v0, v1, v2, &( materials_.back() ) } ) );
+                primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v0, v1, v2, &( materials_.back() ) } ) );
             }
         }
     }
@@ -90,12 +99,77 @@ int Scene::loadMesh( const std::string &file_name,
     return EXIT_SUCCESS;
 }
 
-void Scene::printInfo( void ) const
+void Scene::buildAccelerationStructure( void )
+{
+    if ( acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH )
+    {
+        buildBVH();
+        std::clog << std::endl;
+    }
+}
+
+bool Scene::intersect( const Ray &ray,
+                       IntersectionRecord &intersection_record,
+                       long unsigned int &num_intersection_tests_,
+                       long unsigned int &num_intersections_ ) const
+{
+    bool intersection_result = false;
+    IntersectionRecord tmp_intersection_record;
+    std::size_t num_primitives = primitives_.size();
+
+    switch( acceleration_structure_ )
+    {
+    case AccelerationStructure::NONE:
+        for ( std::size_t primitive_id = 0; primitive_id < num_primitives; primitive_id++ )
+        {
+            num_intersection_tests_++;
+
+            if ( primitives_[primitive_id]->intersect( ray, tmp_intersection_record ) )
+            {
+                num_intersections_++;
+
+                if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
+                {
+                    intersection_record = tmp_intersection_record;
+                    intersection_result = true;
+                }
+            }
+        }
+        break;
+    case AccelerationStructure::BVH_SAH:
+        intersection_result = bvh_->intersect( ray,
+                                               intersection_record,
+                                               num_intersection_tests_,
+                                               num_intersections_ );
+        break;
+    }
+
+    return intersection_result;
+}
+
+void Scene::printInfoPreAccelerationStructure( void ) const
 {
     std::cout << "Scene: " << std::endl;
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
     std::cout << "  # of primitives ..................: " << primitives_.size() << std::endl;
     std::cout << "  # of materials ...................: " << materials_.size() << std::endl;
-    std::cout << "  acceleration structures ..........: none" << std::endl;
+    std::cout << "  acceleration structure ...........: ";
+
+    if ( acceleration_structure_ == Scene::AccelerationStructure::NONE )
+        std::cout << "none";
+    else
+        if ( acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH )
+            std::cout << "BVH-SAH";
+
+    std::cout << std::endl << std::flush;
 }
 
+// TODO: print statistics genearted during the creation of the acceleration structure
+void Scene::printInfoPostAccelerationStructure( void ) const
+{}
+
+void Scene::buildBVH( void )
+{
+    bvh_ = new BVH( primitives_ );
+    //bvh_->dump();
+}

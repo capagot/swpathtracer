@@ -28,8 +28,9 @@ b = buffer{
 
 g = globals{
     background_color = { 0, 0, 0 },
-    max_path_depth = 5,
-    output_filename = "monkey_in_a_box.ppm"
+    max_path_depth = 5,    
+    output_filename = "monkey_in_a_box.ppm",
+    acceleration_data_structure = "bvh-sah"
 }
 
 local a = 2

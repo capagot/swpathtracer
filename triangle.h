@@ -13,7 +13,7 @@ public:
 
     Triangle( const glm::dvec3 &v0,
               const glm::dvec3 &v1,
-              const glm::dvec3 &v2,             
+              const glm::dvec3 &v2,
               const Material *material );
 
     Triangle( const glm::dvec3 &v0,
@@ -24,6 +24,10 @@ public:
 
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );
+
+    AABB getAABB( void ) const;
+
+    virtual void printData( void ) const;
 
     glm::dvec3 v0_ = { 0.0, 0.0, 0.0 };
 
@@ -39,4 +43,3 @@ private:
 };
 
 #endif /* TRIANGLE_H_ */
-

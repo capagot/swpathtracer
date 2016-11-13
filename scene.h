@@ -15,14 +15,21 @@
 #include "sphere.h"
 #include "lambertian.h"
 #include "material.h"
+#include "bvh.h"
 
 class Scene
 {
 public:
 
-    typedef std::unique_ptr< Primitive > primitive_ptr;
+    enum AccelerationStructure
+    {
+        NONE,
+        BVH_SAH
+    };
 
     Scene( void );
+
+    ~Scene( void );
 
     void pushPrimitive( Primitive *primitive );
 
@@ -33,18 +40,33 @@ public:
                   glm::dvec3 &min_aabb,
                   glm::dvec3 &max_aabb );
 
+    void buildAccelerationStructure( void );
 
-    void printInfo( void ) const;
+    bool intersect( const Ray &ray,
+                    IntersectionRecord &intersection_record,
+                    long unsigned int &num_intersection_tests_,
+                    long unsigned int &num_intersections_ ) const;
 
-    std::vector< primitive_ptr > primitives_;
+    void printInfoPreAccelerationStructure( void ) const;
+
+    void printInfoPostAccelerationStructure( void ) const;
+
+    std::vector< Primitive::PrimitiveUniquePtr > primitives_;
 
     // TODO: use pointers here too???
     std::list< Material > materials_;
 
+    // TODO: move this to private section
+    AccelerationStructure acceleration_structure_ = AccelerationStructure::NONE;
+
 private:
 
-    const aiScene* assimp_scene_ = nullptr;
+    void buildBVH( void );
+
+    const aiScene *assimp_scene_ = nullptr;
+
+    const BVH *bvh_ = nullptr;
+
 };
 
 #endif /* SCENE_H_ */
-

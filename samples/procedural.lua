@@ -15,7 +15,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 10000
+    spp = 200
 }
 
 b = buffer{
@@ -26,7 +26,8 @@ b = buffer{
 g = globals{
     background_color = { 0, 0, 0 },
     max_path_depth = 5,
-    output_filename = "procedural.ppm"
+    output_filename = "procedural.ppm",
+    acceleration_data_structure = "bvh-sah"
 }
 
 -- light source

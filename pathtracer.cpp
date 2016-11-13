@@ -37,9 +37,9 @@ void PathTracer::integrate( void )
 
     for ( std::size_t y = 0; y < buffer_.v_resolution_; y++ )
     {
-        std::stringstream progress_stream;        
+        std::stringstream progress_stream;
         progress_stream << "\r  progress .........................: "
-                        << std::fixed << std::setw( 6 ) 
+                        << std::fixed << std::setw( 6 )
                         << std::setprecision( 2 )
                         << 100.0 * y / ( buffer_.v_resolution_ - 1 )
                         << "%";
@@ -52,16 +52,16 @@ void PathTracer::integrate( void )
         {
             // Generate a set of 2D sampling points with coordinates in the interval
             // [-0.5, +0.5). The instantiated sampler will define the number and
-            // actual distribution (regular, uniform,...) of the points.
+            // actual sample distribution (regular, uniform,...).
             sampler_.generateSamplesCoords();
 
             for ( std::size_t samp = 0; samp < sampler_.size(); samp++ )
             {
-                // Transform a point from the continuous screen space into the 
+                // Transform a point from the continuous screen space into the
                 // normalized screen space (that ranges from -1.0 to +1.0 along 'x'
                 // and 'y'). The value 0.5 is added to the pixel coordinates in
                 // screen space in order to have the pixel center as the reference
-                // for the sampling points distribution.               
+                // for the sampling points distribution.
                 glm::dvec2 pixel_cam_space = glm::dvec2{ 2.0 * ( x + 0.5 + sampler_[samp].x ) / buffer_.h_resolution_ - 1.0,
                                                          2.0 * ( y + 0.5 + sampler_[samp].y ) / buffer_.v_resolution_ - 1.0 };
 
@@ -71,7 +71,7 @@ void PathTracer::integrate( void )
 
                 //double xx = x + 0.5 + sampler_[samp].x;
                 //double yy = y + 0.5 + sampler_[samp].y;
-                //buffer_.buffer_data_[x][y] += 0.5 * ( 1.0 + static_cast< double >( sin( ( xx * xx + yy * yy ) / 100.0 ) ) ); 
+                //buffer_.buffer_data_[x][y] += 0.5 * ( 1.0 + static_cast< double >( sin( ( xx * xx + yy * yy ) / 100.0 ) ) );
 
                 // Trace the ray path.
                 buffer_.buffer_data_[x][y] += integrate_recursive( ray, 0, thread_id );
@@ -81,9 +81,9 @@ void PathTracer::integrate( void )
             buffer_.buffer_data_[x][y] /= sampler_.size();
         }
     }
-    
+
     std::clog << std::endl;
-    
+
     t.stop();
     std::clog << "  total rendering time .............: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
 }
@@ -93,9 +93,7 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
                                             int thread_id )
 {
     IntersectionRecord intersection_record;
-    IntersectionRecord tmp_intersection_record;
-    std::size_t num_primitives = scene_.primitives_.size();
-    glm::dvec3 spectrum{ 0.0, 0.0, 0.0 };
+    glm::dvec3 spectrum{ background_color_ };
 
     intersection_record.t_ = std::numeric_limits< double >::max();
 
@@ -103,25 +101,15 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
     {
         num_rays_[ thread_id ]++ ;
 
-        for ( std::size_t primitive_id = 0; primitive_id < num_primitives; primitive_id++ )
-        {
-            num_intersection_tests_[ thread_id ]++;
-
-            if ( scene_.primitives_[primitive_id]->intersect( ray, tmp_intersection_record ) )
-            {
-                num_intersections_[ thread_id ]++;
-
-                if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
-                    intersection_record = tmp_intersection_record;
-            }
-        }
-
-        if ( intersection_record.t_ < std::numeric_limits< double >::max() )
+        if ( scene_.intersect( ray,
+                               intersection_record,
+                               num_intersection_tests_[ thread_id ],
+                               num_intersections_[ thread_id ] ) )
         {
             // flip the normal in the case of a 'backface' in two sided rendering
             if ( glm::dot( intersection_record.normal_, -ray.direction_ ) < 0.0 )
                 intersection_record.normal_ = -intersection_record.normal_;
-           
+
             glm::dvec3 new_dir = intersection_record.material_->bxdf_.getNewDirection( intersection_record.normal_, rng_ );
 
             Ray new_ray{ intersection_record.position_ + new_dir * 0.00001, new_dir };
@@ -131,12 +119,8 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
                                                                  integrate_recursive( new_ray, ++depth, thread_id ) *
                                                                  glm::dot( intersection_record.normal_, new_ray.direction_ );
         }
-        else
-            spectrum = background_color_;
     }
-    else
-        spectrum = background_color_;
-
+    
     return spectrum;
 }
 
@@ -148,9 +132,9 @@ void PathTracer::printInfoPreRendering( void ) const
 
 void PathTracer::printInfoPostRendering( void ) const
 {
-    unsigned long int num_rays = 0;
-    unsigned long int num_intersection_tests = 0;
-    unsigned long int num_intersections = 0;
+    long unsigned int num_rays = 0;
+    long unsigned int num_intersection_tests = 0;
+    long unsigned int num_intersections = 0;
 
     for ( unsigned int thread_id = 0; thread_id < num_rays_.size(); thread_id++ )
     {
@@ -169,4 +153,3 @@ void PathTracer::printInfoPostRendering( void ) const
                                                           << "% )"
                                                           << std::endl;
 }
-

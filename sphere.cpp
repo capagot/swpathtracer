@@ -1,7 +1,7 @@
 #include "sphere.h"
 
 Sphere::Sphere( void )
-{ }
+{}
 
 Sphere::Sphere( const glm::dvec3 &center,
                 double radius,
@@ -9,7 +9,7 @@ Sphere::Sphere( const glm::dvec3 &center,
                 Primitive{ material },
                 center_{ center },
                 radius_{ radius }
-{ }
+{}
 
 bool Sphere::intersect( const Ray &ray,
                         IntersectionRecord &intersection_record  )
@@ -27,7 +27,7 @@ bool Sphere::intersect( const Ray &ray,
     double t2;
 
     glm::dvec3 eo = center_ - ray.origin_;
-    double v = glm::dot( eo, ray.direction_ );    
+    double v = glm::dot( eo, ray.direction_ );
     double disc = ( radius_ * radius_ ) - ( glm::dot( eo, eo ) - ( v * v ) );
 
     if ( disc < 0.0 )
@@ -39,10 +39,30 @@ bool Sphere::intersect( const Ray &ray,
         t2 = v + d;                             // second intersection point
     }
 
+    // TODO: add reference to the intersected primitive
     intersection_record.t_ =  ( t1 > 0.00001 ) ? t1 : t2;
     intersection_record.position_ = ray.origin_ + intersection_record.t_ * ray.direction_;
     intersection_record.normal_ = glm::normalize( intersection_record.position_ - center_ );
     intersection_record.material_ = material_;
 
     return true;
+}
+
+AABB Sphere::getAABB( void ) const
+{
+    AABB aabb;
+
+    aabb.min_ = center_ - radius_;
+    aabb.max_ = center_ + radius_;
+    aabb.centroid_ = center_;
+
+    return aabb;
+}
+
+void Sphere::printData( void ) const
+{
+    std::cerr << "radius: " << radius_ << " ";
+    std::cerr << "center: " << center_.x << ", "
+                            << center_.y << ", "
+                            << center_.z << "\n";
 }
