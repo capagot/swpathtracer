@@ -36,7 +36,6 @@ public:
     //void pushMaterial( long unsigned int material_id );
 
     int loadMesh( const std::string &file_name,
-                  const Material &material,
                   glm::dvec3 &min_aabb,
                   glm::dvec3 &max_aabb );
 
@@ -53,9 +52,7 @@ public:
 
     std::vector< Primitive::PrimitiveUniquePtr > primitives_;
 
-    // TODO: use pointers here too???
-    //std::list< Material > materials_;
-    std::vector< Material > materials_;
+    std::vector< Material::MaterialUniquePtr > materials_;
 
     // TODO: move this to private section
     AccelerationStructure acceleration_structure_ = AccelerationStructure::NONE;

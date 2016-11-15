@@ -1,11 +1,15 @@
 #ifndef MATERIAL_H_
 #define MATERIAL_H_
 
+#include <memory>
+
 #include "lambertian.h"
 
 class Material
 {
 public:
+
+    typedef std::unique_ptr< Material > MaterialUniquePtr;
 
     Material( void );
 

@@ -119,8 +119,7 @@ void LuaBind::getTriangle( Scene *scene )
     parseVertices( "vertices", v );
     glm::dvec3 color = parseVec3( "color" );
     glm::dvec3 emission = parseVec3( "emission" );
-    scene->materials_.push_back( Material{ Lambertian{ color }, emission } );
-    //scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v[0], v[1], v[2], &(scene->materials_.back()) } ) );
+    scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ Lambertian{ color }, emission } ) );
     scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v[0], v[1], v[2], scene->materials_.size() - 1 } ) );
 }
 
@@ -130,8 +129,7 @@ void LuaBind::getSphere( Scene *scene )
     double radius = parseScalar( "radius" );
     glm::dvec3 color = parseVec3( "color" );
     glm::dvec3 emission = parseVec3( "emission" );
-    scene->materials_.push_back( Material{ Lambertian{ color }, emission } );
-    //scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Sphere{ center, radius, &(scene->materials_.back()) } ) );
+    scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ Lambertian{ color }, emission } ) );
     scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Sphere{ center, radius, scene->materials_.size() - 1 } ) );
 }
 
@@ -143,8 +141,8 @@ void LuaBind::getMesh( Scene *scene )
     glm::dvec3 min_aabb;
     glm::dvec3 max_aabb;
 
+    scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ Lambertian{ color }, emission } ) );
     scene->loadMesh( filename,
-                     Material{ Lambertian{ color }, emission },
                      min_aabb,
                      max_aabb );
 }
