@@ -5,10 +5,10 @@ Sphere::Sphere( void )
 
 Sphere::Sphere( const glm::dvec3 &center,
                 double radius,
-                const Material *material ) :
-                Primitive{ material },
-                center_{ center },
-                radius_{ radius }
+                long unsigned int material_id ) :
+        Primitive{ material_id },
+        center_{ center },
+        radius_{ radius }
 {}
 
 bool Sphere::intersect( const Ray &ray,
@@ -43,7 +43,7 @@ bool Sphere::intersect( const Ray &ray,
     intersection_record.t_ =  ( t1 > 0.00001 ) ? t1 : t2;
     intersection_record.position_ = ray.origin_ + intersection_record.t_ * ray.direction_;
     intersection_record.normal_ = glm::normalize( intersection_record.position_ - center_ );
-    intersection_record.material_ = material_;
+    intersection_record.material_id_ = material_id_;
 
     return true;
 }

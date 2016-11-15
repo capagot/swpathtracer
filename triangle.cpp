@@ -8,8 +8,8 @@ Triangle::Triangle( void )
 Triangle::Triangle( const glm::dvec3 &v0,
                     const glm::dvec3 &v1,
                     const glm::dvec3 &v2,
-                    const Material *material ) :
-        Primitive{ material },
+                    long unsigned int material_id ) :
+        Primitive{ material_id },
         v0_{ v0 },
         v1_{ v1 },
         v2_{ v2 },
@@ -20,8 +20,8 @@ Triangle::Triangle( const glm::dvec3 &v0,
                     const glm::dvec3 &v1,
                     const glm::dvec3 &v2,
                     const glm::dvec3 &normal,
-                    const Material *material ) :
-        Primitive{ material },
+                    long unsigned int material_id ) :
+        Primitive{ material_id },
         v0_{ v0 },
         v1_{ v1 },
         v2_{ v2 },
@@ -102,7 +102,7 @@ bool Triangle::intersect( const Ray &ray,
     intersection_record.t_ = t;
     intersection_record.position_ = ray.origin_ + ray.direction_ * t;
     intersection_record.normal_ = normal_;
-    intersection_record.material_ = material_;
+    intersection_record.material_id_ = material_id_;
 
     return true;
 }

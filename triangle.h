@@ -14,13 +14,13 @@ public:
     Triangle( const glm::dvec3 &v0,
               const glm::dvec3 &v1,
               const glm::dvec3 &v2,
-              const Material *material );
+              long unsigned int material_id );
 
     Triangle( const glm::dvec3 &v0,
               const glm::dvec3 &v1,
               const glm::dvec3 &v2,
               const glm::dvec3 &normal,
-              const Material *material );
+              long unsigned int material_id );
 
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );

@@ -9,7 +9,7 @@ public:
 
     Material( void );
 
-    Material( const Lambertian &bxdf, 
+    Material( const Lambertian &bxdf,
               const glm::dvec3 &emitted );
 
     Lambertian bxdf_;

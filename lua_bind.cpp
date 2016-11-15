@@ -120,7 +120,8 @@ void LuaBind::getTriangle( Scene *scene )
     glm::dvec3 color = parseVec3( "color" );
     glm::dvec3 emission = parseVec3( "emission" );
     scene->materials_.push_back( Material{ Lambertian{ color }, emission } );
-    scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v[0], v[1], v[2], &(scene->materials_.back()) } ) );
+    //scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v[0], v[1], v[2], &(scene->materials_.back()) } ) );
+    scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v[0], v[1], v[2], scene->materials_.size() - 1 } ) );
 }
 
 void LuaBind::getSphere( Scene *scene )
@@ -130,7 +131,8 @@ void LuaBind::getSphere( Scene *scene )
     glm::dvec3 color = parseVec3( "color" );
     glm::dvec3 emission = parseVec3( "emission" );
     scene->materials_.push_back( Material{ Lambertian{ color }, emission } );
-    scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Sphere{ center, radius, &(scene->materials_.back()) } ) );
+    //scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Sphere{ center, radius, &(scene->materials_.back()) } ) );
+    scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Sphere{ center, radius, scene->materials_.size() - 1 } ) );
 }
 
 void LuaBind::getMesh( Scene *scene )

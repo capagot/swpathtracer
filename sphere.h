@@ -13,7 +13,7 @@ public:
 
     Sphere( const glm::dvec3 &center,
             double radius,
-            const Material *material );
+            long unsigned int material_id );
 
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );

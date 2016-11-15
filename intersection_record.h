@@ -10,7 +10,7 @@ struct IntersectionRecord
     double t_;
     glm::dvec3 position_;
     glm::dvec3 normal_;
-    const Material *material_ = nullptr;
+    long unsigned int material_id_;
 };
 
 #endif /* INTERSECTION_RECORD_H_ */

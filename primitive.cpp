@@ -3,8 +3,8 @@
 Primitive::Primitive( void )
 { }
 
-Primitive::Primitive( const Material *material ) :
-        material_( material )
+Primitive::Primitive( long unsigned int material_id ) :
+        material_id_( material_id )
 { }
 
 Primitive::~Primitive( void )

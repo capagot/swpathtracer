@@ -7,7 +7,7 @@ CXXFLAGS = -std=c++11 -Wall -Wextra -Wpedantic -fopenmp
 ifeq ($(DEBUG), 1)
 CXXFLAGS += -DDEBUG -O0 -g3
 else
-CXXFLAGS += -DNDEBUG -O2 -g0
+CXXFLAGS += -DNDEBUG -O3 -g0
 endif
 
 CPPFLAGS += -MMD \

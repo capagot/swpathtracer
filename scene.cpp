@@ -12,15 +12,15 @@ Scene::~Scene( void )
     }
 }
 
-void Scene::pushPrimitive( Primitive *primitive )
-{
-    primitives_.push_back( Primitive::PrimitiveUniquePtr( primitive ) );
-}
+//void Scene::pushPrimitive( Primitive *primitive )
+//{
+//    primitives_.push_back( Primitive::PrimitiveUniquePtr( primitive ) );
+//}
 
-void Scene::pushMaterial( const Material *material )
-{
-    materials_.push_back( *material );
-}
+//void Scene::pushMaterial( const Material *material )
+//{
+//    materials_.push_back( *material );
+//}
 
 int Scene::loadMesh( const std::string &file_name,
                      const Material &material,
@@ -91,7 +91,8 @@ int Scene::loadMesh( const std::string &file_name,
                 glm::dvec3 v1{ vertex_ptr[1].x, vertex_ptr[1].y, vertex_ptr[1].z };
                 glm::dvec3 v2{ vertex_ptr[2].x, vertex_ptr[2].y, vertex_ptr[2].z };
 
-                primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v0, v1, v2, &( materials_.back() ) } ) );
+                //primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v0, v1, v2, &( materials_.back() ) } ) );
+                primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v0, v1, v2, materials_.size() - 1 } ) );
             }
         }
     }

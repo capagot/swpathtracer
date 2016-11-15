@@ -16,7 +16,7 @@ public:
 
     Primitive( void );
 
-    Primitive( const Material *material );
+    Primitive( long unsigned int material_id );
 
     virtual ~Primitive( void );
 
@@ -27,7 +27,7 @@ public:
 
     virtual void printData( void ) const = 0;
 
-    const Material *material_ = nullptr;
+    long unsigned int material_id_;
 };
 
 #endif /* PRIMITIVE_H_ */
