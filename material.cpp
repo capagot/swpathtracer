@@ -3,9 +3,8 @@
 Material::Material( void )
 { }
 
-Material::Material( const Lambertian &bxdf,
+Material::Material( BRDF::BRDFUniquePtr brdf,
                     const glm::dvec3 &emitted ) :
-        bxdf_{ bxdf },
+        brdf_( std::move( brdf ) ),
         emitted_{ emitted }
 { }
-

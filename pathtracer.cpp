@@ -110,14 +110,14 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
             if ( glm::dot( intersection_record.normal_, -ray.direction_ ) < 0.0 )
                 intersection_record.normal_ = -intersection_record.normal_;
 
-            glm::dvec3 new_dir = scene_.materials_[intersection_record.material_id_]->bxdf_.getNewDirection( intersection_record.normal_, rng_ );
+            glm::dvec3 new_dir = scene_.materials_[intersection_record.material_id_]->brdf_->getNewDirection( intersection_record.normal_, rng_ );
 
             Ray new_ray{ intersection_record.position_ + new_dir * 0.00001, new_dir };
 
             spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ + 2.0 * M_PI *
-                                                                            scene_.materials_[intersection_record.material_id_]->bxdf_.radiance_ /  M_PI * // TODO: move / M_PI into the BRDF
-                                                                            integrate_recursive( new_ray, ++depth, thread_id ) *
-                                                                            glm::dot( intersection_record.normal_, new_ray.direction_ );
+                                            scene_.materials_[intersection_record.material_id_]->brdf_->fr( -ray.direction_, new_ray.direction_ ) /  M_PI * // TODO: move / M_PI into the BRDF
+                                            integrate_recursive( new_ray, ++depth, thread_id ) *
+                                            glm::dot( intersection_record.normal_, new_ray.direction_ );
         }
     }
     

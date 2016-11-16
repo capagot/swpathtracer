@@ -13,10 +13,10 @@ public:
 
     Material( void );
 
-    Material( const Lambertian &bxdf,
+    Material( BRDF::BRDFUniquePtr brdf,
               const glm::dvec3 &emitted );
 
-    Lambertian bxdf_;
+    BRDF::BRDFUniquePtr brdf_;
 
     glm::dvec3 emitted_;
 };

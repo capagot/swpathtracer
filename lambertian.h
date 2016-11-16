@@ -3,14 +3,21 @@
 
 #include "onb.h"
 #include "random.h"
+#include "brdf.h"
 
-class Lambertian
+class Lambertian : public BRDF
 {
 public:
 
     Lambertian( void );
 
     Lambertian( const glm::dvec3 &radiance );
+
+    glm::dvec3 fr( const glm::dvec3 &w_i,
+                   const glm::dvec3 &w_r ) const
+    {
+        return radiance_;
+    }
 
     glm::dvec3 getNewDirection( const glm::dvec3 &normal,
                                 RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) const;
