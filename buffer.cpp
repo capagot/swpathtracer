@@ -58,21 +58,20 @@ void Buffer::printInfo( void ) const
 {
     std::cout << "Buffer:" << std::endl;
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
-    std::cout << "  resolution .......................: " << h_resolution_ 
-                                                          <<  " x " 
-                                                          << v_resolution_ 
+    std::cout << "  resolution .......................: " << h_resolution_
+                                                          <<  " x "
+                                                          << v_resolution_
                                                           << " ( " << h_resolution_ * v_resolution_ << " ) pixels" << std::endl;
     std::cout << "  pixel format .....................: RGB" << std::endl;
     std::cout << "  color component representation ...: double" << std::endl;
-    std::cout << "  gamma compression factor .........: 1 / 2.2 ( ~" << std::fixed << std::setw( 4 ) 
+    std::cout << "  gamma compression factor .........: 1 / 2.2 ( ~" << std::fixed << std::setw( 4 )
                                                                      << std::setprecision( 2 )
                                                                      << 1.0 / 2.2 << " )" << std::endl;
     std::size_t buffer_byte_size = spectrum_num_samples_ * sizeof( double ) * h_resolution_ * v_resolution_;
-    std::clog << "  total byte size ..................: " << buffer_byte_size << " bytes" 
-                                                          << " ( ~" 
+    std::clog << "  total byte size ..................: " << buffer_byte_size << " bytes"
+                                                          << " ( ~"
                                                           << std::fixed << std::setw( 6 )
                                                           << std::setprecision( 2 )
                                                           << buffer_byte_size / 1024.0 / 1024.0 << " MiB )"
                                                           << std::endl;
 }
-

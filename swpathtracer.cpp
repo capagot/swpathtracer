@@ -2,9 +2,11 @@
 
 int main( int num_args, char **arg_vector )
 {
-    // DEBUG
-    //omp_set_dynamic( 0 );     // Explicitly disable dynamic teams
-    //omp_set_num_threads( 1 );
+
+#ifdef DEBUG
+    omp_set_dynamic( 0 );     // Explicitly disable dynamic teams
+    omp_set_num_threads( 1 );
+#endif
 
     // Create only one instance of the RNG engine per thread. No more instances
     // are created during the execution of the program.

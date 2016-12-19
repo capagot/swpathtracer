@@ -22,4 +22,3 @@ public:
 };
 
 #endif /* MATERIAL_H_ */
-

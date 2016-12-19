@@ -93,34 +93,52 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
                                             int thread_id )
 {
     IntersectionRecord intersection_record;
-    glm::dvec3 spectrum{ background_color_ };
+    glm::dvec3 spectrum{ 0.0, 0.0, 0.0 };
 
     intersection_record.t_ = std::numeric_limits< double >::max();
 
     if ( depth < max_path_depth_ )
     {
-        num_rays_[ thread_id ]++ ;
+        num_rays_[ thread_id ]++;
 
         if ( scene_.intersect( ray,
                                intersection_record,
                                num_intersection_tests_[ thread_id ],
                                num_intersections_[ thread_id ] ) )
         {
-            // flip the normal in the case of a 'backface' in two sided rendering
+            // flip the normal in the case of a 'backface'
             if ( glm::dot( intersection_record.normal_, -ray.direction_ ) < 0.0 )
                 intersection_record.normal_ = -intersection_record.normal_;
 
-            glm::dvec3 new_dir = scene_.materials_[intersection_record.material_id_]->brdf_->getNewDirection( intersection_record.normal_, rng_ );
+            // TODO: getNewDirection generates a ray in tangent space and transforms it back to universe space.
+            //       Maybe it would be more logical to pull this transformation out of the  getNewDirection method.
+            glm::dvec3 new_dir = scene_.materials_[intersection_record.material_id_]->brdf_->getNewDirection( ray.direction_,
+                                                                                                              intersection_record.normal_,
+                                                                                                              rng_ );
 
             Ray new_ray{ intersection_record.position_ + new_dir * 0.00001, new_dir };
 
-            spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ + 2.0 * M_PI *
-                                            scene_.materials_[intersection_record.material_id_]->brdf_->fr( -ray.direction_, new_ray.direction_ ) /  M_PI * // TODO: move / M_PI into the BRDF
-                                            integrate_recursive( new_ray, ++depth, thread_id ) *
-                                            glm::dot( intersection_record.normal_, new_ray.direction_ );
+            // Transform the light and reflected rays into the surface tangent frame centered at the intersection point.
+            // TODO: Simplify this... maybe ONB can have only static methods...
+            ONB tangent_frame;
+            tangent_frame.setFromV( intersection_record.normal_ );
+            glm::dmat3x3 universe_to_tangent_space = glm::transpose( tangent_frame.getBasisMatrix() );
+            glm::dvec3 w_i = universe_to_tangent_space * -ray.direction_;
+            glm::dvec3 w_r = universe_to_tangent_space * new_ray.direction_;
+
+            //spectrum = scene_.materials_[intersection_record.material_id_]->brdf_->fr( w_i, w_r );
+
+            spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ +
+                       scene_.materials_[intersection_record.material_id_]->brdf_->fr( w_i, w_r ) *
+                       integrate_recursive( new_ray, ++depth, thread_id );
         }
+        else
+            // If the primary ray does not hit anything,
+            // tint the pixel with the background color.
+            if ( !depth )
+                spectrum = background_color_;
     }
-    
+
     return spectrum;
 }
 

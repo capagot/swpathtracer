@@ -6,3 +6,5 @@ require "samplers"
 require "buffers"
 require "colors"
 require "globals"
+require "material"
+

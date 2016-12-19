@@ -7,15 +7,15 @@ class ONB
 {
 public:
 
-    // The default constructor creates a standard ONB.
+    // The default constructor creates a "standard" ONB.
     ONB( void );
 
-    // Sets up an ONB from an normalized input vector 'v' that will be assumed to be aligned to
+    // Set up an ONB from an normalized input vector 'v' that will be assumed to be aligned to
     // the 'v' (up) vector of the ONB to be created.
     void setFromV( const glm::dvec3 &v );
 
-    // Sets up an ONB from the normalized input vectors 'u' and 'w', that will be assumed to be aligned to
-    // the vectors 'u' (up) and 'w' vectors of the ONB to be created.
+    // Set up an ONB from the normalized input vectors 'u' and 'w', that will be assumed to be aligned to
+    // the vectors 'u' (right) and 'w' vectors of the ONB to be created.
     void setFromUW( const glm::dvec3 &u,
                     const glm::dvec3 &w );
 

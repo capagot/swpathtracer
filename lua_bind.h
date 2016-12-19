@@ -49,6 +49,12 @@ private:
                      std::string &output_filename,
                      Scene::AccelerationStructure &scene_acceleration_data_structure );
 
+    void getLambertianBRDF( Scene *scene );
+
+    void getCookTorranceBRDF( Scene *scene );
+
+    void getMaterial( Scene *scene );
+
     void getTriangle( Scene *scene );
 
     void getSphere( Scene *scene );

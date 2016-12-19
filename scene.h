@@ -14,6 +14,7 @@
 #include "triangle.h"
 #include "sphere.h"
 #include "lambertian.h"
+#include "cook_torrance.h"
 #include "material.h"
 #include "bvh.h"
 

@@ -112,14 +112,114 @@ void LuaBind::getGlobals( glm::dvec3 &background_color,
         scene_acceleration_data_structure = Scene::AccelerationStructure::BVH_SAH;
 }
 
+void LuaBind::getLambertianBRDF( Scene *scene )
+{
+    glm::dvec3 kd = parseVec3( "kd" );
+
+    //scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ kd } ), emission } ) );
+}
+
+void LuaBind::getCookTorranceBRDF( Scene *scene )
+{
+    std::string material_type = parseString( "material_type" );
+    double s = parseScalar( "s" );
+    double d = parseScalar( "d" );
+    double m = parseScalar( "m" );
+    double ior = parseScalar( "ior" );
+    glm::dvec3 kd = parseVec3( "kd" );
+
+    //scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ color } ), emission } ) );
+
+    // DEBUG
+    /*
+    std::clog << "mat type ..: " << material_type << "\n";
+    std::clog << "s .........: " << s << "\n";
+    std::clog << "d .........: " << d << "\n";
+    std::clog << "m .........: " << m << "\n";
+    std::clog << "ior .......: " << ior << "\n";
+    std::clog << "kd ........: " << kd[0] << ", " << kd[1] << ", " << kd[2] << "\n";
+    //*/
+}
+
+void LuaBind::getMaterial( Scene *scene )
+{
+    lua_pushstring( lua_state_, "material" );
+    lua_gettable( lua_state_, -2 );
+
+    if( lua_istable( lua_state_, -1) )
+    {
+        glm::dvec3 emission = parseVec3( "emission" );
+        std::clog << "emission .............: " << emission[0] << ", " << emission[1] << ", " << emission[2] << "\n";
+
+        lua_pushstring( lua_state_, "brdf" );
+        lua_gettable( lua_state_, -2 );
+
+        lua_pushstring( lua_state_, "object_type" );
+        lua_gettable( lua_state_, -2 );
+
+        if( lua_isstring( lua_state_, -1) )
+        {
+            std::string object_type = lua_tostring( lua_state_, -1 );
+
+            lua_pop( lua_state_, 1 );
+
+            if ( object_type  == "lambertian_brdf" )
+            {
+                std::clog << "lambertian:\n";
+
+                glm::dvec3 kd = parseVec3( "kd" );
+
+                std::clog << "  kd .................: " << kd[0] << ", " << kd[1] << ", " << kd[2] << "\n";
+                std::clog << "\n\n";
+
+                scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ kd } ), emission } ) );
+            }
+
+            if ( object_type  == "cook_torrance_brdf" )
+            {
+                std::clog << "cook:\n";
+
+                std::string material_type = parseString( "material_type" );
+                double s = parseScalar( "s" );
+                double d = parseScalar( "d" );
+                double m = parseScalar( "m" );
+                //double ior = parseScalar( "ior" );
+                //double k = parseScalar( "ior" );
+                glm::dvec3 kd = parseVec3( "kd" );
+                glm::dvec3 ks = parseVec3( "ks" );
+
+                std::clog << "  material_type ......: " << material_type << "\n";
+                std::clog << "  s ..................: " << s << "\n";
+                std::clog << "  d ..................: " << d << "\n";
+                std::clog << "  m ..................: " << m << "\n";
+                //std::clog << "  ior ................: " << ior << "\n";
+                //std::clog << "  k ................: " << k << "\n";
+                std::clog << "  kd .................: " << kd[0] << ", " << kd[1] << ", " << kd[2] << "\n";
+                std::clog << "  ks .................: " << ks[0] << ", " << ks[1] << ", " << ks[2] << "\n";
+                std::clog << "\n\n";
+
+                scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new CookTorrance{ material_type,
+                                                                                                                               s,
+                                                                                                                               d,
+                                                                                                                               m,
+                                                                                                                               0.0,
+                                                                                                                               0.0,
+                                                                                                                               kd,
+                                                                                                                               ks } ),
+                                                                                                                               emission } ) );
+            }
+        }
+    }
+
+    lua_pop( lua_state_, 2 );
+}
+
 void LuaBind::getTriangle( Scene *scene )
 {
     glm::dvec3 v[3];
 
     parseVertices( "vertices", v );
-    glm::dvec3 color = parseVec3( "color" );
-    glm::dvec3 emission = parseVec3( "emission" );
-    scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ color } ), emission } ) );
+    getMaterial( scene );
     scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v[0], v[1], v[2], scene->materials_.size() - 1 } ) );
 }
 
@@ -127,21 +227,16 @@ void LuaBind::getSphere( Scene *scene )
 {
     glm::dvec3 center = parseVec3( "center" );
     double radius = parseScalar( "radius" );
-    glm::dvec3 color = parseVec3( "color" );
-    glm::dvec3 emission = parseVec3( "emission" );
-    scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ color } ), emission } ) );
+    getMaterial( scene );
     scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Sphere{ center, radius, scene->materials_.size() - 1 } ) );
 }
 
 void LuaBind::getMesh( Scene *scene )
 {
     std::string filename = parseString( "filename" );
-    glm::dvec3 color = parseVec3( "color" );
-    glm::dvec3 emission = parseVec3( "emission" );
     glm::dvec3 min_aabb;
     glm::dvec3 max_aabb;
-
-    scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ color } ), emission } ) );
+    getMaterial( scene );
     scene->loadMesh( filename,
                      min_aabb,
                      max_aabb );

@@ -16,10 +16,15 @@ public:
     glm::dvec3 fr( const glm::dvec3 &w_i,
                    const glm::dvec3 &w_r ) const
     {
-        return radiance_;
+        ( void ) w_i; // unused variable
+
+        return 2.0 * radiance_ *  w_r.y;
+
+        //return radiance_;
     }
 
-    glm::dvec3 getNewDirection( const glm::dvec3 &normal,
+    glm::dvec3 getNewDirection( const glm::dvec3 &w_i,
+                                const glm::dvec3 &normal,
                                 RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) const;
 
     glm::dvec3 radiance_ = glm::dvec3{ 0.5, 0.5, 0.5 };
@@ -27,4 +32,3 @@ public:
 };
 
 #endif /* LAMBERTIAN_H_ */
-
