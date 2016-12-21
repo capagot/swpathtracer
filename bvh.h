@@ -19,8 +19,6 @@ public:
     {
         ~BVHNode( void )
         {
-            //std::cerr << " BVHNode dtor...\n";
-
             if ( left_ )
             {
                 delete left_;
@@ -111,10 +109,10 @@ private:
 
     std::deque< long unsigned int > primitive_id_;
 
-    // TODO: refactor this!
     const std::vector< Primitive::PrimitiveUniquePtr > &primitives_;
 
     std::size_t primitives_inserted_ = 0;
 };
 
 #endif /* BVH_H_ */
+

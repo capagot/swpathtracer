@@ -11,13 +11,9 @@ public:
 
     CookTorrance( void );
 
-    CookTorrance( const std::string &material_type, // TODO: change for enum !
-                  double s,
-                  double d,
-                  double m,
+    CookTorrance( double m,
                   double ior,
                   double k,
-                  const glm::dvec3 &kd,
                   const glm::dvec3 &ks );
 
     glm::dvec3 fr( const glm::dvec3 &w_i,
@@ -46,14 +42,7 @@ public:
 
         glm::dvec3 specular = ( f * d * g ) / ( 4.0 * nv * nl );
 
-        //return 2.0 * M_PI * ( ( d_ * kd_ ) / M_PI + ( s_ * specular ) ) * w_r.y ;
-
-        return 2.0 * M_PI * s_ * specular * w_r.y ;
-
-        //return  ( 1.0 / d ) * s_ * specular * w_r.y ;
-
-
-
+        return 2.0 * M_PI * specular * w_r.y ;
     }
 
     glm::dvec3 getNewDirection( const glm::dvec3 &w_i,
@@ -62,21 +51,14 @@ public:
 
 private:
 
-    std::string material_type_;
+    double m_;          // roughness
 
-    double s_;
+    double ior_;        // index of refraction
 
-    double d_;
+    double k_;          // extinction coefficient
 
-    double m_;
-
-    double ior_;  // index of refraction
-
-    double k_;    // extinction coefficient
-
-    glm::dvec3 kd_;
-
-    glm::dvec3 ks_;
+    glm::dvec3 ks_;     // specular color
 };
 
 #endif /* COOK_TORRANCE_H_ */
+

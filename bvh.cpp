@@ -62,20 +62,19 @@ double BVH::SAH( std::size_t s1_size,
                                        ( ( s2_area / s_area ) * s2_size * cost_intersec_tri_ );
 }
 
+/* BVH construction based on the algorithm presented in the paper:
+ *
+ *     "Ray Tracing Deformable Scenes Using Dynamic Bounding Volume Hierarchies".
+ *     Ingo Wald, Solomon Boulos, and Peter Shirley
+ *     ACM Transactions on Graphics.
+ *     Volume 26 Issue 1, 2007.
+ */
 void BVH::splitNode( BVHNode **node,
                      std::deque< PrimitiveAABBArea > &s,
                      std::size_t first,
                      std::size_t last,
                      double s_area )
 {
-    /* BVH construction based on the algorithm presented in the paper:
-     *
-     *     "Ray Tracing Deformable Scenes Using Dynamic Bounding Volume Hierarchies".
-     *     Ingo Wald, Solomon Boulos, and Peter Shirley
-     *     ACM Transactions on Graphics.
-     *     Volume 26 Issue 1, 2007.
-     */
-
     (*node) = new BVHNode();
     (*node)->first_ = first;
     (*node)->last_ = last;
@@ -164,11 +163,7 @@ void BVH::splitNode( BVHNode **node,
             if ( i == first )
                 (*node)->aabb_ = s[i].aabb_;
             else
-            {
-                // TODO: AABBs are already constructed before the evaluation of the SAH function!
-                // build the AABB of the leaf node
                 (*node)->aabb_ = (*node)->aabb_ + s[i].aabb_;
-            }
         }
     }
     else // This is an inner node
@@ -190,14 +185,11 @@ void BVH::splitNode( BVHNode **node,
         splitNode( &(*node)->left_, s, first, best_event, s_area );
         splitNode( &(*node)->right_, s, best_event + 1, last, s_area );
 
-        // TODO: AABBs are already constructed before the evaluation of the SAH function!
-        // build the AABB of the inner node
         (*node)->aabb_ = (*node)->left_->aabb_ + (*node)->right_->aabb_;
     }
 }
 
 // TODO: test for null child before recursive call.
-//       remove the debug string parameter.
 bool BVH::traverse( const BVHNode *node,
                     const Ray &ray,
                     IntersectionRecord &intersection_record,
@@ -290,3 +282,4 @@ void BVH::dump( void ) const
         }
     }
 }
+

@@ -115,8 +115,6 @@ void LuaBind::getGlobals( glm::dvec3 &background_color,
 void LuaBind::getLambertianBRDF( Scene *scene )
 {
     glm::dvec3 kd = parseVec3( "kd" );
-
-    //scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ kd } ), emission } ) );
 }
 
 void LuaBind::getCookTorranceBRDF( Scene *scene )
@@ -127,18 +125,6 @@ void LuaBind::getCookTorranceBRDF( Scene *scene )
     double m = parseScalar( "m" );
     double ior = parseScalar( "ior" );
     glm::dvec3 kd = parseVec3( "kd" );
-
-    //scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ color } ), emission } ) );
-
-    // DEBUG
-    /*
-    std::clog << "mat type ..: " << material_type << "\n";
-    std::clog << "s .........: " << s << "\n";
-    std::clog << "d .........: " << d << "\n";
-    std::clog << "m .........: " << m << "\n";
-    std::clog << "ior .......: " << ior << "\n";
-    std::clog << "kd ........: " << kd[0] << ", " << kd[1] << ", " << kd[2] << "\n";
-    //*/
 }
 
 void LuaBind::getMaterial( Scene *scene )
@@ -179,32 +165,22 @@ void LuaBind::getMaterial( Scene *scene )
             {
                 std::clog << "cook:\n";
 
-                std::string material_type = parseString( "material_type" );
-                double s = parseScalar( "s" );
-                double d = parseScalar( "d" );
                 double m = parseScalar( "m" );
                 //double ior = parseScalar( "ior" );
                 //double k = parseScalar( "ior" );
-                glm::dvec3 kd = parseVec3( "kd" );
                 glm::dvec3 ks = parseVec3( "ks" );
 
-                std::clog << "  material_type ......: " << material_type << "\n";
-                std::clog << "  s ..................: " << s << "\n";
-                std::clog << "  d ..................: " << d << "\n";
+                
                 std::clog << "  m ..................: " << m << "\n";
                 //std::clog << "  ior ................: " << ior << "\n";
                 //std::clog << "  k ................: " << k << "\n";
-                std::clog << "  kd .................: " << kd[0] << ", " << kd[1] << ", " << kd[2] << "\n";
                 std::clog << "  ks .................: " << ks[0] << ", " << ks[1] << ", " << ks[2] << "\n";
                 std::clog << "\n\n";
+                //*/
 
-                scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new CookTorrance{ material_type,
-                                                                                                                               s,
-                                                                                                                               d,
-                                                                                                                               m,
+                scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new CookTorrance{ m,
                                                                                                                                0.0,
                                                                                                                                0.0,
-                                                                                                                               kd,
                                                                                                                                ks } ),
                                                                                                                                emission } ) );
             }
@@ -367,3 +343,4 @@ void LuaBind::parseVertices( const std::string &s,
 
     lua_pop( lua_state_, 2 );
 }
+
