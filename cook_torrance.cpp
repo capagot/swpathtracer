@@ -18,6 +18,7 @@ glm::dvec3 CookTorrance::getNewDirection( const glm::dvec3 &w_i,
                                           RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) const
 {
     ONB onb;
+    ( void ) w_i; // unused variable
 
     // Builds a local tangential reference frame oriented according to the input 'normal' vector.
     // (the 'v' axis (up) of the tangential space will be aligned to the 'normal' input vector).
@@ -28,6 +29,8 @@ glm::dvec3 CookTorrance::getNewDirection( const glm::dvec3 &w_i,
     double r1 = rng();
     double r2 = rng();
     double phi = 2.0 * M_PI * r2;
+
+    // uniform distribution
 
     double sqrt_sin_theta = sqrt( 1.0 - r1 * r1 );
     glm::dvec3 dir = { cos( phi ) * sqrt_sin_theta,

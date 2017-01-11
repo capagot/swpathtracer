@@ -4,16 +4,19 @@ package.path = package.path .. ';./lua_core/?.lua'
 require "core"
 
 -------------------------------------------------------------------------------
+local image_width = 320
+local image_height = 320
+
 Camera = camera{
     type     = "orthographic",
     position = { 0, 0, 6 },
     up       = { 0, 1, 0 },
     look_at  = { 0, 0, 0 },
-    aspect   = 1,
-    minx      = -1,
-    maxx      = 1,
-    miny      = -1,
-    maxy      = 1
+    aspect   = image_width / image_height,
+    minx      = -1.25,
+    maxx      = 1.25,
+    miny      = -1.25,
+    maxy      = 1.25
 }
 
 s = sampler{
@@ -22,8 +25,8 @@ s = sampler{
 }
 
 b = buffer{
-    hres = 320,
-    vres = 320
+    hres = image_width,
+    vres = image_height
 }
 
 g = globals{
@@ -34,18 +37,22 @@ g = globals{
 }
 
 -- light source
-s0 = sphere{
+light_source = sphere{
     center = { 0, 0, 0 },
     radius = 10,
-    color = { 0, 0, 0 },
-    emission = { .18, .18, .18 }
+    material = {
+                 brdf     = lambertian{ kd = { 0, 0, 0 } },
+                 emission = { 1, 1, 1 }
+               }
 }
 
 -- sphere
 s1 = sphere{
     center = { 0, 0, 0 },
     radius = 1,
-    color = { 1, 1, 1 },
-    emission = { 0, 0, 0 }
+    material = {
+                 brdf     = lambertian{ kd = { 1, 1, 1 } },
+                 emission = { 0, 0, 0 }
+               }
 }
 

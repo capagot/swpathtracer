@@ -5,6 +5,20 @@
 #include "random.h"
 #include "brdf.h"
 
+/* The CookTorrance class implements a microfacet-based BRDF model for rough specular surfaces.
+ * It implements the rough specular term proposed originally in [1] and includes the normalizing
+ * factors proposed in [2]. The Fresnel term currently used is based on a simple (and efficient)
+ * approximation proposed originally in [1]. This will be replaced by a more accurate Fresnel term
+ * in a future release.
+ *
+ *     [1] "A Reflectance Model for Computer Graphics"
+ *         Cook, R. L. and Torrance, K. E.
+ *         ACM Transactions on Graphics, ACM, 1982, 1, 7-24 
+ *
+ *     [2] "Microfacet Models for Refraction Through Rough Surfaces"
+ *         Walter, B.; Marschner, S. R.; Li, H. and Torrance, K. E.
+ *         Proceedings of the 18th Eurographics Conference on Rendering Techniques, Eurographics Association, 2007, 195-206.
+ */
 class CookTorrance : public BRDF
 {
 public:
@@ -20,11 +34,11 @@ public:
                    const glm::dvec3 &w_r ) const
     {
         glm::dvec3 h = glm::normalize( w_i + w_r );
-        double nh  = std::abs( h.y );
-        double nv  = std::abs( w_i.y );
-        double nl  = std::abs( w_r.y );
-        double vh  = std::abs( glm::dot( w_i, h ) );
-        double lh  = std::abs( glm::dot( w_r, h ) );
+        double nh = std::abs( h.y );
+        double nv = std::abs( w_i.y );
+        double nl = std::abs( w_r.y );
+        double vh = std::abs( glm::dot( w_i, h ) );
+        double lh = std::abs( glm::dot( w_r, h ) );
 
         // Beckman normal distribution function
         double nh_2 = nh * nh;
@@ -38,6 +52,7 @@ public:
         double g = std::min( 1.0, std::min( g1 * nv, g1 * nl ) );
 
         // Fresnel term according to the Cook-Torrance approximation
+        // TODO: Replace this Fresnel approximation by another one, more accurate. 
         glm::dvec3 f = ks_ + ( 1.0 - ks_ ) * pow( 1.0 - lh, 5.0 );
 
         glm::dvec3 specular = ( f * d * g ) / ( 4.0 * nv * nl );

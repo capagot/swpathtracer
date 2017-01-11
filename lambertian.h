@@ -19,8 +19,6 @@ public:
         ( void ) w_i; // unused variable
 
         return 2.0 * radiance_ *  w_r.y;
-
-        //return radiance_;
     }
 
     glm::dvec3 getNewDirection( const glm::dvec3 &w_i,

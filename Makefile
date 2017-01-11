@@ -11,7 +11,7 @@ CXXFLAGS += -DNDEBUG -O3 -g0
 endif
 
 CPPFLAGS += -MMD \
-			-I/home/christian/work/common/glm-0.9.7.0 \
+			-I../../../../work/common/glm-0.9.7.0 \
 			-I/usr/include/lua5.2 \
 			-I/usr/local/include
 
