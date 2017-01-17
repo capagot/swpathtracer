@@ -16,7 +16,7 @@ As a way to record and share information about the evolution of the project, I'v
 - Perfectly diffuse (Lambertian) surfaces.
 - Rough metallic surfaces described by a Cook-Torrance-based microfacet BRDF model.
 - Diffuse light sources.
-- BRDFs evaluated with uniform sampling.
+- BRDFs evaluated with importance sampling.
 - RGB spectrum.
 - Naïve (brute force) path tracing, with a maximum prescribed path depth.
 - Regular, uniform and jittered box-filtered pixel samplers.
