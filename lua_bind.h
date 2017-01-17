@@ -49,13 +49,17 @@ private:
                      std::string &output_filename,
                      Scene::AccelerationStructure &scene_acceleration_data_structure );
 
-    void getMaterial( Scene *scene );
+    void getMaterial( Scene *scene,
+                      RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
-    void getTriangle( Scene *scene );
+    void getTriangle( Scene *scene,
+                      RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
-    void getSphere( Scene *scene );
+    void getSphere( Scene *scene,
+                    RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
-    void getMesh( Scene *scene );
+    void getMesh( Scene *scene,
+                  RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
     void getElements( Camera **camera,
                       Sampler **sampler,

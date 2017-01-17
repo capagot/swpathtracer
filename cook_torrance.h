@@ -23,12 +23,13 @@ class CookTorrance : public BRDF
 {
 public:
 
-    CookTorrance( void );
+    //CookTorrance( void );
 
     CookTorrance( double m,
                   double ior,
                   double k,
-                  const glm::dvec3 &ks );
+                  const glm::dvec3 &ks,
+                  SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler );
 
     glm::dvec3 fr( const glm::dvec3 &w_i,
                    const glm::dvec3 &w_r ) const
@@ -57,7 +58,7 @@ public:
 
         glm::dvec3 specular = ( f * d * g ) / ( 4.0 * nv * nl );
 
-        return 2.0 * M_PI * specular * w_r.y ;
+        return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * specular * w_r.y ;
     }
 
     glm::dvec3 getNewDirection( const glm::dvec3 &w_i,

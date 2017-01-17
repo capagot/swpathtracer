@@ -18,7 +18,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 400
+    spp = 16000
 }
 
 b = buffer{
@@ -30,7 +30,7 @@ g = globals{
     background_color = { 0, 0, 0 },
     max_path_depth = 5,    
     output_filename = "monkey_in_a_box.ppm",
-    acceleration_data_structure = "none" --"bvh-sah"
+    acceleration_data_structure = "bvh-sah"
 }
 
 local a = 2

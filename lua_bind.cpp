@@ -112,7 +112,8 @@ void LuaBind::getGlobals( glm::dvec3 &background_color,
         scene_acceleration_data_structure = Scene::AccelerationStructure::BVH_SAH;
 }
 
-void LuaBind::getMaterial( Scene *scene )
+void LuaBind::getMaterial( Scene *scene,
+                           RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     lua_pushstring( lua_state_, "material" );
     lua_gettable( lua_state_, -2 );
@@ -136,7 +137,9 @@ void LuaBind::getMaterial( Scene *scene )
             if ( object_type  == "lambertian_brdf" )
             {
                 glm::dvec3 kd = parseVec3( "kd" );
-                scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ kd } ), emission } ) );
+                //scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ kd, SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerUniform( rng ) } } ), emission } ) );
+                scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new Lambertian{ kd, SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerCosine( rng ) } } ),
+                                                                                        emission } ) );
             }
 
             if ( object_type  == "cook_torrance_brdf" )
@@ -146,8 +149,12 @@ void LuaBind::getMaterial( Scene *scene )
                 scene->materials_.push_back( Material::MaterialUniquePtr( new Material{ BRDF::BRDFUniquePtr( new CookTorrance{ m,
                                                                                                                                0.0,
                                                                                                                                0.0,
-                                                                                                                               ks } ),
-                                                                                                                               emission } ) );
+                                                                                                                               ks,
+                                                                                                                               //SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerUniform( rng ) }
+                                                                                                                               SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerCookTorrance( rng, m ) }
+                                                                                                                             }
+                                                                                                           ),
+                                                                                        emission } ) );
             }
         }
     }
@@ -155,29 +162,32 @@ void LuaBind::getMaterial( Scene *scene )
     lua_pop( lua_state_, 2 );
 }
 
-void LuaBind::getTriangle( Scene *scene )
+void LuaBind::getTriangle( Scene *scene,
+                           RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     glm::dvec3 v[3];
 
     parseVertices( "vertices", v );
-    getMaterial( scene );
+    getMaterial( scene, rng );
     scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v[0], v[1], v[2], scene->materials_.size() - 1 } ) );
 }
 
-void LuaBind::getSphere( Scene *scene )
+void LuaBind::getSphere( Scene *scene,
+                         RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     glm::dvec3 center = parseVec3( "center" );
     double radius = parseScalar( "radius" );
-    getMaterial( scene );
+    getMaterial( scene, rng );
     scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Sphere{ center, radius, scene->materials_.size() - 1 } ) );
 }
 
-void LuaBind::getMesh( Scene *scene )
+void LuaBind::getMesh( Scene *scene,
+                       RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     std::string filename = parseString( "filename" );
     glm::dvec3 min_aabb;
     glm::dvec3 max_aabb;
-    getMaterial( scene );
+    getMaterial( scene, rng );
     scene->loadMesh( filename,
                      min_aabb,
                      max_aabb );
@@ -219,11 +229,11 @@ void LuaBind::getElements( Camera **camera,
                                 output_filename,
                                 scene_acceleration_data_structure );
                 if( object_type == "triangle" )
-                    getTriangle( scene );
+                    getTriangle( scene, rng);
                 if( object_type == "sphere" )
-                    getSphere( scene );
+                    getSphere( scene, rng );
                 if( object_type == "mesh" )
-                    getMesh( scene );
+                    getMesh( scene, rng );
                 if( object_type == "union" )
                     getElements( camera,
                                  sampler,

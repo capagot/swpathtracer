@@ -110,19 +110,16 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
             if ( glm::dot( intersection_record.normal_, -ray.direction_ ) < 0.0 )
                 intersection_record.normal_ = -intersection_record.normal_;
 
-            // TODO: getNewDirection generates a ray in tangent space and transforms it back to universe space.
-            //       Maybe it would be more logical to pull this transformation out of the  getNewDirection method.
-            glm::dvec3 new_dir = scene_.materials_[intersection_record.material_id_]->brdf_->getNewDirection( ray.direction_,
+            ONB tangent_frame;
+            tangent_frame.setFromV( intersection_record.normal_ );
+            glm::dmat3x3 universe_to_tangent_space = glm::transpose( tangent_frame.getBasisMatrix() );
+
+            glm::dvec3 new_dir = scene_.materials_[intersection_record.material_id_]->brdf_->getNewDirection( universe_to_tangent_space * -ray.direction_,
                                                                                                               intersection_record.normal_,
                                                                                                               rng_ );
 
             Ray new_ray{ intersection_record.position_ + new_dir * 0.00001, new_dir };
 
-            // Transform the light and reflected rays into the surface tangent frame centered at the intersection point.
-            // TODO: Simplify this... maybe ONB can have only static methods...
-            ONB tangent_frame;
-            tangent_frame.setFromV( intersection_record.normal_ );
-            glm::dmat3x3 universe_to_tangent_space = glm::transpose( tangent_frame.getBasisMatrix() );
             glm::dvec3 w_i = universe_to_tangent_space * -ray.direction_;
             glm::dvec3 w_r = universe_to_tangent_space * new_ray.direction_;
 

@@ -9,16 +9,15 @@ class Lambertian : public BRDF
 {
 public:
 
-    Lambertian( void );
-
-    Lambertian( const glm::dvec3 &radiance );
+    Lambertian( const glm::dvec3 &radiance,
+                SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler );
 
     glm::dvec3 fr( const glm::dvec3 &w_i,
                    const glm::dvec3 &w_r ) const
     {
         ( void ) w_i; // unused variable
 
-        return 2.0 * radiance_ *  w_r.y;
+        return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * ( radiance_ / M_PI ) *  w_r.y;
     }
 
     glm::dvec3 getNewDirection( const glm::dvec3 &w_i,
