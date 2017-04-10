@@ -2,19 +2,19 @@
 
 Lambertian::Lambertian( const glm::dvec3 &radiance,
                         SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler ) :
-    BRDF( std::move( surface_sampler ) ),
-    radiance_{ radiance }
+        BxDF( std::move( surface_sampler ) ),
+        radiance_{ radiance }
 { }
 
-glm::dvec3 Lambertian::getNewDirection( const glm::dvec3 &w_i,
-                                        const glm::dvec3 &normal,
-                                        RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) const
+glm::dvec3 Lambertian::fr( const glm::dvec3 &w_i,
+                           const glm::dvec3 &w_r ) const
 {
-    ONB onb;
+    ( void ) w_i; // unused variable
 
-    // Builds a local tangential reference frame oriented according to the input 'normal' vector.
-    // (the 'v' axis (up) of the tangential space will be aligned to the 'normal' input vector).
-    onb.setFromV( normal );
+    return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * ( radiance_ / M_PI ) *  w_r.y;
+}
 
-    return onb.getBasisMatrix() * surface_sampler_->getSample( w_i );
+glm::dvec3 Lambertian::getNewDirection( const glm::dvec3 &w_i ) const
+{
+    return surface_sampler_->getSample( w_i );
 }

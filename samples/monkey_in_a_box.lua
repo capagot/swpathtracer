@@ -18,7 +18,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 16000
+    spp = 100
 }
 
 b = buffer{
@@ -47,7 +47,18 @@ t1 = triangle{
         {  a,  a, -a } 
     },
     material = {
-                 brdf     = lambertian{ kd = white },
+                 brdf = lambertian{ kd = { 0.75, 0.75, 0.75 },
+                                    surface_sampler = "importance" 
+                 },
+ 
+                 --brdf    = cook_torrance{ 
+                 --                          m = 0.2, -- beckmann
+                 --                          fresnel_type = "schlick-normal-reflectance", 
+                 --                          reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 },
+                 --                          surface_sampler = "importance"
+                 --                        },
+
+                 --brdf     = lambertian{ kd = white },
                  emission = { 0, 0, 0 }
                }
 }
@@ -59,7 +70,18 @@ t2 = triangle{
         { -a, -a, -a } 
     }, 
     material = {
-                 brdf     = lambertian{ kd = white },
+                 brdf = lambertian{ kd = { 0.75, 0.75, 0.75 },
+                                    surface_sampler = "importance" 
+                 },
+ 
+                 --brdf    = cook_torrance{ 
+                 --                          m = 0.2, -- beckmann
+                 --                          fresnel_type = "schlick-normal-reflectance", 
+                 --                          reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 },
+                 --                          surface_sampler = "importance"
+                 --                       },
+
+                 --brdf     = lambertian{ kd = white },
                  emission = { 0, 0, 0 }
                }
 }
@@ -67,12 +89,14 @@ t2 = triangle{
 -- top
 t3 = triangle{ 
     vertices = { 
-        {  a, a, -a },
         { -a, a, -a },
+        {  a, a, -a },
         {  a, a,  a } 
     },
     material = {
-                 brdf     = lambertian{ kd = white },
+                 brdf     = lambertian{ kd = white,
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 0, 0, 0 }
                }
 }
@@ -84,7 +108,9 @@ t4 = triangle{
         { -a, a,  a } 
     }, 
     material = {
-                 brdf     = lambertian{ kd = white },
+                 brdf     = lambertian{ kd = white,
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 0, 0, 0 }
                }
 }
@@ -97,19 +123,23 @@ t5 = triangle{
         {  a, -a,  a } 
     },
     material = {
-                 brdf     = lambertian{ kd = white },
+                 brdf     = lambertian{ kd = white,
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 0, 0, 0 }
                }
 }
 
 t6 = triangle{ 
     vertices = { 
-        { -a, -a, -a },
         {  a, -a,  a },
+        { -a, -a, -a },
         { -a, -a,  a } 
     }, 
     material = {
-                 brdf     = lambertian{ kd = white },
+                 brdf     = lambertian{ kd = white,
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 0, 0, 0 }
                }
 }
@@ -122,7 +152,9 @@ t7 = triangle{
         { -a, -a, -a } 
     },
     material = {
-                 brdf    = lambertian{ kd = red },
+                 brdf     = lambertian{ kd = red,
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 0, 0, 0 }
                }
 }
@@ -134,7 +166,9 @@ t8 = triangle{
         { -a, -a,  a } 
     },
     material = {
-                 brdf    = lambertian{ kd = red },
+                 brdf     = lambertian{ kd = red,
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 0, 0, 0 }
                }
 }
@@ -142,24 +176,28 @@ t8 = triangle{
 -- right wall (blue)
 t9 = triangle{ 
     vertices = { 
-        { a,  a, -a },
         { a,  a,  a },
+        { a,  a, -a },
         { a, -a, -a } 
     }, 
     material = {
-                 brdf    = lambertian{ kd = blue },
+                 brdf     = lambertian{ kd = blue,
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 0, 0, 0 }
                }
 }
 
 t10 = triangle{ 
     vertices = { 
-        { a, -a, -a },
         { a,  a,  a },
+        { a, -a, -a },
         { a, -a,  a } 
     }, 
     material = {
-                 brdf    = lambertian{ kd = blue },
+                 brdf     = lambertian{ kd = blue,
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 0, 0, 0 }
                }
 }
@@ -174,7 +212,9 @@ t11 = triangle{
         {  0.5, a - offset,  0.5 } 
     },
     material = {
-                 brdf    = lambertian{ kd = { 0, 0, 0 } },
+                 brdf     = lambertian{ kd = { 0, 0, 0 },
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 17, 17, 17 }
                }
 }
@@ -186,16 +226,43 @@ t12 = triangle{
         { -0.5, a - offset,  0.5 } 
     }, 
     material = {
-                 brdf    = lambertian{ kd = { 0, 0, 0 } },
+                 brdf     = lambertian{ kd = { 0, 0, 0 },
+                                        surface_sampler = "importance" 
+                                      },
                  emission = { 17, 17, 17 }
                }
 }
 
-mesh1 = mesh{
-    filename = "samples/meshes/monkey.obj",
+
+s1 = sphere{
+    center   = { -1, -1.25, -1 },
+    radius   = 0.75,
     material = {
-                 brdf    = lambertian{ kd = white },
+                 --brdf = lambertian{ kd = { 0.75, 0.75, 0.75 },
+                 --                   surface_sampler = "importance" 
+                 --},
+                 
+                 brdf = smooth_specular_reflection{
+                                           fresnel_type = "schlick-normal-reflectance", 
+                                           reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 }
+                        },
                  emission = { 0, 0, 0 }
                }
 }
+-- --]]
+
+--[[
+mesh1 = mesh{
+    filename = "samples/meshes/monkey.obj",
+    material = {
+                 brdf    = cook_torrance{ 
+                                           m = 0.02, -- beckmann
+                                           fresnel_type = "schlick-normal-reflectance", 
+                                           reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 },
+                                           surface_sampler = "importance"
+                                        },
+                 emission = { 0, 0, 0 }
+               }
+}
+-- --]]
 

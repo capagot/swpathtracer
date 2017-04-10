@@ -13,10 +13,10 @@ public:
 
     Material( void );
 
-    Material( BRDF::BRDFUniquePtr brdf,
+    Material( BxDF::BxDFUniquePtr bxdf,
               const glm::dvec3 &emitted );
 
-    BRDF::BRDFUniquePtr brdf_;
+    BxDF::BxDFUniquePtr bxdf_;
 
     glm::dvec3 emitted_;
 };

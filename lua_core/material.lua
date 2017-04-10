@@ -8,3 +8,8 @@ function cook_torrance( self )
     return self
 end
 
+function smooth_specular_reflection( self )
+    self.object_type = "smooth_specular_reflection"
+    return self
+end
+

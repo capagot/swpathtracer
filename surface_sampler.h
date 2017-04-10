@@ -1,6 +1,10 @@
 #ifndef SURFACE_SAMPLER_H_
 #define SURFACE_SAMPLER_H_
 
+#include <glm/glm.hpp>
+
+#include "random.h"
+
 class SurfaceSampler
 {
 public:
@@ -133,6 +137,29 @@ private:
     RNG< std::uniform_real_distribution, double, std::mt19937 > rng_;
 
     double m_;
+};
+
+class SurfaceSamplerSmoothSpecularReflection : public SurfaceSampler
+{
+public:
+
+    SurfaceSamplerSmoothSpecularReflection( void )
+    {};
+
+    glm::dvec3 getSample( const glm::dvec3 &w_i )
+    {
+        return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
+    }
+
+    double getProbability( const glm::dvec3 &w_i,
+                           const glm::dvec3 &w_r )
+    {
+        ( void ) w_i;
+        ( void ) w_r;
+
+        return 1.0;
+    }
+
 };
 
 #endif /* SURFACE_SAMPLER_H_ */

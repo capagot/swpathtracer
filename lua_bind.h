@@ -14,6 +14,7 @@
 #include "primitive.h"
 #include "scene.h"
 #include "buffer.h"
+#include "fresnel.h"
 
 class LuaBind
 {

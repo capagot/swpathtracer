@@ -106,27 +106,22 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
                                num_intersection_tests_[ thread_id ],
                                num_intersections_[ thread_id ] ) )
         {
-            // flip the normal in the case of a 'backface'
-            if ( glm::dot( intersection_record.normal_, -ray.direction_ ) < 0.0 )
-                intersection_record.normal_ = -intersection_record.normal_;
-
             ONB tangent_frame;
             tangent_frame.setFromV( intersection_record.normal_ );
-            glm::dmat3x3 universe_to_tangent_space = glm::transpose( tangent_frame.getBasisMatrix() );
 
-            glm::dvec3 new_dir = scene_.materials_[intersection_record.material_id_]->brdf_->getNewDirection( universe_to_tangent_space * -ray.direction_,
-                                                                                                              intersection_record.normal_,
-                                                                                                              rng_ );
+            glm::dmat3x3 tangent_to_universe_space = tangent_frame.getBasisMatrix();
+            glm::dmat3x3 universe_to_tangent_space = glm::transpose( tangent_to_universe_space );
+
+            glm::dvec3 w_i = universe_to_tangent_space * -ray.direction_;
+
+            glm::dvec3 w_r = scene_.materials_[intersection_record.material_id_]->bxdf_->getNewDirection( w_i );
+            glm::dvec3 new_dir = tangent_to_universe_space * w_r;
+
 
             Ray new_ray{ intersection_record.position_ + new_dir * 0.00001, new_dir };
 
-            glm::dvec3 w_i = universe_to_tangent_space * -ray.direction_;
-            glm::dvec3 w_r = universe_to_tangent_space * new_ray.direction_;
-
-            //spectrum = scene_.materials_[intersection_record.material_id_]->brdf_->fr( w_i, w_r );
-
             spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ +
-                       scene_.materials_[intersection_record.material_id_]->brdf_->fr( w_i, w_r ) *
+                       scene_.materials_[intersection_record.material_id_]->bxdf_->fr( w_i, w_r ) *
                        integrate_recursive( new_ray, ++depth, thread_id );
         }
         else
