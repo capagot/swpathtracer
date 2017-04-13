@@ -11,6 +11,17 @@ CookTorrance::CookTorrance( double m,
 glm::dvec3 CookTorrance::fr( const glm::dvec3 &w_i,
                              const glm::dvec3 &w_r ) const
 {
+    // Since the microfacet normal may not be aligned with the average surface normal,
+    // it can be the case that the generated w_r might point into the average surface 
+    // (i.e., it's 'y' coordinate may be negative). 
+    // In this case, it is not possible to sample the Cook-Torrance BRDF because it is
+    // defined only for hemisphere above the intersection point. Thus, in these cases, 
+    // teh BRDF simply return 0. 
+    // -- That problem, and teh adopted solution, are mentioned in the Eric Veach's
+    // thesis, in the Secton about shading normals.
+    if ( w_r.y < 0.0 )
+        return glm::dvec3{ 0.0, 0.0, 0.0 };
+
     glm::dvec3 h = glm::normalize( w_i + w_r );
     double nh = std::abs( h.y );
     double nv = std::abs( w_i.y );
@@ -34,7 +45,7 @@ glm::dvec3 CookTorrance::fr( const glm::dvec3 &w_i,
 
     glm::dvec3 rough_specular_term = ( f * d * g ) / ( 4.0 * nv * nl );
 
-    return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * rough_specular_term * w_r.y ;
+    return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * rough_specular_term;
 }
 
 glm::dvec3 CookTorrance::getNewDirection( const glm::dvec3 &w_i ) const

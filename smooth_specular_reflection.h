@@ -16,13 +16,7 @@ public:
                               Fresnel::FresnelUniquePtr fresnel );
 
     glm::dvec3 fr( const glm::dvec3 &w_i,
-                   const glm::dvec3 &w_r ) const
-    {
-        ( void ) w_i;
-        ( void ) w_r;
-
-        return fresnel_->value( 1.0 );
-    }
+                   const glm::dvec3 &w_r ) const;
 
     glm::dvec3 getNewDirection( const glm::dvec3 &w_i ) const;
 

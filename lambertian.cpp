@@ -11,7 +11,9 @@ glm::dvec3 Lambertian::fr( const glm::dvec3 &w_i,
 {
     ( void ) w_i; // unused variable
 
-    return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * ( radiance_ / M_PI ) *  w_r.y;
+    //return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * ( radiance_ / M_PI ) *  w_r.y;
+    return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * ( radiance_ / M_PI );
+
 }
 
 glm::dvec3 Lambertian::getNewDirection( const glm::dvec3 &w_i ) const

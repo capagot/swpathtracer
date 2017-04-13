@@ -17,12 +17,9 @@ Camera = camera{
     fov      = 45
 }
 
--- Since metals present a strong specular component, 
--- and we are not using importance and direct light sampling yet, 
--- the spp must be large 
 s = sampler{
     type = "jittered",
-    spp = 3000
+    spp = 1000
 }
 
 b = buffer{
@@ -37,28 +34,61 @@ g = globals{
     acceleration_data_structure = "none"
 }
 
+local mat_light = { 
+                    brdf =  lambertian{ 
+                                        kd = { 0, 0, 0 },
+                                        surface_sampler = "importance" 
+                                      },
+                    emission = { 40, 40, 40 }
+                  }
+
+local mat_copper = {
+                    brdf = cook_torrance{ 
+                                           m = 0.4, -- beckmann
+                                           fresnel_type = "schlick-normal-reflectance", 
+                                           reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 },
+                                           surface_sampler = "importance"
+                                         },
+                    emission = { 0, 0, 0 }
+                  }
+
+local mat_smooth_refl = {
+                    brdf = smooth_specular_reflection{
+                                           fresnel_type = "schlick-normal-reflectance", 
+                                           reflectance_at_normal_incidence = { 1, 1, 1 }
+                                                     },    
+                    emission = { 0, 0, 0 }
+}
+
+local mat_white = { 
+                    brdf =  lambertian{ 
+                                        kd = { 0.75, 0.75, 0.75 },
+                                        surface_sampler = "importance" 
+                                      },
+                    emission = { 0, 0, 0 }
+                  }
+
+local mat_red = { 
+                    brdf =  lambertian{ 
+                                        kd = { 0.75, 0.25, 0.25 },
+                                        surface_sampler = "importance" 
+                                      },
+                    emission = { 0, 0, 0 }
+                  }
+
 -- light source
 l1 = sphere{
     center   = { 5, 5, 5 },
     radius   = 1,
-    material = {
-                 brdf     = lambertian{ kd = { 0, 0, 0 } },
-                 emission = { 40, 40, 40 }
-               }
+    material = mat_light
 }
 
 -- Sphere
 s1 = sphere{
     center   = { 0, 0, 0 },
     radius   = 1,
-    material = {
-                 brdf    = cook_torrance{ 
-                                          material_type = "metal", -- "dieletric" // the fresnel computation will be different in each case
-                                          m = 0.2, -- beckman                                        
-                                          ks = { 0.95, 0.64, 0.54 },
-                                        },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_copper
+    --material = mat_smooth_refl
 }
 
 -- Back wall
@@ -70,10 +100,7 @@ t1 = triangle{
         {  a, -a, -3 },
         {  a,  a, -3 } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = { 0.75, 0.75, 0.75 } },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 t2 = triangle{ 
@@ -82,10 +109,7 @@ t2 = triangle{
         { -a,  a, -3 },
         { -a, -a, -3 } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = { 0.75, 0.75, 0.75 } },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 -- Floor
@@ -95,22 +119,16 @@ t3 = triangle{
         { -a, -1, -a },
         {  a, -1,  a } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = { 0.75, 0.75, 0.75 } },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 t4 = triangle{ 
     vertices = { 
-        { -a, -1, -a },
         {  a, -1,  a },
+        { -a, -1, -a },
         { -a, -1,  a } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = { 0.75, 0.75, 0.75 } },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 -- Left wall
@@ -120,10 +138,7 @@ triangle7 = triangle{
         { -3,  a,  a },
         { -3, -a, -a } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = { 0.75, 0.25, 0.25 } },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_red
 }
 
 triangle8 = triangle{ 
@@ -132,9 +147,8 @@ triangle8 = triangle{
         { -3,  a,  a },
         { -3, -a,  a } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = { 0.75, 0.25, 0.25 } },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_red
 }
+
+-- --]]
 

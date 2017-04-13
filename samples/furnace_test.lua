@@ -41,8 +41,10 @@ light_source = sphere{
     center = { 0, 0, 0 },
     radius = 10,
     material = {
-                 brdf     = lambertian{ kd = { 0, 0, 0 } },
-                 emission = { 1, 1, 1 }
+                 brdf = lambertian{ kd = { 0, 0, 0 },
+                                    surface_sampler = "importance" 
+                 },
+                 emission = { 0.5, 0.5, 0.5 }
                }
 }
 
@@ -51,7 +53,31 @@ s1 = sphere{
     center = { 0, 0, 0 },
     radius = 1,
     material = {
-                 brdf     = lambertian{ kd = { 1, 1, 1 } },
+                 --[[
+                 -- perfect specular reflection           
+                 brdf = smooth_specular_reflection{
+                                           fresnel_type = "schlick-normal-reflectance", 
+                                           reflectance_at_normal_incidence = { 1, 1, 1 }
+                       },    
+                 -- --]]
+
+
+                 -- cook-torrance                 
+                 brdf    = cook_torrance{ 
+                                           m = 0.2, -- beckmann
+                                           fresnel_type = "schlick-normal-reflectance", 
+                                           reflectance_at_normal_incidence = { 1, 1, 1 },
+                                           surface_sampler = "importance"
+                                         },
+                 -- --]]
+               
+                 --[[ 
+                 -- diffuse
+                 brdf = lambertian{ kd = { 1, 1, 1 },
+                                    surface_sampler = "uniform" 
+                 },
+                 -- --]]
+
                  emission = { 0, 0, 0 }
                }
 }

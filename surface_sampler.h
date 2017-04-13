@@ -157,7 +157,7 @@ public:
         ( void ) w_i;
         ( void ) w_r;
 
-        return 1.0;
+        return w_r.y / 1.0;
     }
 
 };

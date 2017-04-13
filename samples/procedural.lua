@@ -33,6 +33,13 @@ g = globals{
     acceleration_data_structure = "bvh-sah"
 }
 
+local mat_light = {
+              brdf = lambertian{ kd = { 0, 0, 0 },
+                                 surface_sampler = "importance" 
+                               },
+                 emission = { 2, 2, 2 }
+}
+
 -- light source
 t1 = triangle{ 
     vertices = { 
@@ -40,10 +47,7 @@ t1 = triangle{
         { -2, 2, -2 },
         {  2, 2,  2 } 
     },
-    material = {
-                 brdf     = lambertian{ kd = { 0, 0, 0 } },
-                 emission = { 2, 2, 2 }
-               }
+    material = mat_light
 }
 
 t2 = triangle{ 
@@ -52,10 +56,7 @@ t2 = triangle{
         {  2, 2,  2 },
         { -2, 2,  2 } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = { 0, 0, 0 } },
-                 emission = { 2, 2, 2 }
-               }
+    material = mat_light
 }
 
 -- 100 randomly colored spheres
@@ -69,7 +70,7 @@ for c1 = 1, 10 do
             center = { c1 - 5.5, -1.25, c2 - 5.5 },
             radius = 0.5,
             material = {
-                        brdf     = lambertian{ kd = { math.random(), math.random(), math.random() } },
+                        brdf     = lambertian{ kd = { math.random(), math.random(), math.random() }, surface_sampler = "importance" },
                         emission = { 0, 0, 0 }
                        }
         }
