@@ -50,15 +50,6 @@ t1 = triangle{
                  brdf = lambertian{ kd = { 0.75, 0.75, 0.75 },
                                     surface_sampler = "importance" 
                  },
- 
-                 --brdf    = cook_torrance{ 
-                 --                          m = 0.2, -- beckmann
-                 --                          fresnel_type = "schlick-normal-reflectance", 
-                 --                          reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 },
-                 --                          surface_sampler = "importance"
-                 --                        },
-
-                 --brdf     = lambertian{ kd = white },
                  emission = { 0, 0, 0 }
                }
 }
@@ -73,15 +64,6 @@ t2 = triangle{
                  brdf = lambertian{ kd = { 0.75, 0.75, 0.75 },
                                     surface_sampler = "importance" 
                  },
- 
-                 --brdf    = cook_torrance{ 
-                 --                          m = 0.2, -- beckmann
-                 --                          fresnel_type = "schlick-normal-reflectance", 
-                 --                          reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 },
-                 --                          surface_sampler = "importance"
-                 --                       },
-
-                 --brdf     = lambertian{ kd = white },
                  emission = { 0, 0, 0 }
                }
 }
@@ -233,25 +215,6 @@ t12 = triangle{
                }
 }
 
-
-s1 = sphere{
-    center   = { -1, -1.25, -1 },
-    radius   = 0.75,
-    material = {
-                 --brdf = lambertian{ kd = { 0.75, 0.75, 0.75 },
-                 --                   surface_sampler = "importance" 
-                 --},
-                 
-                 brdf = smooth_specular_reflection{
-                                           fresnel_type = "schlick-normal-reflectance", 
-                                           reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 }
-                        },
-                 emission = { 0, 0, 0 }
-               }
-}
--- --]]
-
---[[
 mesh1 = mesh{
     filename = "samples/meshes/monkey.obj",
     material = {
@@ -264,5 +227,4 @@ mesh1 = mesh{
                  emission = { 0, 0, 0 }
                }
 }
--- --]]
 
