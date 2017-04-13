@@ -13,10 +13,10 @@ glm::dvec3 CookTorrance::fr( const glm::dvec3 &w_i,
 {
     // Since the microfacet normal may not be aligned with the average surface normal,
     // it can be the case that the generated w_r might point into the average surface 
-    // (i.e., it's 'y' coordinate may be negative). 
+    // (i.e., in terms of a local coordinate system, it's 'y' coordinate may be negative). 
     // In this case, it is not possible to sample the Cook-Torrance BRDF because it is
     // defined only for hemisphere above the intersection point. Thus, in these cases, 
-    // teh BRDF simply return 0. 
+    // the BRDF simply return 0. 
     // -- That problem, and teh adopted solution, are mentioned in the Eric Veach's
     // thesis, in the Secton about shading normals.
     if ( w_r.y < 0.0 )
@@ -32,7 +32,7 @@ glm::dvec3 CookTorrance::fr( const glm::dvec3 &w_i,
     // Beckmann normal distribution function
     double nh_2 = nh * nh;
     double m_2 = m_ * m_;
-    double d1 = 1.0 / ( M_PI * m_2 * pow( nh, 4.0 ) );
+    double d1 = 1.0 / ( M_PI * m_2 * nh_2 * nh_2 );
     double d2 = ( nh_2 - 1.0 ) / ( m_2 * nh_2 );
     double d = d1 * exp( d2 );
 
