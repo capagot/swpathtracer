@@ -18,5 +18,8 @@ glm::dvec3 Lambertian::fr( const glm::dvec3 &w_i,
 
 glm::dvec3 Lambertian::getNewDirection( const glm::dvec3 &w_i ) const
 {
-    return surface_sampler_->getSample( w_i );
+    if ( w_i.y < 0 )
+        return -surface_sampler_->getSample( w_i );
+    else
+        return surface_sampler_->getSample( w_i );
 }

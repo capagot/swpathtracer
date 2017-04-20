@@ -154,6 +154,39 @@ void LuaBind::getMaterial( Scene *scene,
                 scene->materials_.push_back( std::move( material_object ) );
             }
 
+            if ( object_type  == "smooth_dielectric" )
+            {
+                SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_object;
+                surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothRefraction{ rng } };
+
+                std::string fresnel_type = parseString( "fresnel_type" );
+                glm::dvec3 reflectance_at_normal_incidence;
+                double eta;
+
+                // fresnel setup
+                Fresnel::FresnelUniquePtr fresnel_object;
+                if ( fresnel_type == "schlick-normal-reflectance" )
+                {
+                    reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
+                    fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ reflectance_at_normal_incidence } };
+                }
+
+                if ( fresnel_type == "schlick-ior" )
+                {
+                    eta = parseScalar( "eta" );
+                    fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ 1.0, eta } };
+                }
+
+                // brdf setup
+                BxDF::BxDFUniquePtr bxdf_object = BxDF::BxDFUniquePtr{ new SmoothDielectric{ std::move( surface_sampler_object ),
+                                                                                             std::move( fresnel_object ) } };
+
+                // material setup
+                Material::MaterialUniquePtr material_object = Material::MaterialUniquePtr{ new Material{ std::move( bxdf_object ),
+                                                                                                         emission } };
+                scene->materials_.push_back( std::move( material_object ) );
+            }
+
             if ( object_type  == "smooth_specular_reflection" )
             {
                 SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_object;

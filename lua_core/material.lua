@@ -13,3 +13,8 @@ function smooth_specular_reflection( self )
     return self
 end
 
+function smooth_dielectric( self )
+    self.object_type = "smooth_dielectric"
+    return self
+end
+

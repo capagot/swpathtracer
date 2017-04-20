@@ -162,4 +162,70 @@ public:
 
 };
 
+class SurfaceSamplerSmoothRefraction : public SurfaceSampler
+{
+public:
+
+    SurfaceSamplerSmoothRefraction( RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) :
+        rng_( rng )
+    {};
+
+    glm::dvec3 getSample( const glm::dvec3 &w_i )
+    {
+        glm::dvec3 n{ 0.0, 1.0, 0.0 };
+        double eta_i;
+        double eta_t;
+        double signal;
+
+        if ( w_i.y > 0.0 )  // w_i is entering the denser material
+        {
+            eta_i = 1.0;
+            eta_t = 1.5;
+            signal = 1.0;
+        }
+        else                // w_i is leaving the denser material
+        {
+            eta_i = 1.5;
+            eta_t = 1.0;
+            signal = -1.0;
+        }
+
+        double a = 1.0 - ( eta_i * eta_i ) / ( eta_t * eta_t ) * ( 1.0 - w_i.y * w_i.y );
+
+        if ( a < 0.0 ) // TIR
+            return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
+
+        // compute the refracted ray
+         glm::dvec3 t = glm::normalize( ( eta_i / eta_t ) * ( n * w_i.y - w_i ) - signal * n * sqrt( a ) );
+
+        double cos_theta =  ( w_i.y > 0.0 ) ? w_i.y : t.y ;
+        glm::dvec3 aa{ ( 1.5 - 1.0 ) / ( 1.5 + 1.0 ) };
+        glm::dvec3 r0{ aa * aa };
+
+        // Hardcoded Schlick Fresnel
+        glm::dvec3 schlick_fresnel = r0 + ( 1.0 - r0 ) * pow( 1.0 - cos_theta, 5.0 );
+
+        if ( rng_() < schlick_fresnel[0] )
+            return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
+        else
+            return  t;
+
+    }
+
+    double getProbability( const glm::dvec3 &w_i,
+                           const glm::dvec3 &w_r )
+    {
+        ( void ) w_i;
+        ( void ) w_r;
+
+        return w_r.y / 1.0;
+    }
+
+private:
+
+    RNG< std::uniform_real_distribution, double, std::mt19937 > rng_;
+
+};
+//*/
+
 #endif /* SURFACE_SAMPLER_H_ */
