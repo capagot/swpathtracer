@@ -8,12 +8,12 @@
 #include "bxdf.h"
 #include "fresnel.h"
 
-class SmoothSpecularReflection : public BxDF
+class SpecularReflection : public BxDF
 {
 public:
 
-    SmoothSpecularReflection( SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler,
-                              Fresnel::FresnelUniquePtr fresnel );
+    SpecularReflection( SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler,
+                        Fresnel::FresnelUniquePtr fresnel );
 
     glm::dvec3 fr( const glm::dvec3 &w_i,
                    const glm::dvec3 &w_r ) const;

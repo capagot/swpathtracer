@@ -17,8 +17,8 @@ glm::dvec3 CookTorrance::fr( const glm::dvec3 &w_i,
     // In this case, it is not possible to sample the Cook-Torrance BRDF because it is
     // defined only for hemisphere above the intersection point. Thus, in these cases, 
     // the BRDF simply return 0. 
-    // -- That problem, and teh adopted solution, are mentioned in the Eric Veach's
-    // thesis, in the Secton about shading normals.
+    // -- That problem, and the adopted solution, are mentioned in the Eric Veach's
+    // thesis, in the Section about shading normals.
     if ( w_r.y < 0.0 )
         return glm::dvec3{ 0.0, 0.0, 0.0 };
 
@@ -44,6 +44,7 @@ glm::dvec3 CookTorrance::fr( const glm::dvec3 &w_i,
     glm::dvec3 f = fresnel_->value( lh );
 
     glm::dvec3 rough_specular_term = ( f * d * g ) / ( 4.0 * nv * nl );
+    //glm::dvec3 rough_specular_term = (glm::dvec3{ 0.95, 0.64, 0.54 } *  d * g ) / ( 4.0 * nv * nl );
 
     return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * rough_specular_term;
 }

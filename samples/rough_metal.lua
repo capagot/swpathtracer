@@ -44,7 +44,7 @@ local mat_light = {
 
 local mat_copper = {
                     brdf = cook_torrance{ 
-                                           m = 0.4, -- beckmann
+                                           m = 0.2, -- beckmann
                                            fresnel_type = "schlick-normal-reflectance", 
                                            reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 },
                                            surface_sampler = "importance"

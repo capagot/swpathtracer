@@ -166,50 +166,104 @@ class SurfaceSamplerSmoothRefraction : public SurfaceSampler
 {
 public:
 
-    SurfaceSamplerSmoothRefraction( RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) :
-        rng_( rng )
+    SurfaceSamplerSmoothRefraction( RNG< std::uniform_real_distribution, double, std::mt19937 > &rng,
+                                    double eta_i,
+                                    double eta_t) :
+        rng_( rng ),
+        eta_i_( eta_i ),
+        eta_t_( eta_t )
     {};
 
     glm::dvec3 getSample( const glm::dvec3 &w_i )
     {
-        glm::dvec3 n{ 0.0, 1.0, 0.0 };
+
+        glm::dvec3 n{ 0.0, 1.0, 0.0 }; //  normal vector of the local space
         double eta_i;
         double eta_t;
         double signal;
 
         if ( w_i.y > 0.0 )  // w_i is entering the denser material
         {
-            eta_i = 1.0;
-            eta_t = 1.5;
+            eta_i = eta_i_;
+            eta_t = eta_t_;
             signal = 1.0;
         }
-        else                // w_i is leaving the denser material
+        else
         {
-            eta_i = 1.5;
-            eta_t = 1.0;
+            eta_i = eta_t_;
+            eta_t = eta_i_;
             signal = -1.0;
         }
 
         double a = 1.0 - ( eta_i * eta_i ) / ( eta_t * eta_t ) * ( 1.0 - w_i.y * w_i.y );
 
-        if ( a < 0.0 ) // TIR
+        if ( a < 0.0 )
             return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
 
-        // compute the refracted ray
-         glm::dvec3 t = glm::normalize( ( eta_i / eta_t ) * ( n * w_i.y - w_i ) - signal * n * sqrt( a ) );
-
+        glm::dvec3 t = glm::normalize( ( eta_i / eta_t ) * ( n * w_i.y - w_i ) - signal * n * sqrt( a ) );
         double cos_theta =  ( w_i.y > 0.0 ) ? w_i.y : t.y ;
-        glm::dvec3 aa{ ( 1.5 - 1.0 ) / ( 1.5 + 1.0 ) };
-        glm::dvec3 r0{ aa * aa };
 
-        // Hardcoded Schlick Fresnel
-        glm::dvec3 schlick_fresnel = r0 + ( 1.0 - r0 ) * pow( 1.0 - cos_theta, 5.0 );
+        // Fresnel Schlick
+        glm::dvec3 ratio_diff_eta{ ( eta_t - eta_i ) / ( eta_t + eta_i ) };
+        glm::dvec3 r0{ ratio_diff_eta * ratio_diff_eta };
+        glm::dvec3 fresnel = r0 + ( 1.0 - r0 ) * pow( 1.0 - cos_theta, 5.0 );
 
-        if ( rng_() < schlick_fresnel[0] )
+        // Fresnel dielectric
+        //double cos_th_i = fabs( w_i.y );
+        //double cos_th_t = fabs( t.y );
+        //double r_parallel = ( eta_t * cos_th_i - eta_i * cos_th_t ) / ( eta_t * cos_th_i + eta_i * cos_th_t );
+        //double r_ortho    = ( eta_i * cos_th_i - eta_t * cos_th_t ) / ( eta_i * cos_th_i + eta_t * cos_th_t );
+        //glm::dvec3 fresnel = glm::dvec3{ ( r_parallel * r_parallel + r_ortho * r_ortho ) * 0.5 };
+
+
+        double max_reflectance = std::max( std::max( fresnel[0], fresnel[1] ), fresnel[2] );
+
+        if ( rng_() < max_reflectance )
             return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
         else
-            return  t;
+            return t;
 
+        //*/
+
+        /*
+        glm::dvec3 n{ 0.0, 1.0, 0.0 }; //  normal vector of the local space
+        double eta_i;
+        double eta_t;
+        double signal;
+
+        if ( w_i.y > 0.0 )  // w_i is entering the denser material
+        {
+            eta_i = eta_i_;
+            eta_t = eta_t_;
+            signal = 1.0;
+        }
+        else
+        {
+            eta_i = eta_t_;
+            eta_t = eta_i_;
+            signal = -1.0;
+        }
+
+        double a = 1.0 - ( eta_i * eta_i ) / ( eta_t * eta_t ) * ( 1.0 - w_i.y * w_i.y );
+
+        if ( a < 0.0 )
+            return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
+
+        glm::dvec3 t = glm::normalize( ( eta_i / eta_t ) * ( n * w_i.y - w_i ) - signal * n * sqrt( a ) );
+        double cos_theta =  ( w_i.y > 0.0 ) ? w_i.y : t.y ;
+
+        // Fresnel
+        glm::dvec3 ratio_diff_eta{ ( eta_t - eta_i ) / ( eta_t + eta_i ) };
+        glm::dvec3 r0{ ratio_diff_eta * ratio_diff_eta };
+        glm::dvec3 fresnel = r0 + ( 1.0 - r0 ) * pow( 1.0 - cos_theta, 5.0 );
+
+        double max_reflectance = std::max( std::max( fresnel[0], fresnel[1] ), fresnel[2] );
+
+        if ( rng_() < max_reflectance )
+            return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
+        else
+            return t;
+        //*/
     }
 
     double getProbability( const glm::dvec3 &w_i,
@@ -224,6 +278,10 @@ public:
 private:
 
     RNG< std::uniform_real_distribution, double, std::mt19937 > rng_;
+
+    double eta_i_;
+
+    double eta_t_;
 
 };
 //*/

@@ -7,20 +7,30 @@ class Fresnel
 {
 public:
 
+    enum class FresnelType {
+        NO_OP,
+        SCHLICK,
+        DIELECTRIC,
+        COMPLEX,
+    };
+
     typedef std::unique_ptr< Fresnel > FresnelUniquePtr;
 
-    Fresnel( void )
+    Fresnel( Fresnel::FresnelType type ) :
+        type_{ type }
     {}
 
     virtual glm::dvec3 value( const double theta ) const = 0;
 
+    FresnelType type_;
 };
 
 class FresnelNoOp : public Fresnel
 {
 public:
 
-    FresnelNoOp( void )
+    FresnelNoOp( void ) :
+        Fresnel{ Fresnel::FresnelType::NO_OP }
     {}
 
     glm::dvec3 value( const double cos_theta ) const
@@ -36,35 +46,76 @@ class FresnelSchlick : public Fresnel
 {
 public:
 
+    enum class SchlickType {
+        REFLECTANCE_AT_NORMAL_INCIDENCE,
+        IOR
+    };
+
     // An Schlick's fresnel reflectance object can instanced
     // in two different ways:
     //
     //  1) Through the reflectance at normal incidence.
-    //  2) Through two IOR's: one for the external and one for the internal material.
+    //  2) Through two IOR's: one for the externtal and one for the internal material.
 
-    FresnelSchlick( double eta1,
-                    double eta2 ) :
-        eta1_{ eta1 },
-        eta2_{ eta2 }
-    {
-        glm::dvec3 a{ ( eta1 - eta2_ ) / ( eta1 + eta2_ ) };
-        r0_ = a * a;
-    }
+    FresnelSchlick( double eta_i,
+                    double eta_t ) :
+        Fresnel{ Fresnel::FresnelType::SCHLICK },
+        schlick_type_{ FresnelSchlick::SchlickType::IOR },
+        eta_i_{ eta_i },
+        eta_t_{ eta_t }
+    {}
 
     FresnelSchlick( const glm::dvec3 &reflectance_normal_incidence ) :
+        Fresnel{ Fresnel::FresnelType::SCHLICK },
+        schlick_type_{ FresnelSchlick::SchlickType::REFLECTANCE_AT_NORMAL_INCIDENCE },
         r0_{ reflectance_normal_incidence }
     {}
 
-    glm::dvec3 value( const double cos_theta ) const
+    glm::dvec3 value( const double cos_theta_i ) const
     {
-        return r0_ + ( 1.0 - r0_ ) * pow( 1.0 - cos_theta, 5.0 );
+        if ( schlick_type_ == FresnelSchlick::SchlickType::REFLECTANCE_AT_NORMAL_INCIDENCE )
+            return r0_ + ( 1.0 - r0_ ) * pow( 1.0 - cos_theta_i, 5.0 );
+
+        double eta_i;
+        double eta_t;
+
+        // schlick_type_ == FresnelSchlick::SchlickType::IOR
+        if ( cos_theta_i > 0.0 ) // ray is entering into the surface
+        {
+            eta_i = eta_i_;
+            eta_t = eta_t_;
+        }
+        else // ray is exiting the surface
+        {
+            eta_i = eta_t_;
+            eta_t = eta_i_;
+        }
+
+        // From the Snell's law
+        double sin_theta_t = ( eta_i / eta_t ) * sqrt( 1.0 - cos_theta_i * cos_theta_i );
+
+        if ( sin_theta_t >= 1.0 ) // TIR
+            return glm::dvec3{ 1.0 };
+
+        // The ray is refracted
+        glm::dvec3 ratio_diff_eta{ ( eta_t - eta_i ) / ( eta_t + eta_i ) };
+        glm::dvec3 r0{ ratio_diff_eta * ratio_diff_eta };
+
+        double cos_theta_t = sqrt( 1.0 - sin_theta_t * sin_theta_t );
+
+        return r0_ + ( 1.0 - r0_ ) * pow( 1.0 - cos_theta_t, 5.0 );
+
+        // OLD
+        //return r0_ + ( 1.0 - r0_ ) * pow( 1.0 - cos_theta, 5.0 );
     }
 
 private:
 
-    double eta1_;
+    SchlickType schlick_type_;
 
-    double eta2_;
+    double eta_i_;
+
+    double eta_t_;
 
     glm::dvec3 r0_;
 
@@ -81,6 +132,7 @@ public:
 
     FresnelConductor( const glm::dvec3 &eta,
                       const glm::dvec3 &kappa ) :
+        Fresnel{ Fresnel::FresnelType::COMPLEX },
         eta_{ eta },
         kappa_{ kappa }
     {}

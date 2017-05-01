@@ -157,7 +157,7 @@ void LuaBind::getMaterial( Scene *scene,
             if ( object_type  == "smooth_dielectric" )
             {
                 SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_object;
-                surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothRefraction{ rng } };
+                surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothRefraction{ rng, 1.0, 1.5 } };
 
                 std::string fresnel_type = parseString( "fresnel_type" );
                 glm::dvec3 reflectance_at_normal_incidence;
@@ -211,7 +211,7 @@ void LuaBind::getMaterial( Scene *scene,
                 }
 
                 // brdf setup
-                BxDF::BxDFUniquePtr bxdf_object = BxDF::BxDFUniquePtr{ new SmoothSpecularReflection{ std::move( surface_sampler_object ),
+                BxDF::BxDFUniquePtr bxdf_object = BxDF::BxDFUniquePtr{ new SpecularReflection{ std::move( surface_sampler_object ),
                                                                                                      std::move( fresnel_object ) } };
 
                 // material setup
