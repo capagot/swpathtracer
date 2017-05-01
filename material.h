@@ -4,12 +4,13 @@
 #include <memory>
 
 #include "lambertian.h"
+#include "bsdf.h"
 
 class Material
 {
 public:
 
-    typedef std::unique_ptr< Material > MaterialUniquePtr;
+    using MaterialUniquePtr = std::unique_ptr< Material >;
 
     Material( void );
 
@@ -17,6 +18,8 @@ public:
               const glm::dvec3 &emitted );
 
     BxDF::BxDFUniquePtr bxdf_;
+
+    BSDF bsdf_;
 
     glm::dvec3 emitted_;
 };

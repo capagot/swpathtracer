@@ -11,11 +11,11 @@ class Integrator
 {
 public:
 
-    typedef enum
+    enum class TracingStoppingCriterion
     {
         MAX_DEPTH,
         RUSSIAN_ROULETTE
-    } TracingStoppingCriterion;
+    };
 
     Integrator( Camera &camera,
                 const Scene &scene,

@@ -71,7 +71,7 @@ int main( int num_args, char **arg_vector )
                    scene,
                    background_color,
                    max_path_depth,
-                   Integrator:: MAX_DEPTH,
+                   Integrator::TracingStoppingCriterion::MAX_DEPTH,
                    (*sampler),
                    (*rendering_buffer),
                    rng );

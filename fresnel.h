@@ -14,7 +14,7 @@ public:
         COMPLEX,
     };
 
-    typedef std::unique_ptr< Fresnel > FresnelUniquePtr;
+    using FresnelUniquePtr = std::unique_ptr< Fresnel >;
 
     Fresnel( Fresnel::FresnelType type ) :
         type_{ type }

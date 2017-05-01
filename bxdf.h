@@ -9,7 +9,7 @@ class BxDF
 {
 public:
 
-    typedef std::unique_ptr< BxDF > BxDFUniquePtr;
+    using BxDFUniquePtr = std::unique_ptr< BxDF >;
 
     BxDF( SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler ) :
         surface_sampler_( std::move( surface_sampler ) )

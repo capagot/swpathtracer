@@ -9,7 +9,7 @@ class SurfaceSampler
 {
 public:
 
-    typedef std::unique_ptr< SurfaceSampler > SurfaceSamplerUniquePtr;
+    using SurfaceSamplerUniquePtr = std::unique_ptr< SurfaceSampler >;
 
     SurfaceSampler( void )
     {};
