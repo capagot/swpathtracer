@@ -37,8 +37,6 @@ private:
 
     double m_; // roughness
 
-    Fresnel::FresnelUniquePtr fresnel_;
-
 };
 
 #endif /* COOK_TORRANCE_H_ */

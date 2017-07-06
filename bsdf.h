@@ -2,6 +2,7 @@
 #define BSDF_H_
 
 #include "bxdf.h"
+#include "random.h"
 
 class BSDF
 {
@@ -9,13 +10,14 @@ public:
 
     using BSDFUniquePtr = std::unique_ptr< BSDF >;
 
-    BSDF( void )
-    {};
+    BSDF( RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
     glm::dvec3 fr( const glm::dvec3 &w_i,
-                   const glm::dvec3 &w_r ) const;
+                   const std::vector< glm::dvec3 > &w_r ) const;
 
-    glm::dvec3 getNewDirection( const glm::dvec3 &w_i ) const;
+    void getNewDirection( const glm::dvec3 &w_i, std::vector< glm::dvec3 > &w_r );
+
+    RNG< std::uniform_real_distribution, double, std::mt19937 > rng_;
 
     std::vector< BxDF::BxDFUniquePtr > bxdf_layers_;
 

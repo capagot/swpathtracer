@@ -41,6 +41,8 @@ int main( int num_args, char **arg_vector )
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
     std::cout << "  file name ........................: " << cmdlineparser.getInputScriptFilename() << std::endl;
 
+    //exit(0);
+
     std::cout << std::endl;
     camera->printInfo();
 

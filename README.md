@@ -8,15 +8,18 @@ As a way to record and share information about the evolution of the project, I'v
 
 # Current Features
 
-- Perspective (pin hole) and orthographic cameras.
+- Perspective (pinhole) and orthographic cameras.
 - Input and configuration through Lua scripts.
 - Sphere and triangle primitives.
 - Mesh loading through Assimp.
 - SAH-based BVH for rendering acceleration.
 - Perfectly diffuse (Lambertian) surfaces.
-- Rough metallic surfaces described by a Cook-Torrance-based microfacet BRDF model.
+- Rough conductors described by a Cook-Torrance-based microfacet model.
+- Smooth conductors.
+- Smooth dielectrics.
+- Clear coat implemented through a 2-layer BSDF (takes TIR into account).
 - Diffuse light sources.
-- BRDFs evaluated with importance sampling.
+- Importance sampled BSDFs.
 - RGB spectrum.
 - Naïve (brute force) path tracing, with a maximum prescribed path depth.
 - Regular, uniform and jittered box-filtered pixel samplers.
@@ -56,6 +59,5 @@ To render one of the sample files, just issue the following command from the pro
 
 # TODOs
 
-The development of this ray tracer is just in the beggining, and there are lots and lots of things to be improved and added to the renderer (actually, this might easily be considerred a lifetime software project... :).
-Among some of the planned features, I would mention: importance sampling, higher order pixel samplers, bidirectioal path tracing, instancing, direct light sampling, thin lens camera, russian roulette for ray path termination, subsurface scattering, spectral rendering, support for OpenEXR file format... and much more.
+The development of this ray tracer is just in the beggining, and there are lots and lots of things to be improved and added to the renderer (this coule bd easily considered a lifetime software project... :). Among the planned features, I would mention: multiple importance sampling, higher order pixel samplers, direct light sampling, bidirectioal path tracing, metropolis light transport, instancing, thin lens camera, russian roulette for ray path termination, subsurface scattering, spectral rendering, support for OpenEXR file format... and much more.
 

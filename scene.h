@@ -15,7 +15,7 @@
 #include "sphere.h"
 #include "lambertian.h"
 #include "cook_torrance.h"
-#include "smooth_specular_reflection.h"
+#include "smooth_conductor.h"
 #include "smooth_dielectric.h"
 #include "material.h"
 #include "bvh.h"

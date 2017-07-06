@@ -3,9 +3,10 @@
 CookTorrance::CookTorrance( double m,
                             SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler,
                             Fresnel::FresnelUniquePtr fresnel ) :
-        BxDF( std::move( surface_sampler ) ),
-        m_{ m },
-        fresnel_( std::move( fresnel ) )
+        BxDF( std::move( surface_sampler ),
+              std::move( fresnel ),
+              BxDF::BxDFType::CONDUCTOR ),
+        m_{ m }
 {}
 
 glm::dvec3 CookTorrance::fr( const glm::dvec3 &w_i,
@@ -44,9 +45,8 @@ glm::dvec3 CookTorrance::fr( const glm::dvec3 &w_i,
     glm::dvec3 f = fresnel_->value( lh );
 
     glm::dvec3 rough_specular_term = ( f * d * g ) / ( 4.0 * nv * nl );
-    //glm::dvec3 rough_specular_term = (glm::dvec3{ 0.95, 0.64, 0.54 } *  d * g ) / ( 4.0 * nv * nl );
 
-    return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * rough_specular_term;
+    return rough_specular_term;
 }
 
 glm::dvec3 CookTorrance::getNewDirection( const glm::dvec3 &w_i ) const

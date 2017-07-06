@@ -4,15 +4,26 @@
 #include <memory>
 
 #include "surface_sampler.h"
+#include "fresnel.h"
 
 class BxDF
 {
 public:
 
+    enum class BxDFType {
+        DIFFUSE,
+        DIELECTRIC,
+        CONDUCTOR
+    };
+
     using BxDFUniquePtr = std::unique_ptr< BxDF >;
 
-    BxDF( SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler ) :
-        surface_sampler_( std::move( surface_sampler ) )
+    BxDF( SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler,
+          Fresnel::FresnelUniquePtr fresnel,
+          BxDF::BxDFType bxdf_type ) :
+        surface_sampler_( std::move( surface_sampler ) ),
+        fresnel_( std::move( fresnel ) ),
+        bxdf_type_{ bxdf_type }
     {};
 
     virtual glm::dvec3 fr( const glm::dvec3 &w_i,
@@ -20,10 +31,11 @@ public:
 
     virtual glm::dvec3 getNewDirection( const glm::dvec3 &w_i ) const = 0;
 
-//private:
-
     SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_;
 
+    Fresnel::FresnelUniquePtr fresnel_;
+
+    BxDF::BxDFType bxdf_type_;
 };
 
 #endif /* BXDF_H_ */

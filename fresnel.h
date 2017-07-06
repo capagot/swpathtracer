@@ -51,7 +51,7 @@ public:
         IOR
     };
 
-    // An Schlick's fresnel reflectance object can instanced
+    // A Schlick's fresnel reflectance object can instanced
     // in two different ways:
     //
     //  1) Through the reflectance at normal incidence.
@@ -104,9 +104,6 @@ public:
         double cos_theta_t = sqrt( 1.0 - sin_theta_t * sin_theta_t );
 
         return r0_ + ( 1.0 - r0_ ) * pow( 1.0 - cos_theta_t, 5.0 );
-
-        // OLD
-        //return r0_ + ( 1.0 - r0_ ) * pow( 1.0 - cos_theta, 5.0 );
     }
 
 private:
@@ -126,6 +123,7 @@ private:
 //{
 //}
 
+//TODO: It's not used actually...
 class FresnelConductor : public Fresnel
 {
 public:

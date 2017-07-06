@@ -3,8 +3,8 @@
 Material::Material( void )
 { }
 
-Material::Material( BxDF::BxDFUniquePtr bxdf,
+Material::Material( BSDF::BSDFUniquePtr bsdf,
                     const glm::dvec3 &emitted ) :
-        bxdf_( std::move( bxdf ) ),
+        bsdf_( std::move( bsdf ) ),
         emitted_{ emitted }
 { }

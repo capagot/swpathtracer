@@ -115,156 +115,98 @@ void LuaBind::getGlobals( glm::dvec3 &background_color,
 void LuaBind::getMaterial( Scene *scene,
                            RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
+    SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_object;
+    Fresnel::FresnelUniquePtr fresnel_object;
+    BxDF::BxDFUniquePtr bxdf_object;
+    BSDF::BSDFUniquePtr bsdf_object = BSDF::BSDFUniquePtr{ new BSDF{ rng } };
+    Material::MaterialUniquePtr material_object;
+
     lua_pushstring( lua_state_, "material" );
     lua_gettable( lua_state_, -2 );
 
     if( lua_istable( lua_state_, -1) )
     {
-        glm::dvec3 emission = parseVec3( "emission" );
+        int current_layer = 1;
 
-        lua_pushstring( lua_state_, "brdf" );
+        lua_pushnumber( lua_state_, current_layer );
         lua_gettable( lua_state_, -2 );
 
-        lua_pushstring( lua_state_, "object_type" );
-        lua_gettable( lua_state_, -2 );
-
-        if( lua_isstring( lua_state_, -1) )
+        while ( lua_istable( lua_state_, -1 ) ) // loops over all BSDF layers
         {
-            std::string object_type = lua_tostring( lua_state_, -1 );
+            lua_pushstring( lua_state_, "object_type" );
+            lua_gettable( lua_state_, -2 );
+            if( lua_isstring( lua_state_, -1) )
+            {
+                std::string object_type = lua_tostring( lua_state_, -1 );
+
+                lua_pop( lua_state_, 1 );
+
+                if ( object_type == "lambertian_brdf" )
+                {
+                    glm::dvec3 kd = parseVec3( "kd" );
+                    std::string surface_sampler = parseString( "surface_sampler" );
+                    if ( surface_sampler == "uniform" )
+                        surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerUniform( rng ) };
+                    if ( surface_sampler == "importance" )
+                        surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerCosine( rng ) };
+                    fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelNoOp{} };
+                    bxdf_object = BxDF::BxDFUniquePtr{ new Lambertian{ kd,
+                                                                       std::move( surface_sampler_object ),
+                                                                       std::move( fresnel_object ) } };
+                }
+                else
+                    if ( object_type == "smooth_dielectric" )
+                    {
+                        double eta = parseScalar( "eta" );
+                        surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothRefraction{ rng, 1.0, eta } };
+                        fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ 1.0, eta } };
+                        bxdf_object = BxDF::BxDFUniquePtr{ new SmoothDielectric{ std::move( surface_sampler_object ),
+                                                                                 std::move( fresnel_object ) } };
+                    }
+                    else
+                        if ( object_type == "smooth_specular_reflection" )
+                        {
+                            surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothConductor{} };
+                            glm::dvec3 reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
+                            fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ reflectance_at_normal_incidence } };
+                            bxdf_object = BxDF::BxDFUniquePtr{ new SmoothConductor{ std::move( surface_sampler_object ),
+                                                                                    std::move( fresnel_object ) } };
+                        }
+                        else
+                            if ( object_type == "cook_torrance_brdf" )
+                            {
+                                double m = parseScalar( "m" );
+                                glm::dvec3 reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
+                                fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ reflectance_at_normal_incidence } };
+                                std::string surface_sampler = parseString( "surface_sampler" );
+                                if ( surface_sampler == "uniform" )
+                                    surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerUniform( rng ) };
+                                if ( surface_sampler == "importance" )
+                                    surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerCookTorrance( rng, m ) };
+                                bxdf_object = BxDF::BxDFUniquePtr{ new CookTorrance{ m,
+                                                                                     std::move( surface_sampler_object ),
+                                                                                     std::move( fresnel_object ) } };
+                            }
+
+                bsdf_object->bxdf_layers_.push_back( std::move( bxdf_object ) );
+            }
 
             lua_pop( lua_state_, 1 );
 
-            if ( object_type  == "lambertian_brdf" )
-            {
-                glm::dvec3 kd = parseVec3( "kd" );
-
-                // surface sampler setup
-                SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_object;
-                std::string surface_sampler = parseString( "surface_sampler" );
-                if ( surface_sampler == "uniform" )
-                    surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerUniform( rng ) };
-
-                if ( surface_sampler == "importance" )
-                    surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerCosine( rng ) };
-
-                BxDF::BxDFUniquePtr bxdf_object = BxDF::BxDFUniquePtr{ new Lambertian{ kd,
-                                                                                       std::move( surface_sampler_object ) } };
-                Material::MaterialUniquePtr material_object = Material::MaterialUniquePtr{ new Material{ std::move( bxdf_object ),
-                                                                                                         emission } };
-                scene->materials_.push_back( std::move( material_object ) );
-            }
-
-            if ( object_type  == "smooth_dielectric" )
-            {
-                SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_object;
-                surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothRefraction{ rng, 1.0, 1.5 } };
-
-                std::string fresnel_type = parseString( "fresnel_type" );
-                glm::dvec3 reflectance_at_normal_incidence;
-                double eta;
-
-                // fresnel setup
-                Fresnel::FresnelUniquePtr fresnel_object;
-                if ( fresnel_type == "schlick-normal-reflectance" )
-                {
-                    reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
-                    fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ reflectance_at_normal_incidence } };
-                }
-
-                if ( fresnel_type == "schlick-ior" )
-                {
-                    eta = parseScalar( "eta" );
-                    fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ 1.0, eta } };
-                }
-
-                // brdf setup
-                BxDF::BxDFUniquePtr bxdf_object = BxDF::BxDFUniquePtr{ new SmoothDielectric{ std::move( surface_sampler_object ),
-                                                                                             std::move( fresnel_object ) } };
-
-                // material setup
-                Material::MaterialUniquePtr material_object = Material::MaterialUniquePtr{ new Material{ std::move( bxdf_object ),
-                                                                                                         emission } };
-                scene->materials_.push_back( std::move( material_object ) );
-            }
-
-            if ( object_type  == "smooth_specular_reflection" )
-            {
-                SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_object;
-                surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothSpecularReflection{} };
-
-                std::string fresnel_type = parseString( "fresnel_type" );
-                glm::dvec3 reflectance_at_normal_incidence;
-                double eta;
-
-                // fresnel setup
-                Fresnel::FresnelUniquePtr fresnel_object;
-                if ( fresnel_type == "schlick-normal-reflectance" )
-                {
-                    reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
-                    fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ reflectance_at_normal_incidence } };
-                }
-
-                if ( fresnel_type == "schlick-ior" )
-                {
-                    eta = parseScalar( "eta" );
-                    fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ 1.0, eta } };
-                }
-
-                // brdf setup
-                BxDF::BxDFUniquePtr bxdf_object = BxDF::BxDFUniquePtr{ new SpecularReflection{ std::move( surface_sampler_object ),
-                                                                                                     std::move( fresnel_object ) } };
-
-                // material setup
-                Material::MaterialUniquePtr material_object = Material::MaterialUniquePtr{ new Material{ std::move( bxdf_object ),
-                                                                                                         emission } };
-                scene->materials_.push_back( std::move( material_object ) );
-            }
-
-            //if ( object_type  == "smooth_transmissive" )
-
-            if ( object_type  == "cook_torrance_brdf" )
-            {
-                double m = parseScalar( "m" );
-                std::string fresnel_type = parseString( "fresnel_type" );
-                glm::dvec3 reflectance_at_normal_incidence;
-                double eta;
-
-                // fresnel setup
-                Fresnel::FresnelUniquePtr fresnel_object;
-                if ( fresnel_type == "schlick-normal-reflectance" )
-                {
-                    reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
-                    fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ reflectance_at_normal_incidence } };
-                }
-
-                if ( fresnel_type == "schlick-ior" )
-                {
-                    eta = parseScalar( "eta" );
-                    fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ 1.0, eta } };
-                }
-
-                // surface sampler setup
-                SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_object;
-                std::string surface_sampler = parseString( "surface_sampler" );
-                if ( surface_sampler == "uniform" )
-                    surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerUniform( rng ) };
-
-                if ( surface_sampler == "importance" )
-                    surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerCookTorrance( rng, m ) };
-
-                // brdf setup
-                BxDF::BxDFUniquePtr bxdf_object = BxDF::BxDFUniquePtr{ new CookTorrance{ m,
-                                                                                         std::move( surface_sampler_object ),
-                                                                                         std::move( fresnel_object ) } };
-                // material setup
-                Material::MaterialUniquePtr material_object = Material::MaterialUniquePtr{ new Material{ std::move( bxdf_object ),
-                                                                                                         emission } };
-                scene->materials_.push_back( std::move( material_object ) );
-            }
+            lua_pushnumber( lua_state_, ++current_layer );
+            lua_gettable( lua_state_, -2 );
         }
+
+        lua_pop( lua_state_, 1 );
+
+        glm::dvec3 emission = parseVec3( "emission" );
+
+        Material::MaterialUniquePtr material_object = Material::MaterialUniquePtr{ new Material{ std::move( bsdf_object ),
+                                                                                                 emission } };
+        scene->materials_.push_back( std::move( material_object ) );
     }
 
-    lua_pop( lua_state_, 2 );
+    lua_pop( lua_state_, 1 );
 }
 
 void LuaBind::getTriangle( Scene *scene,

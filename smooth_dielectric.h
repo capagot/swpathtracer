@@ -20,10 +20,6 @@ public:
 
     glm::dvec3 getNewDirection( const glm::dvec3 &w_i ) const;
 
-private:
-
-    Fresnel::FresnelUniquePtr fresnel_;
-
 };
 
 #endif /* SMOOTH_DIELECTRIC_H_ */

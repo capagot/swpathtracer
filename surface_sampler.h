@@ -48,6 +48,7 @@ public:
     {
         ( void ) w_i; // unused variable
         ( void ) w_r; // unused variable
+
         return 1.0 / ( 2.0 * M_PI );
     }
 
@@ -84,6 +85,7 @@ public:
                            const glm::dvec3 &w_r )
     {
         ( void ) w_i; // unused variable
+
         return w_r.y /  M_PI;
     }
 
@@ -139,11 +141,11 @@ private:
     double m_;
 };
 
-class SurfaceSamplerSmoothSpecularReflection : public SurfaceSampler
+class SurfaceSamplerSmoothConductor : public SurfaceSampler
 {
 public:
 
-    SurfaceSamplerSmoothSpecularReflection( void )
+    SurfaceSamplerSmoothConductor( void )
     {};
 
     glm::dvec3 getSample( const glm::dvec3 &w_i )
@@ -157,7 +159,7 @@ public:
         ( void ) w_i;
         ( void ) w_r;
 
-        return w_r.y / 1.0;
+        return 1.0;
     }
 
 };
@@ -215,55 +217,12 @@ public:
         //double r_ortho    = ( eta_i * cos_th_i - eta_t * cos_th_t ) / ( eta_i * cos_th_i + eta_t * cos_th_t );
         //glm::dvec3 fresnel = glm::dvec3{ ( r_parallel * r_parallel + r_ortho * r_ortho ) * 0.5 };
 
-
         double max_reflectance = std::max( std::max( fresnel[0], fresnel[1] ), fresnel[2] );
 
         if ( rng_() < max_reflectance )
             return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
         else
             return t;
-
-        //*/
-
-        /*
-        glm::dvec3 n{ 0.0, 1.0, 0.0 }; //  normal vector of the local space
-        double eta_i;
-        double eta_t;
-        double signal;
-
-        if ( w_i.y > 0.0 )  // w_i is entering the denser material
-        {
-            eta_i = eta_i_;
-            eta_t = eta_t_;
-            signal = 1.0;
-        }
-        else
-        {
-            eta_i = eta_t_;
-            eta_t = eta_i_;
-            signal = -1.0;
-        }
-
-        double a = 1.0 - ( eta_i * eta_i ) / ( eta_t * eta_t ) * ( 1.0 - w_i.y * w_i.y );
-
-        if ( a < 0.0 )
-            return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
-
-        glm::dvec3 t = glm::normalize( ( eta_i / eta_t ) * ( n * w_i.y - w_i ) - signal * n * sqrt( a ) );
-        double cos_theta =  ( w_i.y > 0.0 ) ? w_i.y : t.y ;
-
-        // Fresnel
-        glm::dvec3 ratio_diff_eta{ ( eta_t - eta_i ) / ( eta_t + eta_i ) };
-        glm::dvec3 r0{ ratio_diff_eta * ratio_diff_eta };
-        glm::dvec3 fresnel = r0 + ( 1.0 - r0 ) * pow( 1.0 - cos_theta, 5.0 );
-
-        double max_reflectance = std::max( std::max( fresnel[0], fresnel[1] ), fresnel[2] );
-
-        if ( rng_() < max_reflectance )
-            return glm::dvec3{ -w_i.x, w_i.y, -w_i.z };
-        else
-            return t;
-        //*/
     }
 
     double getProbability( const glm::dvec3 &w_i,
@@ -272,7 +231,8 @@ public:
         ( void ) w_i;
         ( void ) w_r;
 
-        return w_r.y / 1.0;
+        // We are using importance sampling, so we can use probability = 1.
+        return 1.0;
     }
 
 private:

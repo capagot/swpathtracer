@@ -55,6 +55,11 @@ void PathTracer::integrate( void )
             // actual sample distribution (regular, uniform,...).
             sampler_.generateSamplesCoords();
 
+            // DEBUG code
+            //if ( x == 100 && y == 50 )
+            //{
+
+
             for ( std::size_t samp = 0; samp < sampler_.size(); samp++ )
             {
                 // Transform a point from the continuous screen space into the
@@ -69,13 +74,13 @@ void PathTracer::integrate( void )
                 // screen coordinates.
                 Ray ray{ camera_.getWorldSpaceRay( pixel_cam_space ) };
 
-                //double xx = x + 0.5 + sampler_[samp].x;
-                //double yy = y + 0.5 + sampler_[samp].y;
-                //buffer_.buffer_data_[x][y] += 0.5 * ( 1.0 + static_cast< double >( sin( ( xx * xx + yy * yy ) / 100.0 ) ) );
-
                 // Trace the ray path.
                 buffer_.buffer_data_[x][y] += integrate_recursive( ray, 0, thread_id );
             }
+
+            //}
+            //else
+            //    buffer_.buffer_data_[x][y] = glm::dvec3{ 0.0, 0.0, 0.0 };
 
             // Compute the average radiance that falls onto the pixel (x,y).
             buffer_.buffer_data_[x][y] /= sampler_.size();
@@ -94,6 +99,7 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
 {
     IntersectionRecord intersection_record;
     glm::dvec3 spectrum{ 0.0, 0.0, 0.0 };
+    std::vector< glm::dvec3 > w_r;
 
     intersection_record.t_ = std::numeric_limits< double >::max();
 
@@ -114,16 +120,17 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
 
             glm::dvec3 w_i = universe_to_tangent_space * -ray.direction_;
 
-            glm::dvec3 w_r = scene_.materials_[intersection_record.material_id_]->bxdf_->getNewDirection( w_i );
-            glm::dvec3 new_dir = tangent_to_universe_space * w_r;
+            //glm::dvec3 w_r = scene_.materials_[intersection_record.material_id_]->bsdf_->getNewDirection( w_i );
+            scene_.materials_[intersection_record.material_id_]->bsdf_->getNewDirection( w_i, w_r );
 
+            glm::dvec3 new_dir = tangent_to_universe_space * w_r[ w_r.size() - 1 ];
 
             Ray new_ray{ intersection_record.position_ + new_dir * 0.00001, new_dir };
 
             spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ +
-                       scene_.materials_[intersection_record.material_id_]->bxdf_->fr( w_i, w_r ) *
+                       scene_.materials_[intersection_record.material_id_]->bsdf_->fr( w_i, w_r ) *
                        integrate_recursive( new_ray, ++depth, thread_id ) *
-                       w_r.y;
+                       w_r[ w_r.size() - 1 ].y;
         }
         else
             // If the primary ray does not hit anything,

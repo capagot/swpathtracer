@@ -1,19 +1,21 @@
 #include  "lambertian.h"
 
-Lambertian::Lambertian( const glm::dvec3 &radiance,
-                        SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler ) :
-        BxDF( std::move( surface_sampler ) ),
-        radiance_{ radiance }
+Lambertian::Lambertian( const glm::dvec3 &reflectance,
+                        SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler,
+                        Fresnel::FresnelUniquePtr fresnel ) :
+        BxDF( std::move( surface_sampler ),
+              std::move( fresnel ),
+              BxDF::BxDFType::DIFFUSE ),
+        reflectance_{ reflectance }
 { }
 
 glm::dvec3 Lambertian::fr( const glm::dvec3 &w_i,
                            const glm::dvec3 &w_r ) const
 {
     ( void ) w_i; // unused variable
+    ( void ) w_r; // unused variable
 
-    //return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * ( radiance_ / M_PI ) *  w_r.y;
-    return ( 1.0 / surface_sampler_->getProbability( w_i, w_r ) ) * ( radiance_ / M_PI );
-
+    return reflectance_ / M_PI;
 }
 
 glm::dvec3 Lambertian::getNewDirection( const glm::dvec3 &w_i ) const
@@ -23,3 +25,4 @@ glm::dvec3 Lambertian::getNewDirection( const glm::dvec3 &w_i ) const
     else
         return surface_sampler_->getSample( w_i );
 }
+

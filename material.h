@@ -14,14 +14,13 @@ public:
 
     Material( void );
 
-    Material( BxDF::BxDFUniquePtr bxdf,
+    Material( BSDF::BSDFUniquePtr bsdf,
               const glm::dvec3 &emitted );
 
-    BxDF::BxDFUniquePtr bxdf_;
-
-    BSDF bsdf_;
+    BSDF::BSDFUniquePtr bsdf_;
 
     glm::dvec3 emitted_;
 };
 
 #endif /* MATERIAL_H_ */
+
