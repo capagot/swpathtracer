@@ -18,7 +18,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 200
+    spp = 1000
 }
 
 b = buffer{
@@ -34,10 +34,11 @@ g = globals{
 }
 
 local mat_light = {
-              brdf = lambertian{ kd = { 0, 0, 0 },
-                                 surface_sampler = "importance" 
-                               },
-                 emission = { 2, 2, 2 }
+    lambertian{ 
+        kd = { 0, 0, 0 },
+        surface_sampler = "importance" 
+    },
+    emission = { 2, 2, 2 }
 }
 
 -- light source
@@ -70,9 +71,12 @@ for c1 = 1, 10 do
             center = { c1 - 5.5, -1.25, c2 - 5.5 },
             radius = 0.5,
             material = {
-                        brdf     = lambertian{ kd = { math.random(), math.random(), math.random() }, surface_sampler = "importance" },
-                        emission = { 0, 0, 0 }
-                       }
+                lambertian{ 
+                    kd = { math.random(), math.random(), math.random() }, 
+                    surface_sampler = "importance" 
+                },
+                emission = { 0, 0, 0 }
+            }
         }
 
         i = i + 1

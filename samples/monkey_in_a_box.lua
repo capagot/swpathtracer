@@ -18,7 +18,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 100
+    spp = 1000
 }
 
 b = buffer{
@@ -36,8 +36,53 @@ g = globals{
 local a = 2
 
 local white = { 0.75, 0.75, 0.75 }
+
 local red = { 0.75, 0.25, 0.25 }
+
 local blue = { 0.25, 0.25, 0.75 }
+
+local light = { 17, 17, 17 }
+
+local mat_white = {
+    lambertian{ 
+        kd = white,
+        surface_sampler = "importance" 
+    },
+    emission = { 0, 0, 0 }
+}
+
+local mat_red = {
+    lambertian{ 
+        kd = red,
+        surface_sampler = "importance" 
+    },
+    emission = { 0, 0, 0 }
+}
+
+local mat_blue = {
+    lambertian{ 
+        kd = blue,
+        surface_sampler = "importance" 
+    },
+    emission = { 0, 0, 0 }
+}
+
+local mat_light = {
+    lambertian{ 
+        kd = { 0, 0, 0 },
+        surface_sampler = "importance" 
+    },
+    emission = light
+}
+
+local mat_copper = {
+    cook_torrance{ 
+        m = 0.25, -- beckmann distribution
+        reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 }, -- copper reflectance at normal incidence
+        surface_sampler = "importance"
+    },
+    emission = { 0, 0, 0 }
+}
 
 -- back wall
 t1 = triangle{ 
@@ -46,12 +91,7 @@ t1 = triangle{
         {  a, -a, -a },
         {  a,  a, -a } 
     },
-    material = {
-                 brdf = lambertian{ kd = { 0.75, 0.75, 0.75 },
-                                    surface_sampler = "importance" 
-                 },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 t2 = triangle{ 
@@ -60,12 +100,7 @@ t2 = triangle{
         { -a,  a, -a },
         { -a, -a, -a } 
     }, 
-    material = {
-                 brdf = lambertian{ kd = { 0.75, 0.75, 0.75 },
-                                    surface_sampler = "importance" 
-                 },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 -- top
@@ -75,12 +110,7 @@ t3 = triangle{
         {  a, a, -a },
         {  a, a,  a } 
     },
-    material = {
-                 brdf     = lambertian{ kd = white,
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 t4 = triangle{ 
@@ -89,12 +119,7 @@ t4 = triangle{
         {  a, a,  a },
         { -a, a,  a } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = white,
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 -- bottom
@@ -104,12 +129,7 @@ t5 = triangle{
         { -a, -a, -a },
         {  a, -a,  a } 
     },
-    material = {
-                 brdf     = lambertian{ kd = white,
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 t6 = triangle{ 
@@ -118,12 +138,7 @@ t6 = triangle{
         { -a, -a, -a },
         { -a, -a,  a } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = white,
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_white
 }
 
 -- left wall ( red )
@@ -133,12 +148,7 @@ t7 = triangle{
         { -a,  a,  a },
         { -a, -a, -a } 
     },
-    material = {
-                 brdf     = lambertian{ kd = red,
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_red
 }
 
 t8 = triangle{ 
@@ -147,12 +157,7 @@ t8 = triangle{
         { -a,  a,  a },
         { -a, -a,  a } 
     },
-    material = {
-                 brdf     = lambertian{ kd = red,
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_red
 }
 
 -- right wall (blue)
@@ -162,12 +167,7 @@ t9 = triangle{
         { a,  a, -a },
         { a, -a, -a } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = blue,
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_blue
 }
 
 t10 = triangle{ 
@@ -176,12 +176,7 @@ t10 = triangle{
         { a, -a, -a },
         { a, -a,  a } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = blue,
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_blue
 }
 
 -- light source
@@ -193,12 +188,7 @@ t11 = triangle{
         { -0.5, a - offset, -0.5 },
         {  0.5, a - offset,  0.5 } 
     },
-    material = {
-                 brdf     = lambertian{ kd = { 0, 0, 0 },
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 17, 17, 17 }
-               }
+    material = mat_light
 }
 
 t12 = triangle{ 
@@ -207,24 +197,11 @@ t12 = triangle{
         {  0.5, a - offset,  0.5 },
         { -0.5, a - offset,  0.5 } 
     }, 
-    material = {
-                 brdf     = lambertian{ kd = { 0, 0, 0 },
-                                        surface_sampler = "importance" 
-                                      },
-                 emission = { 17, 17, 17 }
-               }
+    material = mat_light
 }
 
 mesh1 = mesh{
     filename = "samples/meshes/monkey.obj",
-    material = {
-                 brdf    = cook_torrance{ 
-                                           m = 0.02, -- beckmann
-                                           fresnel_type = "schlick-normal-reflectance", 
-                                           reflectance_at_normal_incidence = { 0.95, 0.64, 0.54 },
-                                           surface_sampler = "importance"
-                                        },
-                 emission = { 0, 0, 0 }
-               }
+    material = mat_copper
 }
 

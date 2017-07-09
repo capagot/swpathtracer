@@ -202,7 +202,7 @@ void LuaBind::getMaterial( Scene *scene,
         glm::dvec3 emission = parseVec3( "emission" );
 
         Material::MaterialUniquePtr material_object = Material::MaterialUniquePtr{ new Material{ std::move( bsdf_object ),
-                                                                                                 emission } };
+            emission } };
         scene->materials_.push_back( std::move( material_object ) );
     }
 

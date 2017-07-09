@@ -129,8 +129,8 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
 
             spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ +
                        scene_.materials_[intersection_record.material_id_]->bsdf_->fr( w_i, w_r ) *
-                       integrate_recursive( new_ray, ++depth, thread_id ) *
-                       w_r[ w_r.size() - 1 ].y;
+                       integrate_recursive( new_ray, ++depth, thread_id );// *
+                       //w_r[ w_r.size() - 1 ].y;
         }
         else
             // If the primary ray does not hit anything,

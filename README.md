@@ -2,7 +2,7 @@
 
 # Introduction
 
-Physically based rendering is a quite new subject that is under active research and for which new methods and theories are being developed continuously. In order to be able to experiment and learn the most as possible about it, I've decided to write a new (still unnamed and now, hopefully, more easily expandable), experimental ray tracer in C++11 from the scratch. All the code from this project is freely available for download in this repository under the MIT license.
+Physically based rendering is a quite new subject (assuming that I was born before the advent of rendering equation) that is under active research and for which new methods and theories are being developed continuously. In order to be able to experiment and learn the most as possible about it, I've decided to write a new (still unnamed and now, hopefully, more easily expandable), experimental ray tracer in C++11 from the scratch. All the code from this project is freely available for download in this repository under the MIT license.
 
 As a way to record and share information about the evolution of the project, I've also created a blog at https://pbrexperiments.blogspot.com.br.
 

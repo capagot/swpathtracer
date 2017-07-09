@@ -16,14 +16,29 @@ glm::dvec3 BSDF::fr( const glm::dvec3 &w_i,
     // The current implementation handles only materials composed by one or two layers.
     if ( bsdf_path.size() == 2 ) // if the material contains one BxDF
         spectrum = bxdf_layers_[ 0 ]->fr( bsdf_path[ 0 ], bsdf_path[ 1 ] ) /
-                   bxdf_layers_[ 0 ]->surface_sampler_->getProbability( bsdf_path[ 0 ], bsdf_path[ 1 ] );
+                   bxdf_layers_[ 0 ]->surface_sampler_->getProbability( bsdf_path[ 0 ], bsdf_path[ 1 ] ) *
+                   bsdf_path[ 1 ].y;
     else // if the material contains two BxDFs
     {
+        //while ( current_bxdf * 2 <= bsdf_path.size() )
+        //{
+        //    spectrum = ( bxdf_layers_[ 1 ]->fr( -bsdf_path[ current_bxdf ], bsdf_path[ current_bxdf + 1 ] ) /
+        //                 bxdf_layers_[ 1 ]->surface_sampler_->getProbability( -bsdf_path[ current_bxdf ], bsdf_path[ current_bxdf + 1 ] ) ) *
+        //                 bsdf_path[ current_bxdf + 1 ].y;
+        //    current_bxdf += 2;
+        //}
+
         while ( current_bxdf * 2 <= bsdf_path.size() )
         {
-            spectrum = ( bxdf_layers_[ 1 ]->fr( -bsdf_path[ current_bxdf ], bsdf_path[ current_bxdf + 1 ] ) /
-                         bxdf_layers_[ 1 ]->surface_sampler_->getProbability( -bsdf_path[ current_bxdf ], bsdf_path[ current_bxdf + 1 ] ) ) *
-                         bsdf_path[ current_bxdf + 1 ].y;
+            if ( current_bxdf == 1)
+                spectrum = ( bxdf_layers_[ 1 ]->fr( -bsdf_path[ current_bxdf ], bsdf_path[ current_bxdf + 1 ] ) /
+                             bxdf_layers_[ 1 ]->surface_sampler_->getProbability( -bsdf_path[ current_bxdf ], bsdf_path[ current_bxdf + 1 ] ) ) *
+                             bsdf_path[ current_bxdf + 1 ].y;
+            else
+                spectrum *= ( bxdf_layers_[ 1 ]->fr( -bsdf_path[ current_bxdf ], bsdf_path[ current_bxdf + 1 ] ) /
+                              bxdf_layers_[ 1 ]->surface_sampler_->getProbability( -bsdf_path[ current_bxdf ], bsdf_path[ current_bxdf + 1 ] ) ) *
+                              bsdf_path[ current_bxdf + 1 ].y;
+
             current_bxdf += 2;
         }
     }
