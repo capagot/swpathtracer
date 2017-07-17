@@ -60,7 +60,9 @@ private:
                     RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
 
     void getMesh( Scene *scene,
+                  const Scene::MeshType mesh_type,
                   RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
+
 
     void getElements( Camera **camera,
                       Sampler **sampler,

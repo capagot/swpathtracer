@@ -229,6 +229,7 @@ void LuaBind::getSphere( Scene *scene,
 }
 
 void LuaBind::getMesh( Scene *scene,
+                       const Scene::MeshType mesh_type,
                        RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
 {
     std::string filename = parseString( "filename" );
@@ -236,6 +237,7 @@ void LuaBind::getMesh( Scene *scene,
     glm::dvec3 max_aabb;
     getMaterial( scene, rng );
     scene->loadMesh( filename,
+                     mesh_type,
                      min_aabb,
                      max_aabb );
 }
@@ -280,7 +282,9 @@ void LuaBind::getElements( Camera **camera,
                 if( object_type == "sphere" )
                     getSphere( scene, rng );
                 if( object_type == "mesh" )
-                    getMesh( scene, rng );
+                    getMesh( scene, Scene::MeshType::FLAT, rng );
+                if( object_type == "smooth_mesh" )
+                    getMesh( scene, Scene::MeshType::SMOOTH, rng );
                 if( object_type == "union" )
                     getElements( camera,
                                  sampler,

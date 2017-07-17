@@ -3,3 +3,8 @@ function mesh( self )
     return self
 end
 
+function smooth_mesh( self )
+    self.object_type = "smooth_mesh"
+    return self
+end
+

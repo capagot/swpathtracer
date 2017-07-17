@@ -12,6 +12,7 @@
 #include "assimp/postprocess.h"
 
 #include "triangle.h"
+#include "smooth_triangle.h"
 #include "sphere.h"
 #include "lambertian.h"
 #include "cook_torrance.h"
@@ -30,6 +31,12 @@ public:
         BVH_SAH
     };
 
+    enum MeshType
+    {
+        FLAT,
+        SMOOTH
+    };
+
     Scene( void );
 
     ~Scene( void );
@@ -39,6 +46,7 @@ public:
     //void pushMaterial( long unsigned int material_id );
 
     int loadMesh( const std::string &file_name,
+                  const Scene::MeshType mesh_type,
                   glm::dvec3 &min_aabb,
                   glm::dvec3 &max_aabb );
 

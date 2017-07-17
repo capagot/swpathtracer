@@ -15,6 +15,9 @@ glm::dvec3 Lambertian::fr( const glm::dvec3 &w_i,
     ( void ) w_i; // unused variable
     ( void ) w_r; // unused variable
 
+    if ( w_r.y < 0.0 )
+        return glm::dvec3{ 0.0, 0.0, 0.0 };
+    
     return reflectance_ / M_PI;
 }
 
