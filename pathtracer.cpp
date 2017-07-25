@@ -100,44 +100,50 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
     IntersectionRecord intersection_record;
     glm::dvec3 spectrum{ 0.0, 0.0, 0.0 };
     std::vector< glm::dvec3 > w_r;
-
     intersection_record.t_ = std::numeric_limits< double >::max();
 
-    if ( depth < max_path_depth_ )
+    if ( !scene_.intersect( ray,
+                            intersection_record,
+                            num_intersection_tests_[ thread_id ],
+                            num_intersections_[ thread_id ] ) )
     {
-        num_rays_[ thread_id ]++;
-
-        if ( scene_.intersect( ray,
-                               intersection_record,
-                               num_intersection_tests_[ thread_id ],
-                               num_intersections_[ thread_id ] ) )
-        {
-            ONB tangent_frame;
-            tangent_frame.setFromV( intersection_record.normal_ );
-
-            glm::dmat3x3 tangent_to_universe_space = tangent_frame.getBasisMatrix();
-            glm::dmat3x3 universe_to_tangent_space = glm::transpose( tangent_to_universe_space );
-
-            glm::dvec3 w_i = universe_to_tangent_space * -ray.direction_;
-
-            //glm::dvec3 w_r = scene_.materials_[intersection_record.material_id_]->bsdf_->getNewDirection( w_i );
-            scene_.materials_[intersection_record.material_id_]->bsdf_->getNewDirection( w_i, w_r );
-
-            glm::dvec3 new_dir = tangent_to_universe_space * w_r[ w_r.size() - 1 ];
-
-            Ray new_ray{ intersection_record.position_ + new_dir * 0.00001, new_dir };
-
-            spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ +
-                       scene_.materials_[intersection_record.material_id_]->bsdf_->fr( w_i, w_r ) *
-                       integrate_recursive( new_ray, ++depth, thread_id );// *
-                       //w_r[ w_r.size() - 1 ].y;
-        }
+        if ( !depth )
+            return background_color_;
         else
-            // If the primary ray does not hit anything,
-            // tint the pixel with the background color.
-            if ( !depth )
-                spectrum = background_color_;
+            return spectrum;
     }
+
+    ONB tangent_frame;
+    tangent_frame.setFromV( intersection_record.normal_ );
+
+    glm::dmat3x3 tangent_to_universe_space = tangent_frame.getBasisMatrix();
+    glm::dmat3x3 universe_to_tangent_space = glm::transpose( tangent_to_universe_space );
+
+    glm::dvec3 w_i = universe_to_tangent_space * -ray.direction_;
+
+    scene_.materials_[intersection_record.material_id_]->bsdf_->getNewDirection( w_i, w_r );
+
+    glm::dvec3 new_dir = tangent_to_universe_space * w_r[ w_r.size() - 1 ];
+    Ray new_ray{ intersection_record.position_ + new_dir * 0.00001, new_dir };
+
+    glm::dvec3 fr = scene_.materials_[intersection_record.material_id_]->bsdf_->fr( w_i, w_r );
+
+    double p = std::max( std::max( fr[0], fr[1] ), fr[2] );
+
+    if ( depth >= max_path_depth_ )
+    {
+        if ( rng_() < p )
+            fr *= 1.0 / p;
+        else
+            return scene_.materials_[intersection_record.material_id_]->emitted_;
+    }
+
+    num_rays_[ thread_id ]++;
+
+    spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ +
+        fr *
+        integrate_recursive( new_ray, ++depth, thread_id );// *
+        //w_r[ w_r.size() - 1 ].y;
 
     return spectrum;
 }
