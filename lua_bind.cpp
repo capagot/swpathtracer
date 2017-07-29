@@ -29,7 +29,9 @@ void LuaBind::loadFromScript( Camera **camera,
                               Scene *scene,
                               Buffer **rendering_buffer,
                               glm::dvec3 &background_color,
-                              std::size_t &max_path_depth,
+                              std::string &path_termination,
+                              //std::size_t &max_path_depth,
+                              std::size_t &path_length,
                               std::string &output_filename,
                               Scene::AccelerationStructure &scene_acceleration_data_structure,
                               RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
@@ -40,7 +42,9 @@ void LuaBind::loadFromScript( Camera **camera,
                  scene,
                  rendering_buffer,
                  background_color,
-                 max_path_depth,
+                 path_termination,
+                 //max_path_depth,
+                 path_length,
                  output_filename,
                  scene_acceleration_data_structure,
                  rng );
@@ -98,12 +102,15 @@ void LuaBind::getBuffer( Buffer **rendering_buffer )
 }
 
 void LuaBind::getGlobals( glm::dvec3 &background_color,
-                          std::size_t &max_path_depth,
+                          std::string &path_termination,
+                          //std::size_t &max_path_depth,
+                          std::size_t &path_length,
                           std::string &output_filename,
                           Scene::AccelerationStructure &scene_acceleration_data_structure )
 {
     background_color = parseVec3( "background_color" );
-    max_path_depth = parseScalar( "max_path_depth" );
+    path_termination = parseString( "path_termination" );
+    path_length = parseScalar( "path_length" );
     output_filename = parseString( "output_filename" );
     std::string acelleration_structure = parseString( "acceleration_data_structure" );
 
@@ -247,7 +254,9 @@ void LuaBind::getElements( Camera **camera,
                            Scene *scene,
                            Buffer **rendering_buffer,
                            glm::dvec3 &background_color,
-                           std::size_t &max_path_depth,
+                           std::string &path_termination,
+                           //std::size_t &max_path_depth,
+                           std::size_t &path_length,
                            std::string &output_filename,
                            Scene::AccelerationStructure &scene_acceleration_data_structure,
                            RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
@@ -274,7 +283,9 @@ void LuaBind::getElements( Camera **camera,
                     getBuffer( rendering_buffer );
                 if( object_type == "globals" )
                     getGlobals( background_color,
-                                max_path_depth,
+                                path_termination,
+                                //max_path_depth,
+                                path_length,
                                 output_filename,
                                 scene_acceleration_data_structure );
                 if( object_type == "triangle" )
@@ -291,7 +302,9 @@ void LuaBind::getElements( Camera **camera,
                                  scene,
                                  rendering_buffer,
                                  background_color,
-                                 max_path_depth,
+                                 path_termination,
+                                 //max_path_depth,
+                                 path_length,
                                  output_filename,
                                  scene_acceleration_data_structure,
                                  rng );

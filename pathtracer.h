@@ -15,8 +15,8 @@ public:
     PathTracer( Camera &camera,
                 const Scene &scene,
                 const glm::dvec3 background_color,
-                unsigned int max_path_depth,
-                TracingStoppingCriterion tracing_stop_criterion_,
+                PathTerminationCriterion PathTermination_criterion_,
+                unsigned int path_length,
                 Sampler &sampler,
                 Buffer &buffer,
                 RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );

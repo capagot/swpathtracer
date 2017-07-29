@@ -11,7 +11,7 @@ class Integrator
 {
 public:
 
-    enum class TracingStoppingCriterion
+    enum class PathTerminationCriterion
     {
         MAX_DEPTH,
         RUSSIAN_ROULETTE
@@ -20,8 +20,8 @@ public:
     Integrator( Camera &camera,
                 const Scene &scene,
                 const glm::dvec3 background_color,
-                unsigned int max_path_depth,
-                TracingStoppingCriterion tracing_stop_criterion_,
+                PathTerminationCriterion path_termination_criterion_,
+                unsigned int path_length,
                 Sampler &sampler,
                 Buffer &buffer );
 
@@ -29,18 +29,19 @@ public:
 
     unsigned int getMaxPathDepth( void ) const;
 
-    TracingStoppingCriterion getTracingStopCriterion( void ) const;
+    //TracingStoppingCriterion getTracingStopCriterion( void ) const;
 
 protected:
+
     const Camera &camera_;
 
     const Scene &scene_;
 
     glm::dvec3 background_color_;
 
-    unsigned int max_path_depth_;
+    PathTerminationCriterion path_termination_criterion_;
 
-    TracingStoppingCriterion tracing_stop_criterion_;
+    unsigned int path_length_;
 
     Sampler &sampler_;
 

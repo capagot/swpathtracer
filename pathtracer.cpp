@@ -4,16 +4,16 @@
 PathTracer::PathTracer( Camera &camera,
                         const Scene &scene,
                         const glm::dvec3 background_color,
-                        unsigned int max_path_depth,
-                        TracingStoppingCriterion tracing_stop_criterion_,
+                        PathTerminationCriterion path_termination_criterion,
+                        unsigned int path_length,
                         Sampler &sampler,
                         Buffer &buffer,
                         RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) :
         Integrator{ camera,
                     scene,
                     background_color,
-                    max_path_depth,
-                    tracing_stop_criterion_,
+                    path_termination_criterion,
+                    path_length,
                     sampler,
                     buffer },
         rng_( rng )
@@ -55,11 +55,6 @@ void PathTracer::integrate( void )
             // actual sample distribution (regular, uniform,...).
             sampler_.generateSamplesCoords();
 
-            // DEBUG code
-            //if ( x == 100 && y == 50 )
-            //{
-
-
             for ( std::size_t samp = 0; samp < sampler_.size(); samp++ )
             {
                 // Transform a point from the continuous screen space into the
@@ -77,10 +72,6 @@ void PathTracer::integrate( void )
                 // Trace the ray path.
                 buffer_.buffer_data_[x][y] += integrate_recursive( ray, 0, thread_id );
             }
-
-            //}
-            //else
-            //    buffer_.buffer_data_[x][y] = glm::dvec3{ 0.0, 0.0, 0.0 };
 
             // Compute the average radiance that falls onto the pixel (x,y).
             buffer_.buffer_data_[x][y] /= sampler_.size();
@@ -101,6 +92,9 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
     glm::dvec3 spectrum{ 0.0, 0.0, 0.0 };
     std::vector< glm::dvec3 > w_r;
     intersection_record.t_ = std::numeric_limits< double >::max();
+
+    if ( ( depth >= path_length_ ) && ( path_termination_criterion_ ==  PathTerminationCriterion::MAX_DEPTH ) )
+        return spectrum;
 
     if ( !scene_.intersect( ray,
                             intersection_record,
@@ -128,12 +122,12 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
 
     glm::dvec3 fr = scene_.materials_[intersection_record.material_id_]->bsdf_->fr( w_i, w_r );
 
-    double p = std::max( std::max( fr[0], fr[1] ), fr[2] );
+    double k = std::max( std::max( fr[0], fr[1] ), fr[2] );
 
-    if ( depth >= max_path_depth_ )
+    if ( ( depth >= path_length_ ) && ( path_termination_criterion_ ==  PathTerminationCriterion::RUSSIAN_ROULETTE ) )
     {
-        if ( rng_() < p )
-            fr *= 1.0 / p;
+        if ( rng_() < k )
+            fr *= 1.0 / k; 
         else
             return scene_.materials_[intersection_record.material_id_]->emitted_;
     }

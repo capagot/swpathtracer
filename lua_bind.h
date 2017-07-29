@@ -29,7 +29,9 @@ public:
                          Scene *scene,
                          Buffer **rendering_buffer,
                          glm::dvec3 &background_color,
-                         std::size_t &max_path_depth,
+                         std::string &path_termination,
+                         //std::size_t &max_path_depth,
+                         std::size_t &path_length,
                          std::string &output_filename,
                          Scene::AccelerationStructure &scene_acceleration_data_structure,
                          RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );
@@ -46,7 +48,9 @@ private:
     void getBuffer( Buffer **rendering_buffer );
 
     void getGlobals( glm::dvec3 &background_color,
-                     std::size_t &max_path_depth,
+                     std::string &path_termination,
+                     //std::size_t &max_path_depth,
+                     std::size_t &path_length,
                      std::string &output_filename,
                      Scene::AccelerationStructure &scene_acceleration_data_structure );
 
@@ -69,7 +73,9 @@ private:
                       Scene *scene,
                       Buffer **rendering_buffer,
                       glm::dvec3 &background_color,
-                      std::size_t &max_path_depth,
+                      std::string &path_termination,
+                      //max_path_depth,
+                      std::size_t &path_length,
                       std::string &output_filename,
                       Scene::AccelerationStructure &scene_acceleration_data_structure,
                       RNG< std::uniform_real_distribution, double, std::mt19937 > &rng );

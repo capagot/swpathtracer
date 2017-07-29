@@ -17,7 +17,9 @@ int main( int num_args, char **arg_vector )
     Scene scene{};
     Buffer *rendering_buffer = nullptr;
     glm::dvec3 background_color;
-    std::size_t max_path_depth;
+    std::string path_termination;
+    //std::size_t max_path_depth;
+    std::size_t path_length;
     std::string output_filename;
     Scene::AccelerationStructure scene_acceleration_data_structure;
 
@@ -32,7 +34,9 @@ int main( int num_args, char **arg_vector )
                         &scene,
                         &rendering_buffer,
                          background_color,
-                         max_path_depth,
+                         path_termination,
+                         //max_path_depth,
+                         path_length,
                          output_filename,
                          scene_acceleration_data_structure,
                          rng);
@@ -40,8 +44,6 @@ int main( int num_args, char **arg_vector )
     std::cout << "Input: " << std::endl;
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
     std::cout << "  file name ........................: " << cmdlineparser.getInputScriptFilename() << std::endl;
-
-    //exit(0);
 
     std::cout << std::endl;
     camera->printInfo();
@@ -55,8 +57,14 @@ int main( int num_args, char **arg_vector )
     std::cout << "  background color .................: [" << background_color[0] << ", "
                                                            << background_color[1] << ", "
                                                            << background_color[2] << "]" << std::endl;
-    std::cout << "  path tracing term. criterion .....: maximum depth" << std::endl;
-    std::cout << "  max. path depth ..................: " << max_path_depth << std::endl;
+    std::cout << "  path termination criterion .......: " << (( path_termination == "russian-roulette" ) ? "russian roulette" : "fixed length" ) << std::endl; 
+
+    if (  path_termination == "russian-roulette" )
+        std::cout << "  path minimum length ..............: ";
+    else
+        std::cout << "  path maximum length ..............: ";
+    std::cout << path_length << std::endl;
+
     std::cout << "  output file name .................: " << output_filename << std::endl;
 
     std::cout << std::endl;
@@ -72,8 +80,8 @@ int main( int num_args, char **arg_vector )
     PathTracer pt( (*camera),
                    scene,
                    background_color,
-                   max_path_depth,
-                   Integrator::TracingStoppingCriterion::MAX_DEPTH,
+                   ( ( path_termination == "russian-roulette" ) ? Integrator::PathTerminationCriterion::RUSSIAN_ROULETTE : Integrator::PathTerminationCriterion::MAX_DEPTH ),
+                   path_length,
                    (*sampler),
                    (*rendering_buffer),
                    rng );

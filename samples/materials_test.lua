@@ -4,8 +4,8 @@ package.path = package.path .. ';./lua_core/?.lua'
 require "core"
 
 -------------------------------------------------------------------------------
-local image_width = 1740
-local image_height = 300
+local image_width = 870
+local image_height = 150
 
 Camera = camera{
     type     = "perspective",
@@ -18,7 +18,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 512
+    spp = 40
 }
 
 b = buffer{
@@ -28,8 +28,10 @@ b = buffer{
 
 g = globals{
     background_color = { 0, 0, 0 },
-    max_path_depth = 10,
-    output_filename = "material_test.ppm",
+    --path_termination = "russian-roulette",
+    path_termination = "max-length",
+    path_length = 1,
+    output_filename = "material_test_2.ppm",
     acceleration_data_structure = "none"
 }
 
