@@ -28,7 +28,8 @@ b = buffer{
 
 g = globals{
     background_color = { 0, 0, 0 },
-    max_path_depth = 5,
+    path_termination = "russian-roulette",
+    path_length = 5,
     output_filename = "procedural.ppm",
     acceleration_data_structure = "bvh-sah"
 }

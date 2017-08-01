@@ -21,7 +21,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 512
+    spp = 128
 }
 
 b = buffer{
@@ -31,7 +31,8 @@ b = buffer{
 
 g = globals{
     background_color = { 0, 0, 0 },
-    max_path_depth = 10,
+    path_termination = "russian-roulette", --"max-length"
+    path_length = 5,
     output_filename = "furnace_test.ppm",
     acceleration_data_structure = "none"
 }
@@ -112,9 +113,9 @@ s1 = sphere{
     radius = 1,
     --material = mat_lambertian
     --material = mat_smooth_reflection
-    --material = mat_cook_torrance
+    material = mat_cook_torrance
     --material = mat_smooth_dielectric
-    material = plastic
+    --material = plastic
     --material = varnish
 }
 

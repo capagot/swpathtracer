@@ -18,8 +18,8 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 40
-}
+    spp = 400
+}   
 
 b = buffer{
     hres = image_width,
@@ -28,10 +28,9 @@ b = buffer{
 
 g = globals{
     background_color = { 0, 0, 0 },
-    --path_termination = "russian-roulette",
-    path_termination = "max-length",
-    path_length = 1,
-    output_filename = "material_test_2.ppm",
+    path_termination = "russian-roulette", -- "max-length"
+    path_length = 5,
+    output_filename = "material_test.ppm",
     acceleration_data_structure = "none"
 }
 
