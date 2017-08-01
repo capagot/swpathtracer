@@ -10,7 +10,7 @@ As a way to record and share information about the evolution of the project, I'v
 
 - Perspective (pinhole) and orthographic cameras.
 - Input and configuration through Lua scripts.
-- Sphere and triangle primitives.
+- Sphere, triangle and smooth triangle primitives.
 - Mesh loading through Assimp.
 - SAH-based BVH for rendering acceleration.
 - Perfectly diffuse (Lambertian) surfaces.
