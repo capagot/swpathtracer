@@ -21,7 +21,8 @@ As a way to record and share information about the evolution of the project, I'v
 - Diffuse light sources.
 - Importance sampled BSDFs.
 - RGB spectrum.
-- Naïve (brute force) path tracing, with a maximum prescribed path depth.
+- Naïve (brute force) path tracing.
+- Path termination through fixed maximum depth or russian roulette.
 - Regular, uniform and jittered box-filtered pixel samplers.
 - Output in PPM (Portable Pixel Map) file format.
 - Vector and matrix computations with glm.
@@ -59,5 +60,5 @@ To render one of the sample files, just issue the following command from the pro
 
 # TODOs
 
-The development of this ray tracer is just in the beggining, and there are lots and lots of things to be improved and added to the renderer (this coule bd easily considered a lifetime software project... :). Among the planned features, I would mention: multiple importance sampling, higher order pixel samplers, direct light sampling, bidirectioal path tracing, metropolis light transport, instancing, thin lens camera, russian roulette for ray path termination, subsurface scattering, spectral rendering, support for OpenEXR file format... and much more.
+The development of this ray tracer is just in the beggining, and there are lots and lots of things to be improved and added to the renderer (this coule bd easily considered a lifetime software project... :). Among the planned features, I would mention: multiple importance sampling, higher order pixel samplers, direct light sampling, bidirectioal path tracing, metropolis light transport, instancing, thin lens camera, subsurface scattering, spectral rendering, support for OpenEXR file format... and much more.
 
