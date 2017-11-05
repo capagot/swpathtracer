@@ -2,7 +2,8 @@
 
 int main( int num_args, char **arg_vector )
 {
-    feenableexcept( FE_INVALID   | 
+    /*
+    feenableexcept( //FE_INVALID   | 
                     //FE_DIVBYZERO | 
                     FE_OVERFLOW  | 
                     FE_UNDERFLOW );
