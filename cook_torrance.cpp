@@ -30,7 +30,6 @@ glm::vec3 CookTorrance::fr( const glm::vec3 &w_i,
 
     if ( ( nv == 0.0f ) || ( nl == 0.0f ) )
     {
-        std::clog << "Cook Torrance nv/nl == 0.0f!\n";
         return glm::vec3{ 0.0f };
     }
     

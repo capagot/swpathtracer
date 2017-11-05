@@ -14,7 +14,6 @@ glm::vec3 SmoothDielectric::fr( const glm::vec3 &local_w_i,
 
     if ( local_w_r.y == 0.0 )
     {
-        std::clog << "Smooth dielectric in cos = 0.0!\n";
         return glm::vec3{ 0.0f };
     }   
 
