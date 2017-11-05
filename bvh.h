@@ -42,10 +42,10 @@ public:
     struct PrimitiveAABBArea
     {
         std::size_t primitive_id_;
-        glm::dvec3 centroid_;
+        glm::vec3 centroid_;
         AABB aabb_;
-        double left_area_;
-        double right_area_;
+        float left_area_;
+        float right_area_;
 
         AABB left_aabb_;
         AABB right_aabb_;
@@ -83,17 +83,17 @@ private:
         }
     };
 
-    double SAH( std::size_t s1_size,
-                double s1_area,
+    float SAH( std::size_t s1_size,
+                float s1_area,
                 std::size_t s2_size,
-                double s2_area,
-                double s_area  );
+                float s2_area,
+                float s_area  );
 
     void splitNode( BVHNode **node,
                     std::deque< PrimitiveAABBArea > &s,
                     std::size_t first,
                     std::size_t last,
-                    double s_area );
+                    float s_area );
 
     bool traverse( const BVHNode *node,
                    const Ray &ray,
@@ -103,9 +103,9 @@ private:
 
     BVHNode *root_node_ = nullptr;
 
-    double cost_intersec_tri_ = 0.8;
+    float cost_intersec_tri_ = 0.8f;
 
-    double cost_intersec_aabb_ = 0.2;
+    float cost_intersec_aabb_ = 0.2f;
 
     std::deque< long unsigned int > primitive_id_;
 

@@ -15,10 +15,10 @@ public:
     SmoothConductor( SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler,
                      Fresnel::FresnelUniquePtr fresnel );
 
-    glm::dvec3 fr( const glm::dvec3 &w_i,
-                   const glm::dvec3 &w_r ) const;
+    glm::vec3 fr( const glm::vec3 &w_i,
+                   const glm::vec3 &w_r ) const;
 
-    glm::dvec3 getNewDirection( const glm::dvec3 &w_i ) const;
+    glm::vec3 getNewDirection( const glm::vec3 &w_i ) const;
 
 //private:
 

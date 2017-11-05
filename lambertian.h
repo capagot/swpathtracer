@@ -4,21 +4,22 @@
 #include "bxdf.h"
 #include "onb.h"
 #include "random.h"
+#include "utils.h"
 
 class Lambertian : public BxDF
 {
 public:
 
-    Lambertian( const glm::dvec3 &reflectance,
+    Lambertian( const glm::vec3 &reflectance,
                 SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler,
                 Fresnel::FresnelUniquePtr fresnel );
 
-    glm::dvec3 fr( const glm::dvec3 &w_i,
-                   const glm::dvec3 &w_r ) const;
+    glm::vec3 fr( const glm::vec3 &w_i,
+                   const glm::vec3 &w_r ) const;
 
-    glm::dvec3 getNewDirection( const glm::dvec3 &w_i ) const;
+    glm::vec3 getNewDirection( const glm::vec3 &w_i ) const;
 
-    glm::dvec3 reflectance_;
+    glm::vec3 reflectance_;
 
 };
 

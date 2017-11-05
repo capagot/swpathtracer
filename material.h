@@ -15,11 +15,11 @@ public:
     Material( void );
 
     Material( BSDF::BSDFUniquePtr bsdf,
-              const glm::dvec3 &emitted );
+              const glm::vec3 &emitted );
 
     BSDF::BSDFUniquePtr bsdf_;
 
-    glm::dvec3 emitted_;
+    glm::vec3 emitted_;
 };
 
 #endif /* MATERIAL_H_ */

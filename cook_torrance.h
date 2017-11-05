@@ -5,6 +5,7 @@
 #include "onb.h"
 #include "random.h"
 #include "fresnel.h"
+#include "utils.h"
 
 /* The CookTorrance class implements a microfacet-based BRDF model for rough specular surfaces.
  * It implements the rough specular term proposed originally in [1] and includes the normalizing
@@ -24,18 +25,18 @@ class CookTorrance : public BxDF
 {
 public:
 
-    CookTorrance( double m,
+    CookTorrance( float m,
                   SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler,
                   Fresnel::FresnelUniquePtr fresnel );
 
-    glm::dvec3 fr( const glm::dvec3 &w_i,
-                   const glm::dvec3 &w_r ) const;
+    glm::vec3 fr( const glm::vec3 &w_i,
+                   const glm::vec3 &w_r ) const;
 
-    glm::dvec3 getNewDirection( const glm::dvec3 &w_i ) const;
+    glm::vec3 getNewDirection( const glm::vec3 &w_i ) const;
 
 private:
 
-    double m_; // roughness
+    float m_; // roughness
 
 };
 

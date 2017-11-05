@@ -31,6 +31,8 @@ BVH::BVH( const std::vector< Primitive::PrimitiveUniquePtr > &primitives ) :
         splitNode( &root_node_, s, 0, s.size() - 1, root_aabb.getArea() );
     }
 
+    //dump();
+
     t.stop();
     std::cout << "  total BVH construction time ......: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec.";
 }
@@ -52,13 +54,16 @@ bool BVH::intersect( const Ray &ray,
     return traverse( root_node_, ray, intersection_record, num_intersection_tests_, num_intersections_ );
 }
 
-double BVH::SAH( std::size_t s1_size,
-                 double s1_area,
+float BVH::SAH( std::size_t s1_size,
+                 float s1_area,
                  std::size_t s2_size,
-                 double s2_area,
-                 double s_area )
+                 float s2_area,
+                 float s_area )
 {
-    return 2.0 * cost_intersec_aabb_ + ( ( s1_area / s_area ) * s1_size * cost_intersec_tri_ ) +
+    if ( ( s2_area == std::numeric_limits< float >::infinity() ) && ( s2_size == 0 ) )
+        return std::numeric_limits< float >::infinity();
+
+    return 2.0f * cost_intersec_aabb_ + ( ( s1_area / s_area ) * s1_size * cost_intersec_tri_ ) +
                                        ( ( s2_area / s_area ) * s2_size * cost_intersec_tri_ );
 }
 
@@ -73,7 +78,7 @@ void BVH::splitNode( BVHNode **node,
                      std::deque< PrimitiveAABBArea > &s,
                      std::size_t first,
                      std::size_t last,
-                     double s_area )
+                     float s_area )
 {
     (*node) = new BVHNode();
     (*node)->first_ = first;
@@ -83,7 +88,7 @@ void BVH::splitNode( BVHNode **node,
 
     std::deque< PrimitiveAABBArea > s_aux;
 
-    double best_cost = cost_intersec_tri_ * ( last + 1 - first );
+    float best_cost = cost_intersec_tri_ * ( last + 1 - first );
     int best_axis = -1;
     int best_event = -1;
 
@@ -103,11 +108,12 @@ void BVH::splitNode( BVHNode **node,
         }
 
         s_aux = std::deque< PrimitiveAABBArea >( s.begin() + first, s.begin() + last + 1 );
+
         for ( std::size_t i = first; i <= last; i++ )
         {
             if ( i == first )
             {
-                s[i].left_area_ = std::numeric_limits< double >::infinity();
+                s[i].left_area_ = std::numeric_limits< float >::infinity();
                 s_aux[0].left_aabb_ = s_aux[0].aabb_;
             }
             else
@@ -121,7 +127,7 @@ void BVH::splitNode( BVHNode **node,
         {
             if ( i == static_cast< long int >( last ) )
             {
-                s[i].right_area_ = std::numeric_limits< double >::infinity();
+                s[i].right_area_ = std::numeric_limits< float >::infinity();
                 s_aux[ last - first ].right_aabb_ = s_aux[ last - first ].aabb_;
             }
             else
@@ -130,8 +136,8 @@ void BVH::splitNode( BVHNode **node,
                 s_aux[ i - first ].right_aabb_ = s_aux[ i - first ].aabb_ + s_aux[ i - first + 1 ].right_aabb_;
             }
 
-            double this_cost = SAH( i - first + 1,
-                                    s[ ( i + 1 ) % ( s.size() + 1 ) ].left_area_, // Fixes an indexing problem from the original paper.
+            float this_cost = SAH( i - first + 1,
+                                    s[i].left_area_,
                                     last - i,
                                     s[i].right_area_,
                                     s_area );
@@ -152,9 +158,12 @@ void BVH::splitNode( BVHNode **node,
         progress_stream << "\r  BVH building progress ............: "
                         << std::fixed << std::setw( 6 )
                         << std::setprecision( 2 )
-                        << 100.0 * static_cast< float >( primitives_inserted_ ) / primitives_.size()
+                        << 100.0f * static_cast< float >( primitives_inserted_ ) / primitives_.size()
                         << "%";
         std::clog << progress_stream.str();
+
+        //if ( last == first )
+        //    std::clog << "One primitive node!\n";
 
         for ( long unsigned int i = first; i <= last; i++ )
         {
@@ -218,7 +227,7 @@ bool BVH::traverse( const BVHNode *node,
                     {
                         num_intersections_++;
 
-                        if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
+                        if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0f ) )
                         {
                             intersection_record = tmp_intersection_record;
                             primitive_intersect = true;

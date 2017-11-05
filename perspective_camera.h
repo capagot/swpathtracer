@@ -3,6 +3,7 @@
 
 #include "camera.h"
 #include "ray.h"
+#include "utils.h"
 
 class PerspectiveCamera : public Camera
 {
@@ -10,23 +11,23 @@ public:
 
     PerspectiveCamera( void );
 
-    PerspectiveCamera( const glm::dvec3 &position,
-                       const glm::dvec3 &up_vector,
-                       const glm::dvec3 &look_at,
-                       double aspect,
-                       double fov_degrees );
+    PerspectiveCamera( const glm::vec3 &position,
+                       const glm::vec3 &up_vector,
+                       const glm::vec3 &look_at,
+                       float aspect,
+                       float fov_degrees );
 
-    Ray getWorldSpaceRay( const glm::dvec2 &sample_coord ) const;
+    Ray getWorldSpaceRay( const glm::vec2 &sample_coord ) const;
 
     void printInfo( void ) const;
 
-    double aspect_;
+    float aspect_;
 
-    double fov_degrees_;
+    float fov_degrees_;
 
 private:
 
-    static const double kDegreesToRadians_;
+    static const float kDegreesToRadians_;
 };
 
 #endif /* PERSPECTIVE_CAMERA_H_ */

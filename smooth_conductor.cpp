@@ -7,15 +7,18 @@ SmoothConductor::SmoothConductor( SurfaceSampler::SurfaceSamplerUniquePtr surfac
               BxDF::BxDFType::CONDUCTOR )
 {}
 
-glm::dvec3 SmoothConductor::fr( const glm::dvec3 &w_i,
-                                const glm::dvec3 &w_r ) const
+glm::vec3 SmoothConductor::fr( const glm::vec3 &w_i,
+                                const glm::vec3 &w_r ) const
 {
     ( void ) w_i; // unused variable
+
+    if ( w_r.y == 0.0f )
+        return glm::vec3{ 0.0f };
 
     return fresnel_->value( w_r.y ) / w_r.y;
 }
 
-glm::dvec3 SmoothConductor::getNewDirection( const glm::dvec3 &w_i ) const
+glm::vec3 SmoothConductor::getNewDirection( const glm::vec3 &w_i ) const
 {
     return surface_sampler_->getSample( w_i );
 }

@@ -1,17 +1,17 @@
 #include "bsdf.h"
 
-BSDF::BSDF( RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) :
+BSDF::BSDF( RNG< std::uniform_real_distribution, float, std::mt19937 > &rng ) :
     rng_( rng )
 {}
 
-glm::dvec3 BSDF::fr( const glm::dvec3 &w_i,
-                     const std::vector< glm::dvec3 > &bsdf_path ) const
+glm::vec3 BSDF::fr( const glm::vec3 &w_i,
+                     const std::vector< glm::vec3 > &bsdf_path ) const
 {
     ( void ) w_i;
 
     unsigned int current_bxdf = 1;
 
-    glm::dvec3 spectrum{ 0.0 };
+    glm::vec3 spectrum{ 0.0f };
 
     // The current implementation handles only materials composed by one or two layers.
     if ( bsdf_path.size() == 2 ) // if the material contains one BxDF
@@ -46,13 +46,13 @@ glm::dvec3 BSDF::fr( const glm::dvec3 &w_i,
     return spectrum;
 }
 
-void BSDF::getNewDirection( const glm::dvec3 &w_i, std::vector< glm::dvec3 > &bsdf_path )
+void BSDF::getNewDirection( const glm::vec3 &w_i, std::vector< glm::vec3 > &bsdf_path )
 {
     int current_bxdf = 0;
 
     bsdf_path.push_back( w_i );
 
-    double dir = 1.0;
+    float dir = 1.0f;
 
     while ( current_bxdf >= 0 )// && ( current_bxdf < bxdf_layers_.size() ) )
     {
@@ -61,15 +61,15 @@ void BSDF::getNewDirection( const glm::dvec3 &w_i, std::vector< glm::dvec3 > &bs
         {
             bsdf_path.push_back( bxdf_layers_[ current_bxdf ]->getNewDirection( dir * bsdf_path[ bsdf_path.size() - 1 ] ) );
             --current_bxdf;
-            dir = -1.0;
+            dir = -1.0f;
         }
         else // refractive
         {
-            if ( ( dir * bsdf_path[ bsdf_path.size() - 1 ] ).y >= 0.0 ) // ray is incident on the dielectric surface
+            if ( ( dir * bsdf_path[ bsdf_path.size() - 1 ] ).y >= 0.0f ) // ray is incident on the dielectric surface
             {
                 bsdf_path.push_back( bxdf_layers_[ current_bxdf ]->getNewDirection( dir * bsdf_path[ bsdf_path.size() - 1 ] ) );
 
-                if ( bsdf_path[ bsdf_path.size() - 1 ].y >= 0.0 ) // y > 0, new ray is leaving the surface (up)
+                if ( bsdf_path[ bsdf_path.size() - 1 ].y >= 0.0f ) // y > 0, new ray is leaving the surface (up)
                 {
                     if ( current_bxdf == 0 ) // if the current layer is the topmost one, dec layer and leave
                     {
@@ -78,19 +78,19 @@ void BSDF::getNewDirection( const glm::dvec3 &w_i, std::vector< glm::dvec3 > &bs
                     else // if the current layer is an inner layer, dec layer and invert ray
                     {
                         --current_bxdf;
-                        dir = -1.0;
+                        dir = -1.0f;
                     }
                 }
                 else // y < 0, new ray is going down the brdf stack
                 {
                     if ( current_bxdf == static_cast< int >( bxdf_layers_.size() ) - 1 ) // if the current layer is the bottommost one, just leave
                     {
-                        current_bxdf = -1.0;
+                        current_bxdf = -1.0f;
                     }
                     else // if the current layer is an inner layer, inc layer and invert ray
                     {
                         ++current_bxdf;
-                        dir = -1.0;
+                        dir = -1.0f;
                     }
                 }
             }
@@ -98,7 +98,7 @@ void BSDF::getNewDirection( const glm::dvec3 &w_i, std::vector< glm::dvec3 > &bs
             {
                 bsdf_path.push_back( bxdf_layers_[ current_bxdf ]->getNewDirection( dir * bsdf_path[ bsdf_path.size() - 1 ] ) );
 
-                if ( bsdf_path[ bsdf_path.size() - 1 ].y >= 0.0 ) // y > 0, new ray is leaving the surface (up)
+                if ( bsdf_path[ bsdf_path.size() - 1 ].y >= 0.0f ) // y > 0, new ray is leaving the surface (up)
                 {
                     if ( current_bxdf == 0 ) // if the current layer is the topmost one, dec layer and leave
                     {
@@ -107,19 +107,19 @@ void BSDF::getNewDirection( const glm::dvec3 &w_i, std::vector< glm::dvec3 > &bs
                     else // if the current layer is an inner layer, dec layer and invert ray
                     {
                         --current_bxdf;
-                        dir = -1.0;
+                        dir = -1.0f;
                     }
                 }
                 else // y < 0, new ray is going down the brdf stack (due TIR or Fresnel)
                 {
                     if ( current_bxdf == static_cast< int >( bxdf_layers_.size() ) - 1 ) // if the current layer is the bottommost one, just leave
                     {
-                        current_bxdf = -1.0;
+                        current_bxdf = -1.0f;
                     }
                     else // if the current layer is an inner layer, inc layer and invert ray
                     {
                         ++current_bxdf;
-                        dir = -1.0;
+                        dir = -1.0f;
                     }
                 }
             }

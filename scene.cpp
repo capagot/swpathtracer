@@ -25,8 +25,8 @@ Scene::~Scene( void )
 
 int Scene::loadMesh( const std::string &file_name,
                      const Scene::MeshType mesh_type,
-                     glm::dvec3 &min,
-                     glm::dvec3 &max )
+                     glm::vec3 &min,
+                     glm::vec3 &max )
 {
     // TODO: would Assimp handle file reading ??
     std::ifstream fin( file_name.c_str() );
@@ -83,67 +83,70 @@ int Scene::loadMesh( const std::string &file_name,
                 // Compute the mesh's aabb min and max vertices.
                 if ( vertex_id == 0 )
                 {
-                    min.x = std::min( std::min( static_cast< double >( vertex_ptr[0].x ), 
-                                                static_cast< double >( vertex_ptr[1].x ) ), 
-                                                static_cast< double >( vertex_ptr[2].x ) );
-                    min.y = std::min( std::min( static_cast< double >( vertex_ptr[0].y ), 
-                                                static_cast< double >( vertex_ptr[1].y ) ), 
-                                                static_cast< double >( vertex_ptr[2].y ) );
-                    min.z = std::min( std::min( static_cast< double >( vertex_ptr[0].z ), 
-                                                static_cast< double >( vertex_ptr[1].z ) ), 
-                                                static_cast< double >( vertex_ptr[2].z ) );
+                    min.x = std::min( std::min( static_cast< float >( vertex_ptr[0].x ), 
+                                                static_cast< float >( vertex_ptr[1].x ) ), 
+                                                static_cast< float >( vertex_ptr[2].x ) );
+                    min.y = std::min( std::min( static_cast< float >( vertex_ptr[0].y ), 
+                                                static_cast< float >( vertex_ptr[1].y ) ), 
+                                                static_cast< float >( vertex_ptr[2].y ) );
+                    min.z = std::min( std::min( static_cast< float >( vertex_ptr[0].z ), 
+                                                static_cast< float >( vertex_ptr[1].z ) ), 
+                                                static_cast< float >( vertex_ptr[2].z ) );
 
-                    max.x = std::max( std::max( static_cast< double >( vertex_ptr[0].x ), 
-                                                static_cast< double >( vertex_ptr[1].x ) ), 
-                                                static_cast< double >( vertex_ptr[2].x ) );
-                    max.y = std::max( std::max( static_cast< double >( vertex_ptr[0].y ), 
-                                                static_cast< double >( vertex_ptr[1].y ) ), 
-                                                static_cast< double >( vertex_ptr[2].y ) );
-                    max.z = std::max( std::max( static_cast< double >( vertex_ptr[0].z ), 
-                                                static_cast< double >( vertex_ptr[1].z ) ), 
-                                                static_cast< double >( vertex_ptr[2].z ) );
+                    max.x = std::max( std::max( static_cast< float >( vertex_ptr[0].x ), 
+                                                static_cast< float >( vertex_ptr[1].x ) ), 
+                                                static_cast< float >( vertex_ptr[2].x ) );
+                    max.y = std::max( std::max( static_cast< float >( vertex_ptr[0].y ), 
+                                                static_cast< float >( vertex_ptr[1].y ) ), 
+                                                static_cast< float >( vertex_ptr[2].y ) );
+                    max.z = std::max( std::max( static_cast< float >( vertex_ptr[0].z ), 
+                                                static_cast< float >( vertex_ptr[1].z ) ), 
+                                                static_cast< float >( vertex_ptr[2].z ) );
                 }
                 else
                 {
-                    min.x = std::min( std::min( std::min( static_cast< double >( vertex_ptr[0].x ), 
-                                                          static_cast< double >( vertex_ptr[1].x ) ),
-                                                          static_cast< double >( vertex_ptr[2].x ) ), min.x );
-                    min.y = std::min( std::min( std::min( static_cast< double >( vertex_ptr[0].y ), 
-                                                          static_cast< double >( vertex_ptr[1].y ) ), 
-                                                          static_cast< double >( vertex_ptr[2].y ) ), min.y );
-                    min.z = std::min( std::min( std::min( static_cast< double >( vertex_ptr[0].z ), 
-                                                          static_cast< double >( vertex_ptr[1].z ) ), 
-                                                          static_cast< double >( vertex_ptr[2].z ) ), min.z );
+                    min.x = std::min( std::min( std::min( static_cast< float >( vertex_ptr[0].x ), 
+                                                          static_cast< float >( vertex_ptr[1].x ) ),
+                                                          static_cast< float >( vertex_ptr[2].x ) ), min.x );
+                    min.y = std::min( std::min( std::min( static_cast< float >( vertex_ptr[0].y ), 
+                                                          static_cast< float >( vertex_ptr[1].y ) ), 
+                                                          static_cast< float >( vertex_ptr[2].y ) ), min.y );
+                    min.z = std::min( std::min( std::min( static_cast< float >( vertex_ptr[0].z ), 
+                                                          static_cast< float >( vertex_ptr[1].z ) ), 
+                                                          static_cast< float >( vertex_ptr[2].z ) ), min.z );
 
-                    max.x = std::max( std::max( std::max( static_cast< double >( vertex_ptr[0].x ), 
-                                                          static_cast< double >( vertex_ptr[1].x ) ), 
-                                                          static_cast< double >( vertex_ptr[2].x ) ), max.x );
-                    max.y = std::max( std::max( std::max( static_cast< double >( vertex_ptr[0].y ), 
-                                                          static_cast< double >( vertex_ptr[1].y ) ), 
-                                                          static_cast< double >( vertex_ptr[2].y ) ), max.y );
-                    max.z = std::max( std::max( std::max( static_cast< double >( vertex_ptr[0].z ), 
-                                                          static_cast< double >( vertex_ptr[1].z ) ), 
-                                                          static_cast< double >( vertex_ptr[2].z ) ), max.z );
+                    max.x = std::max( std::max( std::max( static_cast< float >( vertex_ptr[0].x ), 
+                                                          static_cast< float >( vertex_ptr[1].x ) ), 
+                                                          static_cast< float >( vertex_ptr[2].x ) ), max.x );
+                    max.y = std::max( std::max( std::max( static_cast< float >( vertex_ptr[0].y ), 
+                                                          static_cast< float >( vertex_ptr[1].y ) ), 
+                                                          static_cast< float >( vertex_ptr[2].y ) ), max.y );
+                    max.z = std::max( std::max( std::max( static_cast< float >( vertex_ptr[0].z ), 
+                                                          static_cast< float >( vertex_ptr[1].z ) ), 
+                                                          static_cast< float >( vertex_ptr[2].z ) ), max.z );
                 }
 
-                glm::dvec3 v0{ vertex_ptr[0].x, vertex_ptr[0].y, vertex_ptr[0].z };
-                glm::dvec3 v1{ vertex_ptr[1].x, vertex_ptr[1].y, vertex_ptr[1].z };
-                glm::dvec3 v2{ vertex_ptr[2].x, vertex_ptr[2].y, vertex_ptr[2].z };
+                glm::vec3 v0{ vertex_ptr[0].x, vertex_ptr[0].y, vertex_ptr[0].z };
+                glm::vec3 v1{ vertex_ptr[1].x, vertex_ptr[1].y, vertex_ptr[1].z };
+                glm::vec3 v2{ vertex_ptr[2].x, vertex_ptr[2].y, vertex_ptr[2].z };
 
-                switch( mesh_type )
+                if ( !( ( v0 == v1  ) || ( v0 == v2 ) || ( v1 == v2 ) ) )
                 {
-                case Scene::MeshType::FLAT :
-                    primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v0, v1, v2, materials_.size() - 1 } ) );
-                    break;
-                case Scene::MeshType::SMOOTH :
-                    const aiVector3D *normal_ptr = &mesh_ptr->mNormals[vertex_id];
+                    switch( mesh_type )
+                    {
+                        case Scene::MeshType::FLAT :
+                            primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v0, v1, v2, materials_.size() - 1 } ) );
+                            break;
+                        case Scene::MeshType::SMOOTH :
+                            const aiVector3D *normal_ptr = &mesh_ptr->mNormals[vertex_id];
 
-                    glm::dvec3 n0{ normal_ptr[0].x, normal_ptr[0].y, normal_ptr[0].z };
-                    glm::dvec3 n1{ normal_ptr[1].x, normal_ptr[1].y, normal_ptr[1].z };
-                    glm::dvec3 n2{ normal_ptr[2].x, normal_ptr[2].y, normal_ptr[2].z };
+                            glm::vec3 n0{ normal_ptr[0].x, normal_ptr[0].y, normal_ptr[0].z };
+                            glm::vec3 n1{ normal_ptr[1].x, normal_ptr[1].y, normal_ptr[1].z };
+                            glm::vec3 n2{ normal_ptr[2].x, normal_ptr[2].y, normal_ptr[2].z };
 
-                    primitives_.push_back( Primitive::PrimitiveUniquePtr( new SmoothTriangle{ v0, v1, v2, n0, n1, n2, materials_.size() - 1 } ) );
-                    break;
+                            primitives_.push_back( Primitive::PrimitiveUniquePtr( new SmoothTriangle{ v0, v1, v2, n0, n1, n2, materials_.size() - 1 } ) );
+                            break;
+                    }
                 }
             }
         }
@@ -181,7 +184,7 @@ bool Scene::intersect( const Ray &ray,
             {
                 num_intersections_++;
 
-                if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0 ) )
+                if ( ( tmp_intersection_record.t_ < intersection_record.t_ ) && ( tmp_intersection_record.t_ > 0.0f ) )
                 {
                     intersection_record = tmp_intersection_record;
                     intersection_result = true;

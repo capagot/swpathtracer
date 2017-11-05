@@ -7,9 +7,9 @@
 
 struct IntersectionRecord
 {
-    double t_;
-    glm::dvec3 position_;
-    glm::dvec3 normal_;
+    float t_;
+    glm::vec3 position_;
+    glm::vec3 normal_;
     long unsigned int material_id_;
 };
 

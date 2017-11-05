@@ -47,8 +47,8 @@ public:
 
     int loadMesh( const std::string &file_name,
                   const Scene::MeshType mesh_type,
-                  glm::dvec3 &min_aabb,
-                  glm::dvec3 &max_aabb );
+                  glm::vec3 &min_aabb,
+                  glm::vec3 &max_aabb );
 
     void buildAccelerationStructure( void );
 

@@ -18,16 +18,16 @@ public:
     AABB( void )
     {};
 
-    AABB( const glm::dvec3 &min,
-          const glm::dvec3 &max ) :
+    AABB( const glm::vec3 &min,
+          const glm::vec3 &max ) :
         min_{ min },
         max_{ max },
-        centroid_{ 0.5 * ( min_ + max_ ) }
+        centroid_{ 0.5f * ( min_ + max_ ) }
     {};
 
     ~AABB( void ){};
 
-    double getArea( void ) const;
+    float getArea( void ) const;
 
     bool intersect( const Ray &ray ) const;
                     //IntersectionRecord &intersection_record,
@@ -40,11 +40,11 @@ public:
                      glm::max( max_, rhs.max_ ) };
     }
 
-    glm::dvec3 min_;
+    glm::vec3 min_;
 
-    glm::dvec3 max_;
+    glm::vec3 max_;
 
-    glm::dvec3 centroid_;
+    glm::vec3 centroid_;
 
 };
 

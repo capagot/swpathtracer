@@ -11,8 +11,8 @@ public:
 
     Sphere( void );
 
-    Sphere( const glm::dvec3 &center,
-            double radius,
+    Sphere( const glm::vec3 &center,
+            float radius,
             long unsigned int material_id );
 
     bool intersect( const Ray &ray,
@@ -22,14 +22,14 @@ public:
 
     virtual void printData( void ) const;
 
-    glm::dvec3 center_ = { 0.0, 0.0, 0.0 };
+    glm::vec3 center_ = { 0.0f, 0.0f, 0.0f };
 
-    double radius_= 1.0;
+    float radius_= 1.0f;
 
 private:
 
     // TODO: this is replicated for each primitive... avoid that!
-    static const double kIntersectionTestEpsilon_;
+    static const float kIntersectionTestEpsilon_;
 };
 
 #endif /* SPHERE_H_ */

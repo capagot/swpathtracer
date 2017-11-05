@@ -10,25 +10,25 @@ public:
 
     OrthographicCamera( void );
 
-    OrthographicCamera( const double min_x,
-                        const double max_x,
-                        const double min_y,
-                        const double max_y,
-                        const glm::dvec3 &position,
-                        const glm::dvec3 &up_vector,
-                        const glm::dvec3 &look_at );
+    OrthographicCamera( const float min_x,
+                        const float max_x,
+                        const float min_y,
+                        const float max_y,
+                        const glm::vec3 &position,
+                        const glm::vec3 &up_vector,
+                        const glm::vec3 &look_at );
 
-    Ray getWorldSpaceRay( const glm::dvec2 &sample_coord ) const;
+    Ray getWorldSpaceRay( const glm::vec2 &sample_coord ) const;
 
     void printInfo( void ) const;
 
-    double min_x_;
+    float min_x_;
 
-    double max_x_;
+    float max_x_;
 
-    double min_y_;
+    float min_y_;
 
-    double max_y_;
+    float max_y_;
 
 };
 

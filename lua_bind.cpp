@@ -28,13 +28,13 @@ void LuaBind::loadFromScript( Camera **camera,
                               Sampler **sampler,
                               Scene *scene,
                               Buffer **rendering_buffer,
-                              glm::dvec3 &background_color,
+                              glm::vec3 &background_color,
                               std::string &path_termination,
                               //std::size_t &max_path_depth,
                               std::size_t &path_length,
                               std::string &output_filename,
                               Scene::AccelerationStructure &scene_acceleration_data_structure,
-                              RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
+                              RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
 {
     lua_getglobal( lua_state_, "user variables" );
     getElements( camera,
@@ -80,7 +80,7 @@ void LuaBind::getCamera( Camera **camera )
 }
 
 void LuaBind::getSampler( Sampler **sampler,
-                          RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
+                          RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
 {
     std::size_t spp = parseScalar( "spp" );
 
@@ -101,7 +101,7 @@ void LuaBind::getBuffer( Buffer **rendering_buffer )
     (*rendering_buffer) = new Buffer( h_res, v_res, 3 );
 }
 
-void LuaBind::getGlobals( glm::dvec3 &background_color,
+void LuaBind::getGlobals( glm::vec3 &background_color,
                           std::string &path_termination,
                           //std::size_t &max_path_depth,
                           std::size_t &path_length,
@@ -120,7 +120,7 @@ void LuaBind::getGlobals( glm::dvec3 &background_color,
 }
 
 void LuaBind::getMaterial( Scene *scene,
-                           RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
+                           RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
 {
     SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_object;
     Fresnel::FresnelUniquePtr fresnel_object;
@@ -150,7 +150,7 @@ void LuaBind::getMaterial( Scene *scene,
 
                 if ( object_type == "lambertian_brdf" )
                 {
-                    glm::dvec3 kd = parseVec3( "kd" );
+                    glm::vec3 kd = parseVec3( "kd" );
                     std::string surface_sampler = parseString( "surface_sampler" );
                     if ( surface_sampler == "uniform" )
                         surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerUniform( rng ) };
@@ -164,9 +164,9 @@ void LuaBind::getMaterial( Scene *scene,
                 else
                     if ( object_type == "smooth_dielectric" )
                     {
-                        double eta = parseScalar( "eta" );
-                        surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothRefraction{ rng, 1.0, eta } };
-                        fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ 1.0, eta } };
+                        float eta = parseScalar( "eta" );
+                        surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothRefraction{ rng, 1.0f, eta } };
+                        fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ 1.0f, eta } };
                         bxdf_object = BxDF::BxDFUniquePtr{ new SmoothDielectric{ std::move( surface_sampler_object ),
                                                                                  std::move( fresnel_object ) } };
                     }
@@ -174,7 +174,7 @@ void LuaBind::getMaterial( Scene *scene,
                         if ( object_type == "smooth_specular_reflection" )
                         {
                             surface_sampler_object = SurfaceSampler::SurfaceSamplerUniquePtr{ new SurfaceSamplerSmoothConductor{} };
-                            glm::dvec3 reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
+                            glm::vec3 reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
                             fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ reflectance_at_normal_incidence } };
                             bxdf_object = BxDF::BxDFUniquePtr{ new SmoothConductor{ std::move( surface_sampler_object ),
                                                                                     std::move( fresnel_object ) } };
@@ -182,8 +182,8 @@ void LuaBind::getMaterial( Scene *scene,
                         else
                             if ( object_type == "cook_torrance_brdf" )
                             {
-                                double m = parseScalar( "m" );
-                                glm::dvec3 reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
+                                float m = parseScalar( "m" );
+                                glm::vec3 reflectance_at_normal_incidence = parseVec3( "reflectance_at_normal_incidence" );
                                 fresnel_object = Fresnel::FresnelUniquePtr{ new FresnelSchlick{ reflectance_at_normal_incidence } };
                                 std::string surface_sampler = parseString( "surface_sampler" );
                                 if ( surface_sampler == "uniform" )
@@ -206,7 +206,7 @@ void LuaBind::getMaterial( Scene *scene,
 
         lua_pop( lua_state_, 1 );
 
-        glm::dvec3 emission = parseVec3( "emission" );
+        glm::vec3 emission = parseVec3( "emission" );
 
         Material::MaterialUniquePtr material_object = Material::MaterialUniquePtr{ new Material{ std::move( bsdf_object ),
             emission } };
@@ -217,9 +217,9 @@ void LuaBind::getMaterial( Scene *scene,
 }
 
 void LuaBind::getTriangle( Scene *scene,
-                           RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
+                           RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
 {
-    glm::dvec3 v[3];
+    glm::vec3 v[3];
 
     parseVertices( "vertices", v );
     getMaterial( scene, rng );
@@ -227,21 +227,21 @@ void LuaBind::getTriangle( Scene *scene,
 }
 
 void LuaBind::getSphere( Scene *scene,
-                         RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
+                         RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
 {
-    glm::dvec3 center = parseVec3( "center" );
-    double radius = parseScalar( "radius" );
+    glm::vec3 center = parseVec3( "center" );
+    float radius = parseScalar( "radius" );
     getMaterial( scene, rng );
     scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Sphere{ center, radius, scene->materials_.size() - 1 } ) );
 }
 
 void LuaBind::getMesh( Scene *scene,
                        const Scene::MeshType mesh_type,
-                       RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
+                       RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
 {
     std::string filename = parseString( "filename" );
-    glm::dvec3 min_aabb;
-    glm::dvec3 max_aabb;
+    glm::vec3 min_aabb;
+    glm::vec3 max_aabb;
     getMaterial( scene, rng );
     scene->loadMesh( filename,
                      mesh_type,
@@ -253,13 +253,13 @@ void LuaBind::getElements( Camera **camera,
                            Sampler **sampler,
                            Scene *scene,
                            Buffer **rendering_buffer,
-                           glm::dvec3 &background_color,
+                           glm::vec3 &background_color,
                            std::string &path_termination,
                            //std::size_t &max_path_depth,
                            std::size_t &path_length,
                            std::string &output_filename,
                            Scene::AccelerationStructure &scene_acceleration_data_structure,
-                           RNG< std::uniform_real_distribution, double, std::mt19937 > &rng )
+                           RNG< std::uniform_real_distribution, float, std::mt19937 > &rng )
 {
     lua_pushnil( lua_state_ );                                   // [pop 0, push 1]
 
@@ -329,9 +329,9 @@ std::string LuaBind::parseString( const std::string &s_input )
     return s_output;
 }
 
-double LuaBind::parseScalar( const std::string &s )
+float LuaBind::parseScalar( const std::string &s )
 {
-    double v;
+    float v;
     lua_pushstring( lua_state_, s.c_str() );
     lua_gettable( lua_state_, -2 );
     v = lua_tonumber( lua_state_, -1 );
@@ -339,9 +339,9 @@ double LuaBind::parseScalar( const std::string &s )
     return v;
 }
 
-glm::dvec3 LuaBind::parseVec3( const std::string &s )
+glm::vec3 LuaBind::parseVec3( const std::string &s )
 {
-    glm::dvec3 v;
+    glm::vec3 v;
 
     lua_pushstring( lua_state_, s.c_str() );
     lua_gettable( lua_state_, -2 );
@@ -359,7 +359,7 @@ glm::dvec3 LuaBind::parseVec3( const std::string &s )
 }
 
 void LuaBind::parseVertices( const std::string &s,
-                             glm::dvec3 v[3] )
+                             glm::vec3 v[3] )
 {
     lua_pushstring( lua_state_, s.c_str() );
     lua_gettable( lua_state_, -2 );

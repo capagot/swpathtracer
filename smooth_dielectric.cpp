@@ -7,15 +7,21 @@ SmoothDielectric::SmoothDielectric( SurfaceSampler::SurfaceSamplerUniquePtr surf
               BxDF::BxDFType::DIELECTRIC )
 {}
 
-glm::dvec3 SmoothDielectric::fr( const glm::dvec3 &local_w_i,
-                                 const glm::dvec3 &local_w_r ) const
+glm::vec3 SmoothDielectric::fr( const glm::vec3 &local_w_i,
+                                 const glm::vec3 &local_w_r ) const
 {
     ( void ) local_w_i;
 
-    return glm::dvec3{ 1.0 } / local_w_r.y;
+    if ( local_w_r.y == 0.0 )
+    {
+        std::clog << "Smooth dielectric in cos = 0.0!\n";
+        return glm::vec3{ 0.0f };
+    }   
+
+    return glm::vec3{ 1.0f } / local_w_r.y;
 }
 
-glm::dvec3 SmoothDielectric::getNewDirection( const glm::dvec3 &local_w_i ) const
+glm::vec3 SmoothDielectric::getNewDirection( const glm::vec3 &local_w_i ) const
 {
     return surface_sampler_->getSample( local_w_i );
 }

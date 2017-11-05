@@ -19,7 +19,7 @@ public:
 
     Integrator( Camera &camera,
                 const Scene &scene,
-                const glm::dvec3 background_color,
+                const glm::vec3 background_color,
                 PathTerminationCriterion path_termination_criterion_,
                 unsigned int path_length,
                 Sampler &sampler,
@@ -37,7 +37,7 @@ protected:
 
     const Scene &scene_;
 
-    glm::dvec3 background_color_;
+    glm::vec3 background_color_;
 
     PathTerminationCriterion path_termination_criterion_;
 

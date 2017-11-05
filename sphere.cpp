@@ -3,8 +3,8 @@
 Sphere::Sphere( void )
 {}
 
-Sphere::Sphere( const glm::dvec3 &center,
-                double radius,
+Sphere::Sphere( const glm::vec3 &center,
+                float radius,
                 long unsigned int material_id ) :
         Primitive{ material_id },
         center_{ center },
@@ -23,24 +23,24 @@ bool Sphere::intersect( const Ray &ray,
      *     1990.
      */
 
-    double t1;
-    double t2;
+    float t1;
+    float t2;
 
-    glm::dvec3 eo = center_ - ray.origin_;
-    double v = glm::dot( eo, ray.direction_ );
-    double disc = ( radius_ * radius_ ) - ( glm::dot( eo, eo ) - ( v * v ) );
+    glm::vec3 eo = center_ - ray.origin_;
+    float v = glm::dot( eo, ray.direction_ );
+    float disc = ( radius_ * radius_ ) - ( glm::dot( eo, eo ) - ( v * v ) );
 
-    if ( disc < 0.0 )
+    if ( disc < 0.0f )
         return false;                           // no intersection
     else
     {
-        double d = sqrt( disc );
+        float d = sqrtf( disc );
         t1 = v - d;                             // first intersection point
         t2 = v + d;                             // second intersection point
     }
 
     // TODO: add reference to the intersected primitive
-    intersection_record.t_ =  ( t1 > 0.00001 ) ? t1 : t2;
+    intersection_record.t_ =  ( t1 > 0.00001f ) ? t1 : t2;
     intersection_record.position_ = ray.origin_ + intersection_record.t_ * ray.direction_;
     intersection_record.normal_ = glm::normalize( intersection_record.position_ - center_ );
     intersection_record.material_id_ = material_id_;

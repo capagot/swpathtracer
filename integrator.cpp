@@ -2,7 +2,7 @@
 
 Integrator::Integrator( Camera &camera,
                         const Scene &scene,
-                        const glm::dvec3 background_color,
+                        const glm::vec3 background_color,
                         PathTerminationCriterion path_termination_criterion,
                         unsigned int path_length,
                         Sampler &sampler,

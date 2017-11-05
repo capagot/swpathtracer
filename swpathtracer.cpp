@@ -2,7 +2,12 @@
 
 int main( int num_args, char **arg_vector )
 {
-
+    feenableexcept( FE_INVALID   | 
+                    //FE_DIVBYZERO | 
+                    FE_OVERFLOW  | 
+                    FE_UNDERFLOW );
+    //*/
+    //
 #ifdef DEBUG
     omp_set_dynamic( 0 );     // Explicitly disable dynamic teams
     omp_set_num_threads( 1 );
@@ -10,13 +15,13 @@ int main( int num_args, char **arg_vector )
 
     // Create only one instance of the RNG engine per thread. No more instances
     // are created during the execution of the program.
-    RNG< std::uniform_real_distribution, double, std::mt19937 > rng{ 0.0, 1.0 };
+    RNG< std::uniform_real_distribution, float, std::mt19937 > rng{ 0.0f, 1.0f };
 
     Camera *camera = nullptr;
     Sampler *sampler = nullptr;
     Scene scene{};
     Buffer *rendering_buffer = nullptr;
-    glm::dvec3 background_color;
+    glm::vec3 background_color;
     std::string path_termination;
     //std::size_t max_path_depth;
     std::size_t path_length;
@@ -96,6 +101,8 @@ int main( int num_args, char **arg_vector )
 
     // Gamma-compress and save the final image to a .ppm file.
     rendering_buffer->save( output_filename );
+
+    //*/
 
     // This is ugly!
     if ( camera )

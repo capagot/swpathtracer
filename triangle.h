@@ -11,15 +11,15 @@ public:
 
     Triangle( void );
 
-    Triangle( const glm::dvec3 &v0,
-              const glm::dvec3 &v1,
-              const glm::dvec3 &v2,
+    Triangle( const glm::vec3 &v0,
+              const glm::vec3 &v1,
+              const glm::vec3 &v2,
               long unsigned int material_id );
 
-    Triangle( const glm::dvec3 &v0,
-              const glm::dvec3 &v1,
-              const glm::dvec3 &v2,
-              const glm::dvec3 &normal,
+    Triangle( const glm::vec3 &v0,
+              const glm::vec3 &v1,
+              const glm::vec3 &v2,
+              const glm::vec3 &normal,
               long unsigned int material_id );
 
     bool intersect( const Ray &ray,
@@ -29,17 +29,17 @@ public:
 
     virtual void printData( void ) const;
 
-    glm::dvec3 v0_ = { 0.0, 0.0, 0.0 };
+    glm::vec3 v0_ = { 0.0f, 0.0f, 0.0f };
 
-    glm::dvec3 v1_ = { 1.0, 0.0, 0.0 };
+    glm::vec3 v1_ = { 1.0f, 0.0f, 0.0f };
 
-    glm::dvec3 v2_ = { 0.0, 1.0, 0.0 };
+    glm::vec3 v2_ = { 0.0f, 1.0f, 0.0f };
 
-    glm::dvec3 normal_ = { 0.0, 0.0, 1.0 };
+    glm::vec3 normal_ = { 0.0f, 0.0f, 1.0f };
 
 private:
 
-    static const double kIntersectionTestEpsilon_;
+    static const float kIntersectionTestEpsilon_;
 };
 
 #endif /* TRIANGLE_H_ */

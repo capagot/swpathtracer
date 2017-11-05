@@ -26,10 +26,10 @@ public:
         bxdf_type_{ bxdf_type }
     {};
 
-    virtual glm::dvec3 fr( const glm::dvec3 &w_i,
-                           const glm::dvec3 &w_r ) const = 0;
+    virtual glm::vec3 fr( const glm::vec3 &w_i,
+                           const glm::vec3 &w_r ) const = 0;
 
-    virtual glm::dvec3 getNewDirection( const glm::dvec3 &w_i ) const = 0;
+    virtual glm::vec3 getNewDirection( const glm::vec3 &w_i ) const = 0;
 
     SurfaceSampler::SurfaceSamplerUniquePtr surface_sampler_;
 

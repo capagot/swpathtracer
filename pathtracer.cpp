@@ -3,12 +3,12 @@
 
 PathTracer::PathTracer( Camera &camera,
                         const Scene &scene,
-                        const glm::dvec3 background_color,
+                        const glm::vec3 background_color,
                         PathTerminationCriterion path_termination_criterion,
                         unsigned int path_length,
                         Sampler &sampler,
                         Buffer &buffer,
-                        RNG< std::uniform_real_distribution, double, std::mt19937 > &rng ) :
+                        RNG< std::uniform_real_distribution, float, std::mt19937 > &rng ) :
         Integrator{ camera,
                     scene,
                     background_color,
@@ -41,7 +41,7 @@ void PathTracer::integrate( void )
         progress_stream << "\r  progress .........................: "
                         << std::fixed << std::setw( 6 )
                         << std::setprecision( 2 )
-                        << 100.0 * y / ( buffer_.v_resolution_ - 1 )
+                        << 100.0f * y / ( buffer_.v_resolution_ - 1 )
                         << "%";
 
         int thread_id = omp_get_thread_num();
@@ -51,19 +51,19 @@ void PathTracer::integrate( void )
         for ( std::size_t x = 0; x < buffer_.h_resolution_; x++ )
         {
             // Generate a set of 2D sampling points with coordinates in the interval
-            // [-0.5, +0.5). The instantiated sampler will define the number and
+            // [-0.5f, +0.5f). The instantiated sampler will define the number and
             // actual sample distribution (regular, uniform,...).
             sampler_.generateSamplesCoords();
 
             for ( std::size_t samp = 0; samp < sampler_.size(); samp++ )
             {
                 // Transform a point from the continuous screen space into the
-                // normalized screen space (that ranges from -1.0 to +1.0 along 'x'
-                // and 'y'). The value 0.5 is added to the pixel coordinates in
+                // normalized screen space (that ranges from -1.0f to +1.0f along 'x'
+                // and 'y'). The value 0.5f is added to the pixel coordinates in
                 // screen space in order to have the pixel center as the reference
                 // for the sampling points distribution.
-                glm::dvec2 pixel_cam_space = glm::dvec2{ 2.0 * ( x + 0.5 + sampler_[samp].x ) / buffer_.h_resolution_ - 1.0,
-                                                         2.0 * ( y + 0.5 + sampler_[samp].y ) / buffer_.v_resolution_ - 1.0 };
+                glm::vec2 pixel_cam_space = glm::vec2{ 2.0f * ( x + 0.5f + sampler_[samp].x ) / buffer_.h_resolution_ - 1.0f,
+                                                       2.0f * ( y + 0.5f + sampler_[samp].y ) / buffer_.v_resolution_ - 1.0f };
 
                 // Generate the primary ray in world space from the normalized
                 // screen coordinates.
@@ -84,14 +84,14 @@ void PathTracer::integrate( void )
     std::clog << "  total rendering time .............: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
 }
 
-glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
+glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
                                             unsigned int depth,
                                             int thread_id )
 {
     IntersectionRecord intersection_record;
-    glm::dvec3 spectrum{ 0.0, 0.0, 0.0 };
-    std::vector< glm::dvec3 > w_r;
-    intersection_record.t_ = std::numeric_limits< double >::max();
+    glm::vec3 spectrum{ 0.0f, 0.0f, 0.0f };
+    std::vector< glm::vec3 > w_r;
+    intersection_record.t_ = std::numeric_limits< float >::max();
 
     if ( ( depth >= path_length_ ) && ( path_termination_criterion_ ==  PathTerminationCriterion::MAX_DEPTH ) )
         return spectrum;
@@ -110,34 +110,35 @@ glm::dvec3 PathTracer::integrate_recursive( const Ray &ray,
     ONB tangent_frame;
     tangent_frame.setFromV( intersection_record.normal_ );
 
-    glm::dmat3x3 tangent_to_universe_space = tangent_frame.getBasisMatrix();
-    glm::dmat3x3 universe_to_tangent_space = glm::transpose( tangent_to_universe_space );
+    glm::mat3x3 tangent_to_universe_space = tangent_frame.getBasisMatrix();
+    glm::mat3x3 universe_to_tangent_space = glm::transpose( tangent_to_universe_space );
 
-    glm::dvec3 w_i = universe_to_tangent_space * -ray.direction_;
+    glm::vec3 w_i = universe_to_tangent_space * -ray.direction_;
 
     scene_.materials_[intersection_record.material_id_]->bsdf_->getNewDirection( w_i, w_r );
 
-    glm::dvec3 new_dir = tangent_to_universe_space * w_r[ w_r.size() - 1 ];
-    Ray new_ray{ intersection_record.position_ + new_dir * 0.00001, new_dir };
+    glm::vec3 new_dir = tangent_to_universe_space * w_r[ w_r.size() - 1 ];
+    Ray new_ray{ intersection_record.position_ + new_dir * 0.001f, new_dir };
 
-    glm::dvec3 fr = scene_.materials_[intersection_record.material_id_]->bsdf_->fr( w_i, w_r );
+    glm::vec3 fr = scene_.materials_[intersection_record.material_id_]->bsdf_->fr( w_i, w_r );
 
-    double k = std::max( std::max( fr[0], fr[1] ), fr[2] );
+    float k = std::max( std::max( fr[0], fr[1] ), fr[2] );
 
     if ( ( depth >= path_length_ ) && ( path_termination_criterion_ ==  PathTerminationCriterion::RUSSIAN_ROULETTE ) )
     {
-        if ( rng_() < k )
-            fr *= 1.0 / k; 
+        // TODO: biased fixed maximum depth set... fix this to be unbiased!!!
+        if ( ( rng_() < k ) && ( depth < 1000 ) )
+            fr *= 1.0f / k; 
         else
             return scene_.materials_[intersection_record.material_id_]->emitted_;
     }
 
     num_rays_[ thread_id ]++;
 
-    spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ +
-        fr *
-        integrate_recursive( new_ray, ++depth, thread_id );// *
-        //w_r[ w_r.size() - 1 ].y;
+    spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ + 
+               fr * 
+               integrate_recursive( new_ray, ++depth, thread_id );// *
+               //w_r[ w_r.size() - 1 ].y;
 
     return spectrum;
 }
@@ -167,7 +168,8 @@ void PathTracer::printInfoPostRendering( void ) const
                                                           << " ( ~"
                                                           << std::fixed << std::setw( 6 )
                                                           << std::setprecision( 2 )
-                                                          << static_cast< double >( num_intersections ) / num_intersection_tests * 100.0
+                                                          << static_cast< float >( num_intersections ) / num_intersection_tests * 100.0f
                                                           << "% )"
                                                           << std::endl;
 }
+

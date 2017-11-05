@@ -3,13 +3,13 @@
 OrthographicCamera::OrthographicCamera( void )
 { }
 
-OrthographicCamera::OrthographicCamera( const double min_x,
-                                        const double max_x,
-                                        const double min_y,
-                                        const double max_y,
-                                        const glm::dvec3 &position,
-                                        const glm::dvec3 &up_vector,
-                                        const glm::dvec3 &look_at ) :
+OrthographicCamera::OrthographicCamera( const float min_x,
+                                        const float max_x,
+                                        const float min_y,
+                                        const float max_y,
+                                        const glm::vec3 &position,
+                                        const glm::vec3 &up_vector,
+                                        const glm::vec3 &look_at ) :
         Camera::Camera{ position,
                         up_vector,
                         look_at },
@@ -19,17 +19,17 @@ OrthographicCamera::OrthographicCamera( const double min_x,
         max_y_{ max_y }
 { }
 
-Ray OrthographicCamera::getWorldSpaceRay( const glm::dvec2 &sample_coord ) const
+Ray OrthographicCamera::getWorldSpaceRay( const glm::vec2 &sample_coord ) const
 {
-    double alpha_x = ( sample_coord.x + 1.0 ) * 0.5;
-    double alpha_y = ( sample_coord.y + 1.0 ) * 0.5;
+    float alpha_x = ( sample_coord.x + 1.0f ) * 0.5f;
+    float alpha_y = ( sample_coord.y + 1.0f ) * 0.5f;
 
-    glm::dvec3 origin{  ( 1.0 - alpha_x ) * min_x_ + alpha_x * max_x_,
-                      -( ( 1.0 - alpha_y ) * min_y_ + alpha_y * max_y_ ),
-                       0.0 };
+    glm::vec3 origin{  ( 1.0f - alpha_x ) * min_x_ + alpha_x * max_x_,
+                      -( ( 1.0f - alpha_y ) * min_y_ + alpha_y * max_y_ ),
+                       0.0f };
 
-    //return Ray{ onb_.m_ * origin + position_, glm::normalize( onb_.m_* glm::dvec3{ 0.0, 0.0, -1.0 } ) };
-    return Ray{ onb_.getBasisMatrix() * origin + position_, glm::normalize( onb_.getBasisMatrix()* glm::dvec3{ 0.0, 0.0, -1.0 } ) };
+    //return Ray{ onb_.m_ * origin + position_, glm::normalize( onb_.m_* glm::vec3{ 0.0f, 0.0f, -1.0f } ) };
+    return Ray{ onb_.getBasisMatrix() * origin + position_, glm::normalize( onb_.getBasisMatrix()* glm::vec3{ 0.0f, 0.0f, -1.0f } ) };
 }
 
 void OrthographicCamera::printInfo( void ) const
