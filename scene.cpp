@@ -209,6 +209,7 @@ void Scene::printInfoPreAccelerationStructure( void ) const
     std::cout << "-------------------------------------------------------------------------------" << std::endl;
     std::cout << "  # of primitives ..................: " << primitives_.size() << std::endl;
     std::cout << "  # of materials ...................: " << materials_.size() << std::endl;
+    std::cout << "  # of light sources ...............: " << light_sources_.size() << std::endl;
     std::cout << "  acceleration structure ...........: ";
 
     if ( acceleration_structure_ == Scene::AccelerationStructure::NONE )

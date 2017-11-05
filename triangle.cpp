@@ -107,6 +107,11 @@ bool Triangle::intersect( const Ray &ray,
     return true;
 }
 
+glm::vec3 Triangle::getUniformPoint( float e1, float e2 ) const
+{
+    return v0_ + e2 * static_cast< float>( sqrt( 1.0f - e1 ) ) * ( v1_ - v0_ ) + ( 1.0f - static_cast< float >( sqrt( 1.0f - e1 ) ) ) * ( v2_ - v0_ ); 
+}
+
 AABB Triangle::getAABB( void ) const
 {
     AABB aabb;

@@ -70,7 +70,7 @@ void PathTracer::integrate( void )
                 Ray ray{ camera_.getWorldSpaceRay( pixel_cam_space ) };
 
                 // Trace the ray path.
-                buffer_.buffer_data_[x][y] += integrate_recursive( ray, 0, thread_id );
+                buffer_.buffer_data_[x][y] += integrate_recursive( ray, 0, 1.0f, thread_id );
             }
 
             // Compute the average radiance that falls onto the pixel (x,y).
@@ -85,8 +85,9 @@ void PathTracer::integrate( void )
 }
 
 glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
-                                            unsigned int depth,
-                                            int thread_id )
+                                           unsigned int depth,
+                                           float see_emitted_light,
+                                           int thread_id )
 {
     IntersectionRecord intersection_record;
     glm::vec3 spectrum{ 0.0f, 0.0f, 0.0f };
@@ -115,6 +116,54 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
 
     glm::vec3 w_i = universe_to_tangent_space * -ray.direction_;
 
+    //-------------------------------------------------------------------------
+
+    glm::vec3 direct_lighting{ 0.0f, 0.0f, 0.0f };
+
+    int i;
+
+    if ( rng_() < 0.5f ) 
+        i = 0;
+    else
+        i = 1;
+    
+    IntersectionRecord light_intersection_record;
+    light_intersection_record.t_ = std::numeric_limits< float >::max();
+    
+    glm::vec3 uniform_sample = scene_.primitives_[ scene_.light_sources_[i] ]->getUniformPoint( rng_(), rng_() );
+
+    glm::vec3 light_dir_universe = glm::normalize( uniform_sample - intersection_record.position_ );    
+
+    std::vector< glm::vec3 > light_dir_tangent;
+    light_dir_tangent.push_back( w_i );
+    light_dir_tangent.push_back( glm::normalize( universe_to_tangent_space * light_dir_universe ) );
+
+    Ray light_ray{ intersection_record.position_ + intersection_record.normal_ * 0.001f, light_dir_universe };
+
+    if ( scene_.intersect( light_ray,
+                           light_intersection_record,
+                           num_intersection_tests_[ thread_id ],
+                           num_intersections_[ thread_id ] ) )
+    {
+        glm::vec3 le = scene_.materials_[light_intersection_record.material_id_ ]->emitted_;
+
+        if ( glm::length( le ) > 0.0f )
+        {
+            glm::vec3 ffrr = scene_.materials_[intersection_record.material_id_]->bsdf_->bxdf_layers_[ 0 ]->fr( w_i, light_dir_tangent[1] );
+
+            float cos_light = glm::dot( glm::normalize( light_intersection_record.normal_ ), -glm::normalize( light_dir_universe ) );
+
+            float cos_surface = light_dir_tangent[1].y;
+
+            if ( cos_surface > 0.0f )
+            {
+                direct_lighting = ( ( le * ffrr * std::max( 0.0f, cos_surface ) * std::max( 0.0f, cos_light ) ) / ( ( light_intersection_record.t_ * light_intersection_record.t_ )  * ( 1.0f / 1.0f ) ) );
+            }
+        }                             
+    }
+
+    //-------------------------------------------------------------------------
+
     scene_.materials_[intersection_record.material_id_]->bsdf_->getNewDirection( w_i, w_r );
 
     glm::vec3 new_dir = tangent_to_universe_space * w_r[ w_r.size() - 1 ];
@@ -130,15 +179,25 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
         if ( ( rng_() < k ) && ( depth < 1000 ) )
             fr *= 1.0f / k; 
         else
-            return scene_.materials_[intersection_record.material_id_]->emitted_;
+            return glm::vec3{ 0.0f, 0.0f, 0.0f };//scene_.materials_[intersection_record.material_id_]->emitted_;
     }
 
     num_rays_[ thread_id ]++;
 
+    /* 
     spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ + 
                fr * 
-               integrate_recursive( new_ray, ++depth, thread_id );// *
+               integrate_recursive( new_ray, ++depth, 0.0, thread_id );// *
                //w_r[ w_r.size() - 1 ].y;
+    //*/
+
+    
+   spectrum = direct_lighting + ( see_emitted_light * scene_.materials_[intersection_record.material_id_]->emitted_ ) + 
+        fr * 
+        //( fr / scene_.materials_[intersection_record.material_id_]->bsdf_->bxdf_layers_[ 0 ]->surface_sampler_->getProbability( w_i, w_r[ 1 ] ) ) *
+        integrate_recursive( new_ray, ++depth, 0.0, thread_id );// *
+    //*/
+
 
     return spectrum;
 }

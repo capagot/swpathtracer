@@ -224,6 +224,11 @@ void LuaBind::getTriangle( Scene *scene,
     parseVertices( "vertices", v );
     getMaterial( scene, rng );
     scene->primitives_.push_back( Primitive::PrimitiveUniquePtr( new Triangle{ v[0], v[1], v[2], scene->materials_.size() - 1 } ) );
+
+    glm::vec3 emission = scene->materials_[ scene->materials_.size() - 1 ]->emitted_;
+
+    if ( ( emission[0] != 0.0f ) || ( emission[1] != 0.0f ) || ( emission[2] != 0.0f ) )
+        scene->light_sources_.push_back( scene->materials_.size() - 1 );
 }
 
 void LuaBind::getSphere( Scene *scene,

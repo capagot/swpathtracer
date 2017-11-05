@@ -23,6 +23,8 @@ public:
     virtual bool intersect( const Ray &ray,
                             IntersectionRecord &intersection_record ) = 0;
 
+    virtual glm::vec3 getUniformPoint( float e1, float e2 ) const = 0;
+
     virtual AABB getAABB( void ) const = 0;
 
     virtual void printData( void ) const = 0;

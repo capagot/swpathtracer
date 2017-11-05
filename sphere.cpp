@@ -48,6 +48,15 @@ bool Sphere::intersect( const Ray &ray,
     return true;
 }
 
+// TODO: implement the selection of uniformly distributed point over the sphere surface!    
+glm::vec3 Sphere::getUniformPoint( float e1, float e2 ) const
+{
+    ( void ) e1;
+    ( void ) e2;
+
+    return glm::vec3{ 0.0f, 0.0f, 0.0f };
+}
+
 AABB Sphere::getAABB( void ) const
 {
     AABB aabb;

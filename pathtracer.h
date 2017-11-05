@@ -31,6 +31,7 @@ private:
 
     glm::vec3 integrate_recursive( const Ray &ray,
                                    unsigned int depth,
+                                   float see_emitted_light,
                                    int thread_id );
 
     RNG< std::uniform_real_distribution, float, std::mt19937 > rng_;

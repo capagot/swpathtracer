@@ -65,6 +65,8 @@ public:
 
     std::vector< Material::MaterialUniquePtr > materials_;
 
+    std::vector< std::size_t > light_sources_;
+
     // TODO: move this to private section
     AccelerationStructure acceleration_structure_ = AccelerationStructure::NONE;
 
