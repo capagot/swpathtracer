@@ -118,6 +118,10 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
 
     //-------------------------------------------------------------------------
 
+#define DIRECT_LIGHTING
+
+#ifdef DIRECT_LIGHTING
+
     glm::vec3 direct_lighting{ 0.0f, 0.0f, 0.0f };
 
     int i;
@@ -143,7 +147,8 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
     if ( scene_.intersect( light_ray,
                            light_intersection_record,
                            num_intersection_tests_[ thread_id ],
-                           num_intersections_[ thread_id ] ) )
+                           num_intersections_[ thread_id ] ) &&
+        ( scene_.materials_[intersection_record.material_id_]->bsdf_->bxdf_layers_[ 0 ]->bxdf_type_ == BxDF::BxDFType::DIFFUSE ) )
     {
         glm::vec3 le = scene_.materials_[light_intersection_record.material_id_ ]->emitted_;
 
@@ -161,6 +166,8 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
             }
         }                             
     }
+
+#endif  // DIRECT_LIGHTING
 
     //-------------------------------------------------------------------------
 
@@ -184,20 +191,28 @@ glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
 
     num_rays_[ thread_id ]++;
 
-    /* 
-    spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ + 
-               fr * 
-               integrate_recursive( new_ray, ++depth, 0.0, thread_id );// *
-               //w_r[ w_r.size() - 1 ].y;
-    //*/
+ #ifdef DIRECT_LIGHTING
 
-    
-   spectrum = direct_lighting + ( see_emitted_light * scene_.materials_[intersection_record.material_id_]->emitted_ ) + 
-        fr * 
-        //( fr / scene_.materials_[intersection_record.material_id_]->bsdf_->bxdf_layers_[ 0 ]->surface_sampler_->getProbability( w_i, w_r[ 1 ] ) ) *
-        integrate_recursive( new_ray, ++depth, 0.0, thread_id );// *
-    //*/
+   if ( scene_.materials_[intersection_record.material_id_]->bsdf_->bxdf_layers_[ 0 ]->bxdf_type_ == BxDF::BxDFType::DIFFUSE )
+    {  
+        spectrum = direct_lighting + ( see_emitted_light * scene_.materials_[intersection_record.material_id_]->emitted_ ) + 
+            fr * 
+            //( fr / scene_.materials_[intersection_record.material_id_]->bsdf_->bxdf_layers_[ 0 ]->surface_sampler_->getProbability( w_i, w_r[ 1 ] ) ) *
+            integrate_recursive( new_ray, ++depth, 0.0, thread_id );// *
+        //*/
+    }
+    else
 
+#endif // DIRECT_LIGHTING
+
+    {
+        spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ + 
+            fr * 
+            integrate_recursive( new_ray, ++depth, 1.0, thread_id );// *
+        //w_r[ w_r.size() - 1 ].y;
+        //*/
+
+    }
 
     return spectrum;
 }
