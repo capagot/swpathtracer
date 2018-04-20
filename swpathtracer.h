@@ -8,6 +8,7 @@
 #include "scene.h"
 #include "buffer.h"
 #include "pathtracer.h"
+#include "raycaster.h"
 #include "lua_bind.h"
 #include "cmdlineparser.h"
 

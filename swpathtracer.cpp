@@ -83,7 +83,17 @@ int main( int num_args, char **arg_vector )
     rendering_buffer->printInfo();
 
     // Set up the renderer.
-    PathTracer pt( (*camera),
+    //PathTracer pt( (*camera),
+    //               scene,
+    //               background_color,
+    //               ( ( path_termination == "russian-roulette" ) ? Integrator::PathTerminationCriterion::RUSSIAN_ROULETTE : Integrator::PathTerminationCriterion::MAX_DEPTH ),
+    //               path_length,
+    //               (*sampler),
+    //               (*rendering_buffer),
+    //               rng );
+
+
+    RayCaster pt( (*camera),
                    scene,
                    background_color,
                    ( ( path_termination == "russian-roulette" ) ? Integrator::PathTerminationCriterion::RUSSIAN_ROULETTE : Integrator::PathTerminationCriterion::MAX_DEPTH ),
@@ -91,6 +101,7 @@ int main( int num_args, char **arg_vector )
                    (*sampler),
                    (*rendering_buffer),
                    rng );
+
 
     std::cout << std::endl;
     std::cout << "Rendering statistics: " << std::endl;

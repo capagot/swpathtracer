@@ -17,8 +17,8 @@ Camera = camera{
 }
 
 s = sampler{
-    type = "jittered",
-    spp = 400
+    type = "regular",
+    spp = 1
 }   
 
 b = buffer{
@@ -28,10 +28,10 @@ b = buffer{
 
 g = globals{
     background_color = { 0, 0, 0 },
-    path_termination = "russian-roulette", -- "max-length"
-    path_length = 5,
+    path_termination = "max-length", --"russian-roulette", -- "max-length"
+    path_length = 1,
     output_filename = "material_test.ppm",
-    acceleration_data_structure = "none"
+    acceleration_data_structure = "bvh-sah" --"none"
 }
 
 -- Diffuse white light

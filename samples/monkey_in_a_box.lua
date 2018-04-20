@@ -17,8 +17,8 @@ Camera = camera{
 }
 
 s = sampler{
-    type = "jittered",
-    spp = 256
+    type = "regular",
+    spp = 1
 }
 
 b = buffer{
@@ -28,10 +28,10 @@ b = buffer{
 
 g = globals{
     background_color = { 0, 0, 0 },
-    path_termination = "russian-roulette",
-    path_length = 5,    
+    path_termination = "max-length",
+    path_length = 1,    
     output_filename = "monkey_in_a_box.ppm",
-    acceleration_data_structure = "bvh-sah"
+    acceleration_data_structure = "bvh-sah" -- "none"
 }
 
 local a = 2
