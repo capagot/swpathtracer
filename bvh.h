@@ -52,7 +52,7 @@ public:
 
     };
 
-    BVH( const std::vector< Primitive::PrimitiveUniquePtr > &primitives );
+    BVH( const std::vector< Primitive::PrimitiveUniquePtr >& primitives );
 
     ~BVH( void );
 

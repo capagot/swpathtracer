@@ -65,6 +65,12 @@ void RayCaster::integrate( void )
         for ( std::size_t x = 0; x < buffer_.h_resolution_; x++ )
             max_t = ( max_t > buffer_.buffer_data_[x][y][0] )? max_t : buffer_.buffer_data_[x][y][0];
 
+
+        std::cout << "actual max_t: " << max_t << "\n";
+        max_t = 895.0f;
+
+    std::cout << "\n---------> Max Intersect/ray: " << max_t << "\n\n";
+
     for ( std::size_t y = 0; y < buffer_.v_resolution_; y++ )
     {
         for ( std::size_t x = 0; x < buffer_.h_resolution_; x++ )
@@ -136,22 +142,24 @@ glm::vec3 RayCaster::integrate_recursive( const Ray &ray,
 
 	glm::vec3 color = glm::vec3{ 1.0f, 0.0f, 0.0f };
 
+    long unsigned int num_intersection_tests = 0;
+    long unsigned int num_intersections = 0;
+
     scene_.intersect( ray,
                       intersection_record,
-                      num_intersection_tests_[ thread_id ],
-                      num_intersections_[ thread_id ] );
+                      num_intersection_tests,
+                      num_intersections );
 
-    float t = num_intersection_tests_[ thread_id ] / ( scene_.primitives_.size() * 1.0f );
+    num_intersection_tests_[ thread_id ] += num_intersection_tests;
+    num_intersections_[ thread_id ] += num_intersections;
 
-    num_intersection_tests_[ thread_id ] = 0;
-
-	return glm::vec3{ t, 0.0f, 0.0f };
+	return glm::vec3{ num_intersection_tests, 0.0f, 0.0f };
 }
 
 void RayCaster::printInfoPreRendering( void ) const
 {
     std::cout << "  # of threads .....................: " << omp_get_max_threads() << std::endl;
-    std::cout << "  rendering algorithm ..............: brute force path tracing" << std::endl;
+    std::cout << "  rendering algorithm ..............: ray casting" << std::endl;
 }
 
 void RayCaster::printInfoPostRendering( void ) const

@@ -1,15 +1,17 @@
 #include "scene.h"
 
-Scene::Scene( void )
-{ }
+Scene::Scene(void) {}
 
-Scene::~Scene( void )
-{
+Scene::~Scene(void) {
     // TODO: Use smartpointers here!
-    if ( bvh_ )
-    {
+    if (bvh_) {
         delete bvh_;
         bvh_ = nullptr;
+    }
+
+    if (sbvh_) {
+        delete sbvh_;
+        sbvh_ = nullptr;
     }
 }
 
@@ -83,46 +85,46 @@ int Scene::loadMesh( const std::string &file_name,
                 // Compute the mesh's aabb min and max vertices.
                 if ( vertex_id == 0 )
                 {
-                    min.x = std::min( std::min( static_cast< float >( vertex_ptr[0].x ), 
-                                                static_cast< float >( vertex_ptr[1].x ) ), 
+                    min.x = std::min( std::min( static_cast< float >( vertex_ptr[0].x ),
+                                                static_cast< float >( vertex_ptr[1].x ) ),
                                                 static_cast< float >( vertex_ptr[2].x ) );
-                    min.y = std::min( std::min( static_cast< float >( vertex_ptr[0].y ), 
-                                                static_cast< float >( vertex_ptr[1].y ) ), 
+                    min.y = std::min( std::min( static_cast< float >( vertex_ptr[0].y ),
+                                                static_cast< float >( vertex_ptr[1].y ) ),
                                                 static_cast< float >( vertex_ptr[2].y ) );
-                    min.z = std::min( std::min( static_cast< float >( vertex_ptr[0].z ), 
-                                                static_cast< float >( vertex_ptr[1].z ) ), 
+                    min.z = std::min( std::min( static_cast< float >( vertex_ptr[0].z ),
+                                                static_cast< float >( vertex_ptr[1].z ) ),
                                                 static_cast< float >( vertex_ptr[2].z ) );
 
-                    max.x = std::max( std::max( static_cast< float >( vertex_ptr[0].x ), 
-                                                static_cast< float >( vertex_ptr[1].x ) ), 
+                    max.x = std::max( std::max( static_cast< float >( vertex_ptr[0].x ),
+                                                static_cast< float >( vertex_ptr[1].x ) ),
                                                 static_cast< float >( vertex_ptr[2].x ) );
-                    max.y = std::max( std::max( static_cast< float >( vertex_ptr[0].y ), 
-                                                static_cast< float >( vertex_ptr[1].y ) ), 
+                    max.y = std::max( std::max( static_cast< float >( vertex_ptr[0].y ),
+                                                static_cast< float >( vertex_ptr[1].y ) ),
                                                 static_cast< float >( vertex_ptr[2].y ) );
-                    max.z = std::max( std::max( static_cast< float >( vertex_ptr[0].z ), 
-                                                static_cast< float >( vertex_ptr[1].z ) ), 
+                    max.z = std::max( std::max( static_cast< float >( vertex_ptr[0].z ),
+                                                static_cast< float >( vertex_ptr[1].z ) ),
                                                 static_cast< float >( vertex_ptr[2].z ) );
                 }
                 else
                 {
-                    min.x = std::min( std::min( std::min( static_cast< float >( vertex_ptr[0].x ), 
+                    min.x = std::min( std::min( std::min( static_cast< float >( vertex_ptr[0].x ),
                                                           static_cast< float >( vertex_ptr[1].x ) ),
                                                           static_cast< float >( vertex_ptr[2].x ) ), min.x );
-                    min.y = std::min( std::min( std::min( static_cast< float >( vertex_ptr[0].y ), 
-                                                          static_cast< float >( vertex_ptr[1].y ) ), 
+                    min.y = std::min( std::min( std::min( static_cast< float >( vertex_ptr[0].y ),
+                                                          static_cast< float >( vertex_ptr[1].y ) ),
                                                           static_cast< float >( vertex_ptr[2].y ) ), min.y );
-                    min.z = std::min( std::min( std::min( static_cast< float >( vertex_ptr[0].z ), 
-                                                          static_cast< float >( vertex_ptr[1].z ) ), 
+                    min.z = std::min( std::min( std::min( static_cast< float >( vertex_ptr[0].z ),
+                                                          static_cast< float >( vertex_ptr[1].z ) ),
                                                           static_cast< float >( vertex_ptr[2].z ) ), min.z );
 
-                    max.x = std::max( std::max( std::max( static_cast< float >( vertex_ptr[0].x ), 
-                                                          static_cast< float >( vertex_ptr[1].x ) ), 
+                    max.x = std::max( std::max( std::max( static_cast< float >( vertex_ptr[0].x ),
+                                                          static_cast< float >( vertex_ptr[1].x ) ),
                                                           static_cast< float >( vertex_ptr[2].x ) ), max.x );
-                    max.y = std::max( std::max( std::max( static_cast< float >( vertex_ptr[0].y ), 
-                                                          static_cast< float >( vertex_ptr[1].y ) ), 
+                    max.y = std::max( std::max( std::max( static_cast< float >( vertex_ptr[0].y ),
+                                                          static_cast< float >( vertex_ptr[1].y ) ),
                                                           static_cast< float >( vertex_ptr[2].y ) ), max.y );
-                    max.z = std::max( std::max( std::max( static_cast< float >( vertex_ptr[0].z ), 
-                                                          static_cast< float >( vertex_ptr[1].z ) ), 
+                    max.z = std::max( std::max( std::max( static_cast< float >( vertex_ptr[0].z ),
+                                                          static_cast< float >( vertex_ptr[1].z ) ),
                                                           static_cast< float >( vertex_ptr[2].z ) ), max.z );
                 }
 
@@ -155,11 +157,12 @@ int Scene::loadMesh( const std::string &file_name,
     return EXIT_SUCCESS;
 }
 
-void Scene::buildAccelerationStructure( void )
-{
-    if ( acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH )
-    {
+void Scene::buildAccelerationStructure(void) {
+    if (acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH) {
         buildBVH();
+        std::clog << std::endl;
+    } else if (acceleration_structure_ == Scene::AccelerationStructure::SBVH_SAH) {
+        buildSBVH();
         std::clog << std::endl;
     }
 }
@@ -198,6 +201,12 @@ bool Scene::intersect( const Ray &ray,
                                                num_intersection_tests_,
                                                num_intersections_ );
         break;
+    case AccelerationStructure::SBVH_SAH:
+        intersection_result = sbvh_->intersect( ray,
+                                               intersection_record,
+                                               num_intersection_tests_,
+                                               num_intersections_ );
+        break;
     }
 
     return intersection_result;
@@ -211,11 +220,12 @@ void Scene::printInfoPreAccelerationStructure( void ) const
     std::cout << "  # of materials ...................: " << materials_.size() << std::endl;
     std::cout << "  acceleration structure ...........: ";
 
-    if ( acceleration_structure_ == Scene::AccelerationStructure::NONE )
+    if (acceleration_structure_ == Scene::AccelerationStructure::NONE)
         std::cout << "none";
-    else
-        if ( acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH )
-            std::cout << "BVH-SAH";
+    else if (acceleration_structure_ == Scene::AccelerationStructure::BVH_SAH)
+        std::cout << "BVH-SAH";
+    else if (acceleration_structure_ == Scene::AccelerationStructure::SBVH_SAH)
+        std::cout << "SBVH-SAH";
 
     std::cout << std::endl << std::flush;
 }
@@ -228,4 +238,10 @@ void Scene::buildBVH( void )
 {
     bvh_ = new BVH( primitives_ );
     //bvh_->dump();
+}
+
+void Scene::buildSBVH( void )
+{
+    sbvh_ = new SBVH( primitives_ );
+    //sbvh_->dump();
 }

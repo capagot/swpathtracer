@@ -117,6 +117,8 @@ void LuaBind::getGlobals( glm::vec3 &background_color,
     scene_acceleration_data_structure = Scene::AccelerationStructure::NONE;
     if ( acelleration_structure == "bvh-sah" )
         scene_acceleration_data_structure = Scene::AccelerationStructure::BVH_SAH;
+    if ( acelleration_structure == "sbvh-sah" )
+        scene_acceleration_data_structure = Scene::AccelerationStructure::SBVH_SAH;
 }
 
 void LuaBind::getMaterial( Scene *scene,

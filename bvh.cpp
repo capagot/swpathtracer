@@ -8,14 +8,14 @@ BVH::BVH( const std::vector< Primitive::PrimitiveUniquePtr > &primitives ) :
 
     if ( primitives_.size() > 0 )
     {
-        std::deque< PrimitiveAABBArea > s( primitives_.size() );
-        primitive_id_.resize( primitives_.size() );
+        std::deque< PrimitiveAABBArea > s( primitives_.size() ); // deque containing primitive AABB surface area
+        primitive_id_.resize( primitives_.size() ); // array containing primitive IDs
 
         AABB root_aabb;
 
         for( std::size_t i = 0; i < primitives_.size(); i++ )
         {
-            AABB aabb = primitives_[i]->getAABB();
+            AABB aabb = primitives_[i]->getAABB(); // computes the AABB area of each primitive
 
             // compute the AABB area for the root node
             if ( !i )

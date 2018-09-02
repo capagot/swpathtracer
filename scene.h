@@ -19,6 +19,7 @@
 #include "smooth_conductor.h"
 #include "smooth_dielectric.h"
 #include "material.h"
+#include "sbvh.h"
 #include "bvh.h"
 
 class Scene
@@ -28,7 +29,8 @@ public:
     enum AccelerationStructure
     {
         NONE,
-        BVH_SAH
+        BVH_SAH,
+        SBVH_SAH
     };
 
     enum MeshType
@@ -70,12 +72,15 @@ public:
 
 private:
 
+    const aiScene *assimp_scene_ = nullptr;
+
     void buildBVH( void );
 
-    const aiScene *assimp_scene_ = nullptr;
+    void buildSBVH( void );
 
     const BVH *bvh_ = nullptr;
 
+    const SBVH *sbvh_ = nullptr;
 };
 
 #endif /* SCENE_H_ */
