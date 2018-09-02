@@ -1,14 +1,13 @@
 #include "sbvh.h"
 
-SBVH::SBVH( const std::vector< Primitive::PrimitiveUniquePtr > &primitives ) :
+SBVH::SBVH( const std::vector< Primitive::PrimitiveUniquePtr >& primitives ) :
         primitives_( primitives )
 {
     Timer t;
     t.start();
 
-    if ( primitives_.size() > 0 )
-    {
-        std::deque< PrimitiveAABBArea > s( primitives_.size() );
+    if (primitives_.size() > 0) {
+        std::deque<PrimitiveAABBArea> s(primitives_.size());
         primitive_id_.resize( primitives_.size() );
 
         AABB root_aabb;

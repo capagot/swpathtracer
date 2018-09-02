@@ -52,7 +52,7 @@ public:
 
     };
 
-    SBVH( const std::vector< Primitive::PrimitiveUniquePtr > &primitives );
+    SBVH(const std::vector< Primitive::PrimitiveUniquePtr >& primitives);
 
     ~SBVH( void );
 
@@ -109,7 +109,7 @@ private:
 
     std::deque< long unsigned int > primitive_id_;
 
-    const std::vector< Primitive::PrimitiveUniquePtr > &primitives_;
+    const std::vector<Primitive::PrimitiveUniquePtr>& primitives_;
 
     std::size_t primitives_inserted_ = 0;
 };
