@@ -29,6 +29,8 @@ public:
 
     float getArea( void ) const;
 
+    glm::vec3 getCentroid( void ) const;
+
     bool intersect( const Ray &ray ) const;
                     //IntersectionRecord &intersection_record,
                     //long unsigned int &num_intersection_tests_,

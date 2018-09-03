@@ -3,9 +3,9 @@
 int main( int num_args, char **arg_vector )
 {
     /*
-    feenableexcept( //FE_INVALID   | 
-                    //FE_DIVBYZERO | 
-                    FE_OVERFLOW  | 
+    feenableexcept( //FE_INVALID   |
+                    //FE_DIVBYZERO |
+                    FE_OVERFLOW  |
                     FE_UNDERFLOW );
     //*/
     //
@@ -63,7 +63,7 @@ int main( int num_args, char **arg_vector )
     std::cout << "  background color .................: [" << background_color[0] << ", "
                                                            << background_color[1] << ", "
                                                            << background_color[2] << "]" << std::endl;
-    std::cout << "  path termination criterion .......: " << (( path_termination == "russian-roulette" ) ? "russian roulette" : "fixed length" ) << std::endl; 
+    std::cout << "  path termination criterion .......: " << (( path_termination == "russian-roulette" ) ? "russian roulette" : "fixed length" ) << std::endl;
 
     if (  path_termination == "russian-roulette" )
         std::cout << "  path minimum length ..............: ";
@@ -83,7 +83,7 @@ int main( int num_args, char **arg_vector )
     rendering_buffer->printInfo();
 
     // Set up the renderer.
-    /*
+
     PathTracer pt( (*camera),
                    scene,
                    background_color,
@@ -94,7 +94,7 @@ int main( int num_args, char **arg_vector )
                    rng );
     //*/
 
-    
+    /*
     RayCaster pt( (*camera),
                    scene,
                    background_color,

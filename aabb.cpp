@@ -1,11 +1,14 @@
 #include "aabb.h"
 
-float AABB::getArea( void ) const
-{
+float AABB::getArea( void ) const {
     float l = ( max_.x - min_.x );
     float m = ( max_.y - min_.y );
     float n = ( max_.z - min_.z );
     return 2.0f * ( l * ( m + n ) + m * n );
+}
+
+glm::vec3 AABB::getCentroid( void ) const {
+    return glm::vec3(min_ + max_) * 0.5f;
 }
 
 bool AABB::intersect( const Ray &ray ) const

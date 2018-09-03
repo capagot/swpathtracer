@@ -243,5 +243,8 @@ void Scene::buildBVH( void )
 void Scene::buildSBVH( void )
 {
     sbvh_ = new SBVH( primitives_ );
+
+    //exit(1);
+
     //sbvh_->dump();
 }

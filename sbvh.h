@@ -14,32 +14,27 @@
 class SBVH
 {
 public:
-
-    struct SBVHNode
-    {
-        ~SBVHNode( void )
-        {
-            if ( left_ )
-            {
-                delete left_;
-                left_ = nullptr;
-            }
-
-            if ( right_ )
-            {
-                delete right_;
-                right_ = nullptr;
-            }
-        }
-
-        std::size_t first_;                       // index of the first primitive
-        std::size_t last_;                        // number of primitives into this node (whose index start at "first_").
-        AABB aabb_;                               // AABB represeted by the current node.
-        SBVHNode *left_ = nullptr;                 // Pointer to the left child node (if the current node is a inner node).
-        SBVHNode *right_ = nullptr;                // Pointer to right inner node (if the current node is a inner node).
+    struct PrimitiveRef {
+        PrimitiveRef(long int id, const AABB& aabb) : id_(id),
+                                                      aabb_(aabb) {}
+        long int id_;
+        AABB aabb_;
     };
 
-    struct PrimitiveAABBArea
+    struct SBVHNode {
+        using PrimitiveRefListUniquePtr = std::unique_ptr<std::vector<PrimitiveRef>>;
+        using UniquePtr = std::unique_ptr<SBVHNode>;
+
+        //SBVHNode() : primitive_ref_list_(new std::vector<PrimitiveRef>()) {}
+        SBVHNode() {}
+
+        PrimitiveRefListUniquePtr primitive_ref_list_;
+        AABB aabb_;
+        SBVHNode::UniquePtr left_node_;
+        SBVHNode::UniquePtr right_node_;
+    };
+
+/*    struct PrimitiveAABBArea
     {
         std::size_t primitive_id_;
         glm::vec3 centroid_;
@@ -51,10 +46,10 @@ public:
         AABB right_aabb_;
 
     };
-
+*/
     SBVH(const std::vector< Primitive::PrimitiveUniquePtr >& primitives);
 
-    ~SBVH( void );
+    //~SBVH( void );
 
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record,
@@ -65,49 +60,39 @@ public:
 
 private:
 
-    struct Comparator
-    {
-        static bool sortInX( const PrimitiveAABBArea &lhs, const PrimitiveAABBArea &rhs )
-        {
-            return lhs.centroid_.x < rhs.centroid_.x;
+    struct Comparator {
+        static bool sortInX(const PrimitiveRef& a, const PrimitiveRef& b) {
+            return a.aabb_.getCentroid().x < b.aabb_.getCentroid().x;
         }
 
-        static bool sortInY( const PrimitiveAABBArea &lhs, const PrimitiveAABBArea &rhs )
-        {
-            return lhs.centroid_.y < rhs.centroid_.y;
+        static bool sortInY(const PrimitiveRef& a, const PrimitiveRef& b) {
+            return a.aabb_.getCentroid().y < b.aabb_.getCentroid().y;
         }
 
-        static bool sortInZ( const PrimitiveAABBArea &lhs, const PrimitiveAABBArea &rhs )
-        {
-            return lhs.centroid_.z < rhs.centroid_.z;
+        static bool sortInZ(const PrimitiveRef& a, const PrimitiveRef& b) {
+            return a.aabb_.getCentroid().z < b.aabb_.getCentroid().z;
         }
     };
 
-    float SAH( std::size_t s1_size,
-                float s1_area,
-                std::size_t s2_size,
-                float s2_area,
-                float s_area  );
+    float SAH(std::size_t s1_size,
+              float s1_area,
+              std::size_t s2_size,
+              float s2_area,
+              float root_aabb_area);
 
-    void splitNode( SBVHNode **node,
-                    std::deque< PrimitiveAABBArea > &s,
-                    std::size_t first,
-                    std::size_t last,
-                    float s_area );
+    void splitNode(SBVHNode::UniquePtr& node, float root_aabb_area);
 
-    bool traverse( const SBVHNode *node,
+    bool traverse( const SBVHNode::UniquePtr& node,
                    const Ray &ray,
                    IntersectionRecord &intersection_record,
                    long unsigned int &num_intersection_tests_,
                    long unsigned int &num_intersections_ ) const;
 
-    SBVHNode *root_node_ = nullptr;
-
+    SBVHNode::UniquePtr root_node_;
     float cost_intersec_tri_ = 0.8f;
-
     float cost_intersec_aabb_ = 0.2f;
 
-    std::deque< long unsigned int > primitive_id_;
+/*    std::deque< long unsigned int > primitive_id_;*/
 
     const std::vector<Primitive::PrimitiveUniquePtr>& primitives_;
 
