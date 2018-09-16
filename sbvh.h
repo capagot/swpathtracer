@@ -17,8 +17,9 @@ public:
     struct PrimitiveRef {
         PrimitiveRef(long int id, const AABB& aabb) : id_(id),
                                                       aabb_(aabb) {}
-        long int id_;
-        AABB aabb_;
+        long int id_;           // index of the primitive in the actual primitive list
+        glm::vec3 centroid_;    // primitive centroid after the clipping against current node AABB
+        AABB aabb_;             // AABB of the primitive after the clipping against current node AABB
     };
 
     struct SBVHNode {
@@ -80,7 +81,13 @@ private:
               float s2_area,
               float root_aabb_area);
 
-    void splitNode(SBVHNode::UniquePtr& node, float root_aabb_area);
+    //AABB ComputeAABB(const Primitive& primitive, float p0_offset, float p1_offset, int axis);
+
+    void splitNode(SBVHNode::UniquePtr& node,
+                   float root_aabb_area,
+                   const std::string& ident,
+                   const std::string& split_method,
+                   const std::string& child_side);
 
     bool traverse( const SBVHNode::UniquePtr& node,
                    const Ray &ray,

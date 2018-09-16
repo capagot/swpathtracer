@@ -102,10 +102,19 @@ bool SmoothTriangle::intersect( const Ray &ray,
     // DEBUG
     if ( u + v > 1.0f )
         exit( 1 );
- 
+
     intersection_record.material_id_ = material_id_;
 
     return true;
+}
+
+/*AABB SmoothTriangle::computeSBVHAABB(float p0, float p1, int axis) {
+    return AABB(glm::vec3(0.0f, 0.0f, 0.0), glm::vec3(0.0f, 0.0f, 0.0));
+}
+*/
+
+bool SmoothTriangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_y,  float min_z, float max_z,  int axis, AABB& aabb) {
+    return false;
 }
 
 AABB SmoothTriangle::getAABB( void ) const

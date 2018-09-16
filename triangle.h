@@ -25,6 +25,10 @@ public:
     bool intersect( const Ray &ray,
                     IntersectionRecord &intersection_record );
 
+    //AABB computeSBVHAABB(float p0, float p1, int axis);
+
+    bool computeSBVHAABB(float min_x, float max_x, float min_y, float max_y,  float min_z, float max_z,  int axis, AABB& aabb);
+
     AABB getAABB( void ) const;
 
     virtual void printData( void ) const;

@@ -83,7 +83,7 @@ int main( int num_args, char **arg_vector )
     rendering_buffer->printInfo();
 
     // Set up the renderer.
-
+    /*
     PathTracer pt( (*camera),
                    scene,
                    background_color,
@@ -94,7 +94,7 @@ int main( int num_args, char **arg_vector )
                    rng );
     //*/
 
-    /*
+
     RayCaster pt( (*camera),
                    scene,
                    background_color,

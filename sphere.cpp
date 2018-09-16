@@ -48,6 +48,15 @@ bool Sphere::intersect( const Ray &ray,
     return true;
 }
 
+/*AABB Sphere::computeSBVHAABB(float p0, float p1, int axis) {
+    return AABB(glm::vec3(0.0f, 0.0f, 0.0), glm::vec3(0.0f, 0.0f, 0.0));
+}
+*/
+
+bool Sphere::computeSBVHAABB(float min_x, float max_x, float min_y, float max_y,  float min_z, float max_z,  int axis, AABB& aabb) {
+    return false;
+}
+
 AABB Sphere::getAABB( void ) const
 {
     AABB aabb;
