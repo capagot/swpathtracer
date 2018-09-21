@@ -83,6 +83,7 @@ int main( int num_args, char **arg_vector )
     rendering_buffer->printInfo();
 
     // Set up the renderer.
+
     /*
     PathTracer pt( (*camera),
                    scene,

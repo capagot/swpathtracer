@@ -18,7 +18,7 @@ Camera = camera{
 
 s = sampler{
     type = "jittered",
-    spp = 10
+    spp = 100
 }
 
 b = buffer{
@@ -29,7 +29,7 @@ b = buffer{
 g = globals{
     background_color = { 0, 0, 0 },
     path_termination = "max-length",
-    path_length = 3,
+    path_length = 5,
     output_filename = "monkey_in_a_box_SBVH.ppm",
     acceleration_data_structure = "sbvh-sah" -- "none"
 }
@@ -84,6 +84,7 @@ local mat_copper = {
     },
     emission = { 0, 0, 0 }
 }
+
 
 -- back wall
 t1 = triangle{
@@ -200,9 +201,10 @@ t12 = triangle{
     },
     material = mat_light
 }
+--]]
 
 mesh1 = mesh{
     filename = "samples/meshes/monkey.obj",
-    material = mat_copper
+    material = mat_white
 }
 

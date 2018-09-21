@@ -113,7 +113,15 @@ bool SmoothTriangle::intersect( const Ray &ray,
 }
 */
 
-bool SmoothTriangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_y,  float min_z, float max_z,  int axis, AABB& aabb) {
+bool SmoothTriangle::computeSBVHAABB(float min_x,
+                                     float max_x,
+                                     float min_y,
+                                     float max_y,
+                                     float min_z,
+                                     float max_z,
+                                     int axis,
+                                     AABB& aabb,
+                                     glm::vec3& centroid) {
     return false;
 }
 
@@ -125,6 +133,10 @@ AABB SmoothTriangle::getAABB( void ) const
     aabb.max_ = glm::max( glm::max( v0_, v1_ ), v2_ );
     aabb.centroid_ = ( 1.0f / 3.0f ) * ( v0_ + v1_ + v2_ );
     return aabb;
+}
+
+glm::vec3 SmoothTriangle::getCentroid( void ) const {
+    return (v0_ + v1_ + v2_) * (1.0f / 3.0f);
 }
 
 void SmoothTriangle::printData( void ) const

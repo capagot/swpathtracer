@@ -194,9 +194,20 @@ bool Triangle::intersect( const Ray &ray,
 }
 */
 
-bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_y,  float min_z, float max_z,  int axis, AABB& aabb) {
+bool Triangle::computeSBVHAABB(float min_x,
+                               float max_x,
+                               float min_y,
+                               float max_y,
+                               float min_z,
+                               float max_z,
+                               int axis,
+                               AABB& aabb,
+                               glm::vec3& new_centroid) {
 
     bool result = false;
+
+    int polygon_vertex_count = 0;
+    new_centroid = glm::vec3(0.0f);
 
     glm::vec3 min_p(std::numeric_limits<float>::infinity(),
                     std::numeric_limits<float>::infinity(),
@@ -215,6 +226,8 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
         min_p = glm::min(min_p, v0_);
         max_p = glm::max(max_p, v0_);
         ++inner_vertex_count;
+        ++polygon_vertex_count;
+        new_centroid += v0_;
     }
 
     // vertex v1 is inside the AABB
@@ -224,6 +237,8 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
         min_p = glm::min(min_p, v1_);
         max_p = glm::max(max_p, v1_);
         ++inner_vertex_count;
+        ++polygon_vertex_count;
+        new_centroid += v1_;
     }
 
     // vertex v2 is inside the AABB
@@ -233,6 +248,8 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
         min_p = glm::min(min_p, v2_);
         max_p = glm::max(max_p, v2_);
         ++inner_vertex_count;
+        ++polygon_vertex_count;
+        new_centroid += v2_;
     }
 
     if (inner_vertex_count == 3) {  // triangle completely enclosed by the AABB
@@ -262,6 +279,10 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
                             aabb.min_ = min_p;
                             aabb.max_ = max_p;
                             result = true;
+
+                            ++polygon_vertex_count;
+                            new_centroid += ip;
+
                         }
                     }
 
@@ -274,6 +295,10 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
                             aabb.min_ = min_p;
                             aabb.max_ = max_p;
                             result = true;
+
+                            ++polygon_vertex_count;
+                            new_centroid += ip;
+
                         }
                     }
                 }
@@ -288,6 +313,10 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
                             aabb.min_ = min_p;
                             aabb.max_ = max_p;
                             result = true;
+
+                            ++polygon_vertex_count;
+                            new_centroid += ip;
+
                         }
                     }
 
@@ -300,6 +329,10 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
                             aabb.min_ = min_p;
                             aabb.max_ = max_p;
                             result = true;
+
+                            ++polygon_vertex_count;
+                            new_centroid += ip;
+
                         }
                     }
                 }
@@ -314,6 +347,10 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
                             aabb.min_ = min_p;
                             aabb.max_ = max_p;
                             result = true;
+
+                            ++polygon_vertex_count;
+                            new_centroid += ip;
+
                         }
                     }
 
@@ -326,6 +363,10 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
                             aabb.min_ = min_p;
                             aabb.max_ = max_p;
                             result = true;
+
+                            ++polygon_vertex_count;
+                            new_centroid += ip;
+
                         }
                     }
                 }
@@ -360,9 +401,16 @@ bool Triangle::computeSBVHAABB(float min_x, float max_x, float min_y, float max_
                     aabb.min_ = min_p;
                     aabb.max_ = max_p;
                     result = true;
+
+                    ++polygon_vertex_count;
+                    new_centroid += i_rec.position_;
+
                 }
             }
         }
+
+        if (polygon_vertex_count > 0)
+            new_centroid = new_centroid / static_cast<float>(polygon_vertex_count);
 
         return result;
     }
@@ -376,6 +424,10 @@ AABB Triangle::getAABB( void ) const
     aabb.max_ = glm::max( glm::max( v0_, v1_ ), v2_ );
     aabb.centroid_ = ( 1.0f / 3.0f ) * ( v0_ + v1_ + v2_ );
     return aabb;
+}
+
+glm::vec3 Triangle::getCentroid( void ) const {
+    return (v0_ + v1_ + v2_) * (1.0f / 3.0f);
 }
 
 void Triangle::printData( void ) const

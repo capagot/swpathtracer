@@ -66,8 +66,9 @@ void RayCaster::integrate( void )
             max_t = ( max_t > buffer_.buffer_data_[x][y][0] )? max_t : buffer_.buffer_data_[x][y][0];
 
 
-        std::cout << "actual max_t: " << max_t << "\n";
-        max_t = 895.0f;
+        std::cout << "\n\nactual max_t: " << max_t << "\n";
+        //max_t = 895.0f;
+        //max_t = 161.0f;
 
     std::cout << "\n---------> Max Intersect/ray: " << max_t << "\n\n";
 

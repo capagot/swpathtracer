@@ -11,8 +11,8 @@ CXXFLAGS += -DNDEBUG -O3 -g0
 endif
 
 CPPFLAGS += -MMD \
-			-I../../../../work/common/glm-0.9.7.0 \
-			-I/usr/include/lua5.2 \
+			-I../../../../work/common/glm-0.9.8.5 \
+			-I/usr/include/lua5.3 \
 			-I/usr/local/include
 
 LDFLAGS = -L/usr/lib/gcc/x86_64-linux-gnu/4.8 \
@@ -20,7 +20,7 @@ LDFLAGS = -L/usr/lib/gcc/x86_64-linux-gnu/4.8 \
 		  -L/usr/lib \
 	      -L/usr/local/lib
 
-LDLIBS = -lgomp -lassimp -llua5.2
+LDLIBS = -lgomp -lassimp -llua5.3
 
 SOURCES = $(wildcard *.cpp)
 

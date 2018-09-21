@@ -8,13 +8,24 @@ SBVH::SBVH(const std::vector<Primitive::PrimitiveUniquePtr> &primitives) : primi
         root_node_ = SBVHNode::UniquePtr(new SBVHNode());
         root_node_->primitive_ref_list_ = SBVHNode::PrimitiveRefListUniquePtr(new std::vector<PrimitiveRef>());
 
-        //std::cout << "--- Primitives -----------------------\n";
+        //std::cout << "--- Primitives -- (" << primitives_.size() << ") ----------------------\n";
 
         for (long int i = 0; i < primitives_.size(); i++) {
             //primitives_[i]->printData();
             //std::cout << "--\n";
 
-            root_node_->primitive_ref_list_->emplace_back(i, primitives_[i]->getAABB());
+            root_node_->primitive_ref_list_->emplace_back(i,
+                                                          primitives_[i]->getAABB(),
+                                                          primitives_[i]->getCentroid());
+
+            //std::cout << "get centroid   ===>>> " << primitives_[i]->getAABB().getCentroid()[0] << ", "
+            //                       << primitives_[i]->getAABB().getCentroid()[1] << ", "
+            //                       << primitives_[i]->getAABB().getCentroid()[2] << "\n";
+
+            //std::cout << "poly centroid  ===>>> " << (*root_node_->primitive_ref_list_)[i].poly_centroid_[0] << ", "
+            //                       << (*root_node_->primitive_ref_list_)[i].poly_centroid_[1] << ", "
+            //                       << (*root_node_->primitive_ref_list_)[i].poly_centroid_[2] << "\n\n\n";
+
 
             if (!i)
                 root_node_->aabb_ = (*root_node_->primitive_ref_list_)[i].aabb_;
@@ -60,10 +71,14 @@ float SBVH::SAH(std::size_t s1_size,
                 std::size_t s2_size,
                 float s2_area,
                 float root_aabb_area) {
+    if ((s1_area == std::numeric_limits<float>::infinity()) && (s1_size == 0))
+        return std::numeric_limits<float>::infinity();
+
     if ((s2_area == std::numeric_limits<float>::infinity()) && (s2_size == 0))
         return std::numeric_limits<float>::infinity();
 
-    return 2.0f * cost_intersec_aabb_ + ((s1_area / root_aabb_area) * s1_size * cost_intersec_tri_) +
+    return 2.0f * cost_intersec_aabb_ +
+           ((s1_area / root_aabb_area) * s1_size * cost_intersec_tri_) +
            ((s2_area / root_aabb_area) * s2_size * cost_intersec_tri_);
 }
 
@@ -77,63 +92,63 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
                      const std::string& split_method,
                      const std::string& child_side) {
 
-#define DUMP_TREE_DATA
-
     ///////////////////////////////////////////////////////////////////////////
     // object split evaluation
     ///////////////////////////////////////////////////////////////////////////
 
-#ifdef DUMP_TREE_DATA
-    std::cout << "\n" << ident << "=== " << split_method << " --> Node [ " << child_side << " ] ========================================================\n";
-    std::cout <<  ident << "    num primitives: " << node->primitive_ref_list_->size() << "\n";
-    std::cout <<  ident << "    aabb area: " << node->aabb_.getArea() << "\n";
-    std::cout <<  ident << "    aabb: [" << node->aabb_.min_[0] << ", "
-                                         << node->aabb_.min_[1] << ", "
-                                         << node->aabb_.min_[2] << "] - ["
-                                         << node->aabb_.max_[0] << ", "
-                                         << node->aabb_.max_[1] << ", "
-                                         << node->aabb_.max_[2] << "]\n";
-#endif
-
     float best_cost = cost_intersec_tri_ * node->primitive_ref_list_->size();
     int best_axis = -1;
     int best_event = -1;
+    AABB best_left_aabb;
+    AABB best_right_aabb;
 
-    for (int axis = 1; axis <= 3; axis++) {
+    for (int axis = 0; axis < 3; axis++) {
         switch (axis) {
-            case 1:
+            case 0:
                 std::sort(node->primitive_ref_list_->begin(), node->primitive_ref_list_->end(), Comparator::sortInX);
                 break;
-            case 2:
+            case 1:
                 std::sort(node->primitive_ref_list_->begin(), node->primitive_ref_list_->end(), Comparator::sortInY);
                 break;
-            case 3:
+            case 2:
                 std::sort(node->primitive_ref_list_->begin(), node->primitive_ref_list_->end(), Comparator::sortInZ);
                 break;
         }
 
-        AABB aux_aabb;
+        //AABB aux_aabb;
+        std::vector<AABB> left_aabb(node->primitive_ref_list_->size());
         std::vector<float> left_area(node->primitive_ref_list_->size());
 
         for (long int i = 0; i < node->primitive_ref_list_->size(); ++i) {
-            if (!i) {
-                left_area[i] = std::numeric_limits<float>::infinity();
-                aux_aabb = (*node->primitive_ref_list_)[i].aabb_;
+            if (i == 0) {
+                left_area[0] = std::numeric_limits<float>::infinity();
+                //aux_aabb = (*node->primitive_ref_list_)[i].aabb_;
+
+                left_aabb[0] = (*node->primitive_ref_list_)[0].aabb_;
             } else {
-                left_area[i] = aux_aabb.getArea();
-                aux_aabb = aux_aabb + (*node->primitive_ref_list_)[i].aabb_;
+                //left_area[i] = aux_aabb.getArea();
+                //aux_aabb = aux_aabb + (*node->primitive_ref_list_)[i].aabb_;
+
+                left_area[i] = left_aabb[i-1].getArea();
+                left_aabb[i] = left_aabb[i-1] + (*node->primitive_ref_list_)[i].aabb_;
             }
         }
 
+        std::vector<AABB> right_aabb(node->primitive_ref_list_->size());
         std::vector<float> right_area(node->primitive_ref_list_->size());
 
         for (long int i = node->primitive_ref_list_->size() - 1; i >= 0; --i) {
             if (i == node->primitive_ref_list_->size() - 1) {
                 right_area[i] = std::numeric_limits<float>::infinity();
-                aux_aabb = (*node->primitive_ref_list_)[i].aabb_;
+                //aux_aabb = (*node->primitive_ref_list_)[i].aabb_;
+
+                right_aabb[i] = (*node->primitive_ref_list_)[i].aabb_;
             } else {
-                right_area[i] = aux_aabb.getArea();
-                aux_aabb = aux_aabb + (*node->primitive_ref_list_)[i].aabb_;
+                //right_area[i] = aux_aabb.getArea();
+                //aux_aabb = aux_aabb + (*node->primitive_ref_list_)[i].aabb_;
+
+                right_area[i] = right_aabb[i+1].getArea();
+                right_aabb[i] = right_aabb[i+1] + (*node->primitive_ref_list_)[i].aabb_;                
             }
 
             float this_cost = SAH(i + 1,
@@ -143,6 +158,8 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
                                   root_aabb_area);
 
             if (this_cost < best_cost) {
+                best_left_aabb = left_aabb[i];
+                best_right_aabb = right_aabb[i];
                 best_cost = this_cost;
                 best_event = i;
                 best_axis = axis;
@@ -150,16 +167,27 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
         }
     }
 
-#ifdef DUMP_TREE_DATA
-    std::cout <<  ident << "    ---- Object Split -------------------------------------\n";
-    std::cout <<  ident << "        best axis ....: " << best_axis << "\n";
-    std::cout <<  ident << "        best event ...: " << best_event << "\n";
-    std::cout <<  ident << "        best cost ....: " << best_cost << "\n";
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     // spatial split evaluation
     ///////////////////////////////////////////////////////////////////////////
+
+/*    constexpr int kApha = 0.5f;
+
+    float lambda;
+
+    if (best_event != -1) {
+        AABB aux_aabb;
+        if (best_left_aabb.getIntersection(best_right_aabb, aux_aabb)) {
+            lambda = aux_aabb.getArea();
+            if ((lambda / root_aabb_area) > kAlpha) {
+                //compute spatial split
+
+
+
+                
+            }
+        }
+    }*/
 
     constexpr int kBinListSize = 32;
 
@@ -195,14 +223,22 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
     std::vector<SplitPlane> sbvh_best_split_plane_list;
     std::vector<Bin> sbvh_best_bin_list;
 
-    if ((node->primitive_ref_list_->size() > 32) &&
-        ((node->aabb_.max_[0] - node->aabb_.min_[0]) > 0.01f) &&
-        ((node->aabb_.max_[1] - node->aabb_.min_[1]) > 0.01f) &&
-        ((node->aabb_.max_[2] - node->aabb_.min_[2]) > 0.01f))
-   {
-        for (int axis = 0; axis < 3; axis++) {
-        //for (int axis = 0; axis <= 0; axis++) {
 
+    if (node->primitive_ref_list_->size() >= 32) {
+        // ugly... but works for the moment...
+        float min_size = 1.0f;
+        std::vector<int> valid_axis;
+        if ((node->aabb_.max_[0] - node->aabb_.min_[0]) > min_size)
+            valid_axis.push_back(0);
+
+        if ((node->aabb_.max_[1] - node->aabb_.min_[1]) > min_size)
+            valid_axis.push_back(1);
+
+        if ((node->aabb_.max_[2] - node->aabb_.min_[2]) > min_size)
+            valid_axis.push_back(2);
+
+        for (int axis_idx = 0; axis_idx < valid_axis.size(); ++axis_idx) {
+            int axis = valid_axis[axis_idx];
 
             std::vector<SplitPlane> split_plane_list(kBinListSize + 1);
             std::vector<Bin> bin_list(kBinListSize);
@@ -222,19 +258,11 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
                 bin_list[i].right_split_plane_id_ = i + 1;
             }
 
+            // Chop each primitive against the bin and update the bin AABB
             for (long int i = 0; i < node->primitive_ref_list_->size(); ++i) {
-                //std::cout << "-- " << (*node->primitive_ref_list_)[i].aabb_.min_[axis] << ", "
-                //                   << (*node->primitive_ref_list_)[i].aabb_.max_[axis]
-                //                   << "\n";
-
                 // compute the entry/exit point of the primitive over the bin list
                 int in_bin = static_cast<int>(((*node->primitive_ref_list_)[i].aabb_.min_[axis] - node->aabb_.min_[axis]) / (span + 0.00001f) * kBinListSize);
                 int out_bin = static_cast<int>(((*node->primitive_ref_list_)[i].aabb_.max_[axis] - node->aabb_.min_[axis]) / (span + 0.00001f) * kBinListSize);
-
-                if (in_bin < 0)
-                    in_bin = 0;
-                if (out_bin > (kBinListSize - 1))
-                    out_bin = kBinListSize - 1;
 
                 bin_list[in_bin].in_primitive_refs_.push_back(i);
                 bin_list[out_bin].out_primitive_refs_.push_back(i);
@@ -242,6 +270,7 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
                 // update the bin's AABB
                 for (int k = in_bin; k <= out_bin; ++k) {
                         AABB chopped_primitive_aabb;
+                        glm::vec3 dummy_centroid;
 
                         if (axis == 0)
                             if (primitives_[(*node->primitive_ref_list_)[i].id_]->computeSBVHAABB(
@@ -252,7 +281,8 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
                                                                            node->aabb_.min_.z,
                                                                            node->aabb_.max_.z,
                                                                            axis,
-                                                                           chopped_primitive_aabb))
+                                                                           chopped_primitive_aabb,
+                                                                           dummy_centroid))
                                 if (!bin_list[k].has_aabb_) {
                                     bin_list[k].aabb_ = chopped_primitive_aabb;
                                     bin_list[k].has_aabb_ = true;
@@ -268,7 +298,8 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
                                                                            node->aabb_.min_.z,
                                                                            node->aabb_.max_.z,
                                                                            axis,
-                                                                           chopped_primitive_aabb))
+                                                                           chopped_primitive_aabb,
+                                                                           dummy_centroid))
                                 if (!bin_list[k].has_aabb_) {
                                     bin_list[k].aabb_ = chopped_primitive_aabb;
                                     bin_list[k].has_aabb_ = true;
@@ -284,7 +315,8 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
                                                                            split_plane_list[bin_list[k].left_split_plane_id_].offset_,
                                                                            split_plane_list[bin_list[k].right_split_plane_id_].offset_,
                                                                            axis,
-                                                                           chopped_primitive_aabb))
+                                                                           chopped_primitive_aabb,
+                                                                           dummy_centroid))
                                 if (!bin_list[k].has_aabb_) {
                                     bin_list[k].aabb_ = chopped_primitive_aabb;
                                     bin_list[k].has_aabb_ = true;
@@ -347,71 +379,18 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
             if (sbvh_best_axis == axis) {
                 sbvh_best_split_plane_list = split_plane_list;
                 sbvh_best_bin_list = bin_list;
-
-                //std::cout << ">>> sbvh_best_event:" << sbvh_best_event << "\n";
             }
-
-            //std::cout << "\n\n";
-            //for (int i = 0; i < split_plane_list.size(); ++i) {
-            //   std::cout << "== split plane " << i << " ====================\n";
-            //   std::cout << "    area .....: " << split_plane_list[i].left_area_ << " / " << split_plane_list[i].right_area_ << "\n";
-            //   std::cout << "    # prims ..: " << split_plane_list[i].num_left_prim_refs_ << " / " << split_plane_list[i].num_right_prim_refs_ << "\n";
-            //   std::cout << "    SAH cost .: " << split_plane_list[i].sah_cost_ << "\n";
-            //}
-            //std::cout << "\n\n";
-
-            // dump bin list content
-
-            //for (int i = 0; i < bin_list.size(); ++i) {
-            //   std::cout << "== bin " << i << " ====================\n";
-            //   std::cout << "    in/out count : " << bin_list[i].in_primitive_refs_.size() << " / "
-            //                                      << bin_list[i].out_primitive_refs_.size() << "\n";
-            //   std::cout << "    bin begin/end : " << split_plane_list[bin_list[i].left_split_plane_id_].offset_ << " / "
-            //                                       << split_plane_list[bin_list[i].right_split_plane_id_].offset_ << "\n";
-            //   std::cout << "    in prim refs...: ";
-            //   for (int j = 0; j < bin_list[i].in_primitive_refs_.size(); ++j) {
-            //       std::cout << bin_list[i].in_primitive_refs_[j] << ", ";
-            //   }
-            //   std::cout << "\n";
-            //   std::cout << "    out prim refs..: ";
-            //   for (int j = 0; j < bin_list[i].out_primitive_refs_.size(); ++j) {
-            //       std::cout << bin_list[i].out_primitive_refs_[j] << ", ";
-            //   }
-            //   std::cout << "\n";
-            //   std::cout << "    aabb: [" << bin_list[i].aabb_.min_[0] << ", "
-            //                              << bin_list[i].aabb_.min_[1] << ", "
-            //                              << bin_list[i].aabb_.min_[2]
-            //                              << "] - ["
-            //                              << bin_list[i].aabb_.max_[0] << ", "
-            //                              << bin_list[i].aabb_.max_[1] << ", "
-            //                              << bin_list[i].aabb_.max_[2]
-            //                              << "]\n";
-            //}
-
-            //exit(1);
         }
     }
 
-#ifdef DUMP_TREE_DATA
-    std::cout <<  ident << "    ---- Spatial Split -------------------------------------\n";
-    std::cout <<  ident << "        best axis ....: " << sbvh_best_axis << "\n";
-    std::cout <<  ident << "        best event ...: " << sbvh_best_event << "\n";
-    std::cout <<  ident << "        best cost ....: " << sbvh_best_cost << "\n";
-#endif
+
 
     ///////////////////////////////////////////////////////////////////////////
     // select the better one: object or spatial split
     ///////////////////////////////////////////////////////////////////////////
 
-#ifdef DUMP_TREE_DATA
-    std::cout << ident << "    SAH cost (BVH/SBVH) : " << best_cost << " / " << sbvh_best_cost;
-    if (best_cost <= sbvh_best_cost)
-        std::cout << " -- BVH wins! (go for object split)\n";
-    else
-        std::cout << " -- SBVH wins! (go for spatial split)\n";
-#endif
-
     if (best_cost <= sbvh_best_cost) {
+
         if (best_axis == -1) { // this is a leaf node
             primitives_inserted_ += node->primitive_ref_list_->size();
             std::stringstream progress_stream;
@@ -423,13 +402,13 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
             std::clog << progress_stream.str();
         } else {
             switch (best_axis) {
-                case 1:
+                case 0:
                     std::sort(node->primitive_ref_list_->begin(), node->primitive_ref_list_->end(), Comparator::sortInX);
                     break;
-                case 2:
+                case 1:
                     std::sort(node->primitive_ref_list_->begin(), node->primitive_ref_list_->end(), Comparator::sortInY);
                     break;
-                case 3:
+                case 2:
                     std::sort(node->primitive_ref_list_->begin(), node->primitive_ref_list_->end(), Comparator::sortInZ);
                     break;
             }
@@ -464,12 +443,12 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
             node->right_node_->right_node_ = nullptr;
             node->right_node_->left_node_ = nullptr;
 
+            node->primitive_ref_list_.reset();
+
             splitNode(node->left_node_, root_aabb_area, ident + " .", "Object Split", child_side + "->L");
             splitNode(node->right_node_, root_aabb_area, ident + " .", "Object Split", child_side + "->R");
         }
     } else { // Spatial split is better
-
-        //std::cout << "+";
 
         if (sbvh_best_axis == -1) { // this is a leaf node
             primitives_inserted_ += node->primitive_ref_list_->size();
@@ -481,112 +460,78 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
                            << "%";
             std::clog << progress_stream.str();
         } else {
-
-
             node->left_node_ = SBVHNode::UniquePtr(new SBVHNode());
+            node->left_node_->aabb_ = sbvh_best_split_plane_list[sbvh_best_event].left_aabb_;
             node->left_node_->primitive_ref_list_ = SBVHNode::PrimitiveRefListUniquePtr(new std::vector<PrimitiveRef>());
 
             for (int split_id = 1; split_id <= sbvh_best_event; ++split_id) {
                     for (long int prim_id = 0; prim_id < sbvh_best_bin_list[sbvh_best_split_plane_list[split_id].left_bin_].in_primitive_refs_.size(); ++prim_id) {
-                        //node->left_node_->primitive_ref_list_->emplace_back(prim_id, primitives_[prim_id]->getAABB());
 
                         long int pid1 = sbvh_best_bin_list[sbvh_best_split_plane_list[split_id].left_bin_].in_primitive_refs_[prim_id];
                         long int pid2 = (*node->primitive_ref_list_)[pid1].id_;
 
-                        node->left_node_->primitive_ref_list_->emplace_back(pid2, primitives_[pid2]->getAABB());
+                        AABB new_prim_ref_aabb;
+                        glm::vec3 new_prim_ref_centroid;
+                        int axis = 999;
 
+                        if (primitives_[pid2]->computeSBVHAABB(node->left_node_->aabb_.min_.x,
+                                                           node->left_node_->aabb_.max_.x,
+                                                           node->left_node_->aabb_.min_.y,
+                                                           node->left_node_->aabb_.max_.y,
+                                                           node->left_node_->aabb_.min_.z,
+                                                           node->left_node_->aabb_.max_.z,
+                                                           axis,
+                                                           new_prim_ref_aabb,
+                                                           new_prim_ref_centroid)) {
+                            node->left_node_->primitive_ref_list_->emplace_back(pid2,
+                                                                                new_prim_ref_aabb,
+                                                                                new_prim_ref_centroid);
+                        }
                     }
             }
-
-            node->left_node_->aabb_ = sbvh_best_split_plane_list[sbvh_best_event].left_aabb_;
 
             node->left_node_->right_node_ = nullptr;
             node->left_node_->left_node_ = nullptr;
 
             node->right_node_ = SBVHNode::UniquePtr(new SBVHNode());
+            node->right_node_->aabb_ = sbvh_best_split_plane_list[sbvh_best_event].right_aabb_;
             node->right_node_->primitive_ref_list_ = SBVHNode::PrimitiveRefListUniquePtr(new std::vector<PrimitiveRef>());
 
             for (int split_id = sbvh_best_split_plane_list.size() - 2; split_id >= sbvh_best_event; --split_id) {
                     for (long int prim_id = 0; prim_id < sbvh_best_bin_list[sbvh_best_split_plane_list[split_id].right_bin_].out_primitive_refs_.size(); ++prim_id) {
-                        //node->right_node_->primitive_ref_list_->emplace_back(prim_id, primitives_[prim_id]->getAABB());
 
                         long int pid1 = sbvh_best_bin_list[sbvh_best_split_plane_list[split_id].right_bin_].out_primitive_refs_[prim_id];
                         long int pid2 = (*node->primitive_ref_list_)[pid1].id_;
 
-                        node->right_node_->primitive_ref_list_->emplace_back(pid2, primitives_[pid2]->getAABB());
+                        AABB new_prim_ref_aabb;
+                        glm::vec3 new_prim_ref_centroid;
+                        int axis = 999;
 
+                        if (primitives_[pid2]->computeSBVHAABB(node->right_node_->aabb_.min_.x,
+                                                           node->right_node_->aabb_.max_.x,
+                                                           node->right_node_->aabb_.min_.y,
+                                                           node->right_node_->aabb_.max_.y,
+                                                           node->right_node_->aabb_.min_.z,
+                                                           node->right_node_->aabb_.max_.z,
+                                                           axis,
+                                                           new_prim_ref_aabb,
+                                                           new_prim_ref_centroid)) {
+                            node->right_node_->primitive_ref_list_->emplace_back(pid2,
+                                                                                 new_prim_ref_aabb,
+                                                                                 new_prim_ref_centroid);
+                        }
                     }
             }
 
-            node->right_node_->aabb_ = sbvh_best_split_plane_list[sbvh_best_event].right_aabb_;
-
             node->right_node_->right_node_ = nullptr;
             node->right_node_->left_node_ = nullptr;
+
+            node->primitive_ref_list_.reset();
 
             splitNode(node->left_node_, root_aabb_area, ident + " .", "Spatial Split", child_side + "->L");
             splitNode(node->right_node_, root_aabb_area, ident + " .", "Spatial Split", child_side + "->R");
         }
     }
-
-    //exit(0);
-
-/*    if ( best_axis == -1 ) // This is a leaf node
-    {
-        primitives_inserted_ += node->primitive_ref_list_->size();
-        std::stringstream progress_stream;
-        progress_stream << "\r  SBVH building progress ............: "
-                        << std::fixed << std::setw( 6 )
-                        << std::setprecision( 2 )
-                        << 100.0f * static_cast< float >( primitives_inserted_ ) / primitives_.size()
-                        << "%";
-        std::clog << progress_stream.str();
-    } else { // This is an inner node
-        // Make inner node with best_axis / best_event
-        switch (best_axis) {
-            case 1:
-                std::sort(node->primitive_ref_list_->begin(), node->primitive_ref_list_->end(), Comparator::sortInX);
-                break;
-            case 2:
-                std::sort(node->primitive_ref_list_->begin(), node->primitive_ref_list_->end(), Comparator::sortInY);
-                break;
-            case 3:
-                std::sort(node->primitive_ref_list_->begin(), node->primitive_ref_list_->end(), Comparator::sortInZ);
-                break;
-        }
-
-        node->left_node_ = SBVHNode::UniquePtr(new SBVHNode());
-        node->left_node_->primitive_ref_list_ =
-            SBVHNode::PrimitiveRefListUniquePtr(
-                new std::vector<PrimitiveRef>(node->primitive_ref_list_->begin(),
-                                              node->primitive_ref_list_->begin() + best_event));
-
-        for ( long int i = 0; i < node->left_node_->primitive_ref_list_->size(); ++i) {
-            if ( !i )
-                node->left_node_->aabb_ = (*node->left_node_->primitive_ref_list_)[i].aabb_;
-            else
-                node->left_node_->aabb_ = node->left_node_->aabb_ + (*node->left_node_->primitive_ref_list_)[i].aabb_;
-        }
-        node->left_node_->right_node_ = nullptr;
-        node->left_node_->left_node_ = nullptr;
-
-        node->right_node_ = SBVHNode::UniquePtr(new SBVHNode());
-        node->right_node_->primitive_ref_list_ =
-            SBVHNode::PrimitiveRefListUniquePtr(
-                new std::vector<PrimitiveRef>(node->primitive_ref_list_->begin() + best_event,
-                                              node->primitive_ref_list_->end()));
-
-        for ( long int i = 0; i < node->right_node_->primitive_ref_list_->size(); ++i) {
-            if ( !i )
-                node->right_node_->aabb_ = (*node->right_node_->primitive_ref_list_)[i].aabb_;
-            else
-                node->right_node_->aabb_ = node->right_node_->aabb_ + (*node->right_node_->primitive_ref_list_)[i].aabb_;
-        }
-        node->right_node_->right_node_ = nullptr;
-        node->right_node_->left_node_ = nullptr;
-
-        splitNode(node->left_node_, root_aabb_area);
-        splitNode(node->right_node_, root_aabb_area);
-    }*/
 }
 
 bool SBVH::traverse(const SBVHNode::UniquePtr& node,
@@ -597,7 +542,7 @@ bool SBVH::traverse(const SBVHNode::UniquePtr& node,
 {
     bool primitive_intersect = false;
 
-#define NO_LEAF_TRI_BOX
+//#define NO_LEAF_TRI_BOX
 
 #ifdef NO_LEAF_TRI_BOX
 

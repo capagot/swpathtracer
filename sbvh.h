@@ -15,11 +15,12 @@ class SBVH
 {
 public:
     struct PrimitiveRef {
-        PrimitiveRef(long int id, const AABB& aabb) : id_(id),
-                                                      aabb_(aabb) {}
-        long int id_;           // index of the primitive in the actual primitive list
-        glm::vec3 centroid_;    // primitive centroid after the clipping against current node AABB
-        AABB aabb_;             // AABB of the primitive after the clipping against current node AABB
+        PrimitiveRef(long int id, const AABB& aabb, const glm::vec3& centroid) : id_(id),
+                                                      aabb_(aabb),
+                                                      poly_centroid_(centroid) {}
+        long int id_;           // index of the actual primitive
+        AABB aabb_;             // polygon AABB
+        glm::vec3 poly_centroid_;    // polygon centroid (polygon = the primitive clipped against node AABBs)
     };
 
     struct SBVHNode {
@@ -63,15 +64,18 @@ private:
 
     struct Comparator {
         static bool sortInX(const PrimitiveRef& a, const PrimitiveRef& b) {
-            return a.aabb_.getCentroid().x < b.aabb_.getCentroid().x;
+            //return a.aabb_.getCentroid().x < b.aabb_.getCentroid().x;
+            return a.poly_centroid_.x < b.poly_centroid_.x;
         }
 
         static bool sortInY(const PrimitiveRef& a, const PrimitiveRef& b) {
-            return a.aabb_.getCentroid().y < b.aabb_.getCentroid().y;
+            //return a.aabb_.getCentroid().y < b.aabb_.getCentroid().y;
+            return a.poly_centroid_.y < b.poly_centroid_.y;
         }
 
         static bool sortInZ(const PrimitiveRef& a, const PrimitiveRef& b) {
-            return a.aabb_.getCentroid().z < b.aabb_.getCentroid().z;
+            //return a.aabb_.getCentroid().z < b.aabb_.getCentroid().z;
+            return a.poly_centroid_.z < b.poly_centroid_.z;
         }
     };
 

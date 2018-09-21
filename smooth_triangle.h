@@ -23,10 +23,20 @@ public:
                     IntersectionRecord &intersection_record );
 
     //AABB computeSBVHAABB(float p0, float p1, int axis);
-    bool computeSBVHAABB(float min_x, float max_x, float min_y, float max_y,  float min_z, float max_z,  int axis, AABB& aabb);
+    bool computeSBVHAABB(float min_x,
+                         float max_x,
+                         float min_y,
+                         float max_y,
+                         float min_z,
+                         float max_z,
+                         int axis,
+                         AABB& aabb,
+                         glm::vec3& centroid);
 
 
     AABB getAABB( void ) const;
+
+    glm::vec3 getCentroid( void ) const;
 
     virtual void printData( void ) const;
 

@@ -29,6 +29,19 @@ public:
 
     float getArea( void ) const;
 
+    bool getIntersection(const AABB& aabb, AABB& result_aabb) const {
+        bool result = false;
+
+        if ((aabb.min_[0] < max_[0]) && (aabb.max_[0] > min_[0]) &&
+            (aabb.min_[1] < max_[1]) && (aabb.max_[1] > min_[1]) &&
+            (aabb.min_[2] < max_[2]) && (aabb.max_[2] > min_[2])) {
+            result = true;
+            result_aabb = AABB(glm::max(min_, aabb.min_), glm::min(max_, aabb.max_));
+        }
+
+        return result;
+    }
+
     glm::vec3 getCentroid( void ) const;
 
     bool intersect( const Ray &ray ) const;

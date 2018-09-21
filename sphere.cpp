@@ -53,7 +53,15 @@ bool Sphere::intersect( const Ray &ray,
 }
 */
 
-bool Sphere::computeSBVHAABB(float min_x, float max_x, float min_y, float max_y,  float min_z, float max_z,  int axis, AABB& aabb) {
+bool Sphere::computeSBVHAABB(float min_x,
+                             float max_x,
+                             float min_y,
+                             float max_y,
+                             float min_z,
+                             float max_z,
+                             int axis,
+                             AABB& aabb,
+                             glm::vec3& centroid) {
     return false;
 }
 
@@ -66,6 +74,10 @@ AABB Sphere::getAABB( void ) const
     aabb.centroid_ = center_;
 
     return aabb;
+}
+
+glm::vec3 Sphere::getCentroid( void ) const {
+    return center_;
 }
 
 void Sphere::printData( void ) const
