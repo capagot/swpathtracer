@@ -85,7 +85,7 @@ local mat_copper = {
     emission = { 0, 0, 0 }
 }
 
-
+--[[
 -- back wall
 t1 = triangle{
     vertices = {

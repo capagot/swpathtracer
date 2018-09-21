@@ -67,8 +67,9 @@ void RayCaster::integrate( void )
 
 
         std::cout << "\n\nactual max_t: " << max_t << "\n";
+        //max_t = 572.0f;
         //max_t = 895.0f;
-        //max_t = 161.0f;
+        max_t = 153.0f;
 
     std::cout << "\n---------> Max Intersect/ray: " << max_t << "\n\n";
 

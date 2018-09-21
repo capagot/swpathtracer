@@ -171,24 +171,6 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
     // spatial split evaluation
     ///////////////////////////////////////////////////////////////////////////
 
-/*    constexpr int kApha = 0.5f;
-
-    float lambda;
-
-    if (best_event != -1) {
-        AABB aux_aabb;
-        if (best_left_aabb.getIntersection(best_right_aabb, aux_aabb)) {
-            lambda = aux_aabb.getArea();
-            if ((lambda / root_aabb_area) > kAlpha) {
-                //compute spatial split
-
-
-
-                
-            }
-        }
-    }*/
-
     constexpr int kBinListSize = 32;
 
     float sbvh_best_cost = cost_intersec_tri_ * node->primitive_ref_list_->size();
@@ -224,164 +206,191 @@ void SBVH::splitNode(SBVHNode::UniquePtr& node,
     std::vector<Bin> sbvh_best_bin_list;
 
 
-    if (node->primitive_ref_list_->size() >= 32) {
-        // ugly... but works for the moment...
-        float min_size = 1.0f;
-        std::vector<int> valid_axis;
-        if ((node->aabb_.max_[0] - node->aabb_.min_[0]) > min_size)
-            valid_axis.push_back(0);
 
-        if ((node->aabb_.max_[1] - node->aabb_.min_[1]) > min_size)
-            valid_axis.push_back(1);
+    //constexpr int kAlpha = 0.00001f;
+    constexpr int kAlpha = 0.00001f;
 
-        if ((node->aabb_.max_[2] - node->aabb_.min_[2]) > min_size)
-            valid_axis.push_back(2);
+    float lambda;
 
-        for (int axis_idx = 0; axis_idx < valid_axis.size(); ++axis_idx) {
-            int axis = valid_axis[axis_idx];
+    if (best_event != -1) {
+        AABB aux_aabb;
+        if (best_left_aabb.getIntersection(best_right_aabb, aux_aabb)) {
+            lambda = aux_aabb.getArea();
+            if ((lambda / root_aabb_area) > kAlpha) {
+                //compute spatial split
 
-            std::vector<SplitPlane> split_plane_list(kBinListSize + 1);
-            std::vector<Bin> bin_list(kBinListSize);
-            float span = node->aabb_.max_[axis] - node->aabb_.min_[axis];
-            float bin_width = span / static_cast<float>(kBinListSize);
 
-            // set up the split plane list
-            for (int i=0; i<=bin_list.size(); ++i) {
-                split_plane_list[i].offset_ = node->aabb_.min_[axis] + i * bin_width;
-                split_plane_list[i].left_bin_ = (i % (kBinListSize + 1)) - 1;
-                split_plane_list[i].right_bin_ = ((i + 1) % (kBinListSize + 1)) - 1;
-            }
+                if (node->primitive_ref_list_->size() >= 1) {
+                    // ugly... but works for the moment...
+                    //float min_size = 0.01f;
+                    std::vector<int> valid_axis;
+                    //if ((node->aabb_.max_[0] - node->aabb_.min_[0]) > min_size)
+                    //    valid_axis.push_back(0);
 
-            // set up the bin list
-            for (int i=0; i<bin_list.size(); ++i) {
-                bin_list[i].left_split_plane_id_ = i;
-                bin_list[i].right_split_plane_id_ = i + 1;
-            }
+                    //if ((node->aabb_.max_[1] - node->aabb_.min_[1]) > min_size)
+                    //    valid_axis.push_back(1);
 
-            // Chop each primitive against the bin and update the bin AABB
-            for (long int i = 0; i < node->primitive_ref_list_->size(); ++i) {
-                // compute the entry/exit point of the primitive over the bin list
-                int in_bin = static_cast<int>(((*node->primitive_ref_list_)[i].aabb_.min_[axis] - node->aabb_.min_[axis]) / (span + 0.00001f) * kBinListSize);
-                int out_bin = static_cast<int>(((*node->primitive_ref_list_)[i].aabb_.max_[axis] - node->aabb_.min_[axis]) / (span + 0.00001f) * kBinListSize);
+                    //if ((node->aabb_.max_[2] - node->aabb_.min_[2]) > min_size)
+                    //    valid_axis.push_back(2);
 
-                bin_list[in_bin].in_primitive_refs_.push_back(i);
-                bin_list[out_bin].out_primitive_refs_.push_back(i);
+                    valid_axis.push_back(0);
+                    valid_axis.push_back(1);
+                    valid_axis.push_back(2);
 
-                // update the bin's AABB
-                for (int k = in_bin; k <= out_bin; ++k) {
-                        AABB chopped_primitive_aabb;
-                        glm::vec3 dummy_centroid;
+                    for (int axis_idx = 0; axis_idx < valid_axis.size(); ++axis_idx) {
+                        int axis = valid_axis[axis_idx];
 
-                        if (axis == 0)
-                            if (primitives_[(*node->primitive_ref_list_)[i].id_]->computeSBVHAABB(
-                                                                           split_plane_list[bin_list[k].left_split_plane_id_].offset_,
-                                                                           split_plane_list[bin_list[k].right_split_plane_id_].offset_,
-                                                                           node->aabb_.min_.y,
-                                                                           node->aabb_.max_.y,
-                                                                           node->aabb_.min_.z,
-                                                                           node->aabb_.max_.z,
-                                                                           axis,
-                                                                           chopped_primitive_aabb,
-                                                                           dummy_centroid))
-                                if (!bin_list[k].has_aabb_) {
-                                    bin_list[k].aabb_ = chopped_primitive_aabb;
-                                    bin_list[k].has_aabb_ = true;
-                                } else
-                                    bin_list[k].aabb_ = bin_list[k].aabb_ + chopped_primitive_aabb;
+                        std::vector<SplitPlane> split_plane_list(kBinListSize + 1);
+                        std::vector<Bin> bin_list(kBinListSize);
+                        float span = node->aabb_.max_[axis] - node->aabb_.min_[axis];
+                        float bin_width = span / static_cast<float>(kBinListSize);
 
-                        if (axis == 1)
-                            if (primitives_[(*node->primitive_ref_list_)[i].id_]->computeSBVHAABB(
-                                                                           node->aabb_.min_.x,
-                                                                           node->aabb_.max_.x,
-                                                                           split_plane_list[bin_list[k].left_split_plane_id_].offset_,
-                                                                           split_plane_list[bin_list[k].right_split_plane_id_].offset_,
-                                                                           node->aabb_.min_.z,
-                                                                           node->aabb_.max_.z,
-                                                                           axis,
-                                                                           chopped_primitive_aabb,
-                                                                           dummy_centroid))
-                                if (!bin_list[k].has_aabb_) {
-                                    bin_list[k].aabb_ = chopped_primitive_aabb;
-                                    bin_list[k].has_aabb_ = true;
-                                } else
-                                    bin_list[k].aabb_ = bin_list[k].aabb_ + chopped_primitive_aabb;
+                        // set up the split plane list
+                        for (int i=0; i<=bin_list.size(); ++i) {
+                            split_plane_list[i].offset_ = node->aabb_.min_[axis] + i * bin_width;
+                            split_plane_list[i].left_bin_ = (i % (kBinListSize + 1)) - 1;
+                            split_plane_list[i].right_bin_ = ((i + 1) % (kBinListSize + 1)) - 1;
+                        }
 
-                        if (axis == 2)
-                            if (primitives_[(*node->primitive_ref_list_)[i].id_]->computeSBVHAABB(
-                                                                           node->aabb_.min_.x,
-                                                                           node->aabb_.max_.x,
-                                                                           node->aabb_.min_.y,
-                                                                           node->aabb_.max_.y,
-                                                                           split_plane_list[bin_list[k].left_split_plane_id_].offset_,
-                                                                           split_plane_list[bin_list[k].right_split_plane_id_].offset_,
-                                                                           axis,
-                                                                           chopped_primitive_aabb,
-                                                                           dummy_centroid))
-                                if (!bin_list[k].has_aabb_) {
-                                    bin_list[k].aabb_ = chopped_primitive_aabb;
-                                    bin_list[k].has_aabb_ = true;
-                                } else
-                                    bin_list[k].aabb_ = bin_list[k].aabb_ + chopped_primitive_aabb;
-                }
-            }
+                        // set up the bin list
+                        for (int i=0; i<bin_list.size(); ++i) {
+                            bin_list[i].left_split_plane_id_ = i;
+                            bin_list[i].right_split_plane_id_ = i + 1;
+                        }
 
-            // Compute AABB area at the left of each split
-            AABB aux_aabb;
-            for (int i = 0; i < split_plane_list.size(); ++i) {
-                if (!i) {
-                    split_plane_list[i].left_area_ = std::numeric_limits<float>::infinity();
-                    split_plane_list[i].num_left_prim_refs_ = 0;
-                } else {
-                    if (bin_list[split_plane_list[i].left_bin_].has_aabb_)
-                        if (i==1)
-                            aux_aabb = bin_list[split_plane_list[i].left_bin_].aabb_;
-                        else
-                            aux_aabb = aux_aabb + bin_list[split_plane_list[i].left_bin_].aabb_;
+                        // Chop each primitive against the bin and update the bin AABB
+                        for (long int i = 0; i < node->primitive_ref_list_->size(); ++i) {
+                            // compute the entry/exit point of the primitive over the bin list
+                            int in_bin = static_cast<int>(((*node->primitive_ref_list_)[i].aabb_.min_[axis] - node->aabb_.min_[axis]) / (span + 0.00001f) * kBinListSize);
+                            int out_bin = static_cast<int>(((*node->primitive_ref_list_)[i].aabb_.max_[axis] - node->aabb_.min_[axis]) / (span + 0.00001f) * kBinListSize);
 
-                    split_plane_list[i].left_area_ = aux_aabb.getArea();
-                    split_plane_list[i].left_aabb_ = aux_aabb;
-                    split_plane_list[i].num_left_prim_refs_ = split_plane_list[i-1].num_left_prim_refs_ + bin_list[split_plane_list[i].left_bin_].in_primitive_refs_.size();
-                }
-            }
+                            bin_list[in_bin].in_primitive_refs_.push_back(i);
+                            bin_list[out_bin].out_primitive_refs_.push_back(i);
 
-            // Compute AABB area at the right of each split
-            for (int i = split_plane_list.size() - 1; i >=0 ; --i) {
-                if (i == split_plane_list.size() - 1) {
-                    split_plane_list[i].right_area_ = std::numeric_limits<float>::infinity();
-                    split_plane_list[i].num_right_prim_refs_ = 0;
-                } else {
-                    if (bin_list[split_plane_list[i].right_bin_].has_aabb_)
-                        if (i == (split_plane_list.size() - 2))
-                            aux_aabb = bin_list[split_plane_list[i].right_bin_].aabb_;
-                        else
-                            aux_aabb = aux_aabb + bin_list[split_plane_list[i].right_bin_].aabb_;
+                            // update the bin's AABB
+                            for (int k = in_bin; k <= out_bin; ++k) {
+                                    AABB chopped_primitive_aabb;
+                                    glm::vec3 dummy_centroid;
 
-                    split_plane_list[i].right_area_ = aux_aabb.getArea();
-                    split_plane_list[i].right_aabb_ = aux_aabb;
-                    split_plane_list[i].num_right_prim_refs_ = split_plane_list[i+1].num_right_prim_refs_ + bin_list[split_plane_list[i].right_bin_].out_primitive_refs_.size();
+                                    if (axis == 0)
+                                        if (primitives_[(*node->primitive_ref_list_)[i].id_]->computeSBVHAABB(
+                                                                                       split_plane_list[bin_list[k].left_split_plane_id_].offset_,
+                                                                                       split_plane_list[bin_list[k].right_split_plane_id_].offset_,
+                                                                                       node->aabb_.min_.y,
+                                                                                       node->aabb_.max_.y,
+                                                                                       node->aabb_.min_.z,
+                                                                                       node->aabb_.max_.z,
+                                                                                       axis,
+                                                                                       chopped_primitive_aabb,
+                                                                                       dummy_centroid))
+                                            if (!bin_list[k].has_aabb_) {
+                                                bin_list[k].aabb_ = chopped_primitive_aabb;
+                                                bin_list[k].has_aabb_ = true;
+                                            } else
+                                                bin_list[k].aabb_ = bin_list[k].aabb_ + chopped_primitive_aabb;
 
-                    float this_cost = SAH(split_plane_list[i].num_left_prim_refs_,
-                                          split_plane_list[i].left_area_,
-                                          split_plane_list[i].num_right_prim_refs_,
-                                          split_plane_list[i].right_area_,
-                                          root_aabb_area);
+                                    if (axis == 1)
+                                        if (primitives_[(*node->primitive_ref_list_)[i].id_]->computeSBVHAABB(
+                                                                                       node->aabb_.min_.x,
+                                                                                       node->aabb_.max_.x,
+                                                                                       split_plane_list[bin_list[k].left_split_plane_id_].offset_,
+                                                                                       split_plane_list[bin_list[k].right_split_plane_id_].offset_,
+                                                                                       node->aabb_.min_.z,
+                                                                                       node->aabb_.max_.z,
+                                                                                       axis,
+                                                                                       chopped_primitive_aabb,
+                                                                                       dummy_centroid))
+                                            if (!bin_list[k].has_aabb_) {
+                                                bin_list[k].aabb_ = chopped_primitive_aabb;
+                                                bin_list[k].has_aabb_ = true;
+                                            } else
+                                                bin_list[k].aabb_ = bin_list[k].aabb_ + chopped_primitive_aabb;
 
-                    split_plane_list[i].sah_cost_ = this_cost;
+                                    if (axis == 2)
+                                        if (primitives_[(*node->primitive_ref_list_)[i].id_]->computeSBVHAABB(
+                                                                                       node->aabb_.min_.x,
+                                                                                       node->aabb_.max_.x,
+                                                                                       node->aabb_.min_.y,
+                                                                                       node->aabb_.max_.y,
+                                                                                       split_plane_list[bin_list[k].left_split_plane_id_].offset_,
+                                                                                       split_plane_list[bin_list[k].right_split_plane_id_].offset_,
+                                                                                       axis,
+                                                                                       chopped_primitive_aabb,
+                                                                                       dummy_centroid))
+                                            if (!bin_list[k].has_aabb_) {
+                                                bin_list[k].aabb_ = chopped_primitive_aabb;
+                                                bin_list[k].has_aabb_ = true;
+                                            } else
+                                                bin_list[k].aabb_ = bin_list[k].aabb_ + chopped_primitive_aabb;
+                            }
+                        }
 
-                    if (this_cost < sbvh_best_cost) {
-                        sbvh_best_cost = this_cost;
-                        sbvh_best_event = i;
-                        sbvh_best_axis = axis;
+                        // Compute AABB area at the left of each split
+                        AABB aux_aabb;
+                        for (int i = 0; i < split_plane_list.size(); ++i) {
+                            if (!i) {
+                                split_plane_list[i].left_area_ = std::numeric_limits<float>::infinity();
+                                split_plane_list[i].num_left_prim_refs_ = 0;
+                            } else {
+                                if (bin_list[split_plane_list[i].left_bin_].has_aabb_)
+                                    if (i==1)
+                                        aux_aabb = bin_list[split_plane_list[i].left_bin_].aabb_;
+                                    else
+                                        aux_aabb = aux_aabb + bin_list[split_plane_list[i].left_bin_].aabb_;
+
+                                split_plane_list[i].left_area_ = aux_aabb.getArea();
+                                split_plane_list[i].left_aabb_ = aux_aabb;
+                                split_plane_list[i].num_left_prim_refs_ = split_plane_list[i-1].num_left_prim_refs_ + bin_list[split_plane_list[i].left_bin_].in_primitive_refs_.size();
+                            }
+                        }
+
+                        // Compute AABB area at the right of each split
+                        for (int i = split_plane_list.size() - 1; i >=0 ; --i) {
+                            if (i == split_plane_list.size() - 1) {
+                                split_plane_list[i].right_area_ = std::numeric_limits<float>::infinity();
+                                split_plane_list[i].num_right_prim_refs_ = 0;
+                            } else {
+                                if (bin_list[split_plane_list[i].right_bin_].has_aabb_)
+                                    if (i == (split_plane_list.size() - 2))
+                                        aux_aabb = bin_list[split_plane_list[i].right_bin_].aabb_;
+                                    else
+                                        aux_aabb = aux_aabb + bin_list[split_plane_list[i].right_bin_].aabb_;
+
+                                split_plane_list[i].right_area_ = aux_aabb.getArea();
+                                split_plane_list[i].right_aabb_ = aux_aabb;
+                                split_plane_list[i].num_right_prim_refs_ = split_plane_list[i+1].num_right_prim_refs_ + bin_list[split_plane_list[i].right_bin_].out_primitive_refs_.size();
+
+                                float this_cost = SAH(split_plane_list[i].num_left_prim_refs_,
+                                                      split_plane_list[i].left_area_,
+                                                      split_plane_list[i].num_right_prim_refs_,
+                                                      split_plane_list[i].right_area_,
+                                                      root_aabb_area);
+
+                                split_plane_list[i].sah_cost_ = this_cost;
+
+                                if (this_cost < sbvh_best_cost) {
+                                    sbvh_best_cost = this_cost;
+                                    sbvh_best_event = i;
+                                    sbvh_best_axis = axis;
+                                }
+                            }
+                        }
+
+                        if (sbvh_best_axis == axis) {
+                            sbvh_best_split_plane_list = split_plane_list;
+                            sbvh_best_bin_list = bin_list;
+                        }
                     }
                 }
-            }
 
-            if (sbvh_best_axis == axis) {
-                sbvh_best_split_plane_list = split_plane_list;
-                sbvh_best_bin_list = bin_list;
+
+                
             }
         }
     }
+
+
+
 
 
 
