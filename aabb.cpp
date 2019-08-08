@@ -1,11 +1,23 @@
 #include "aabb.h"
 
-float AABB::getArea( void ) const
-{
+float AABB::getArea( void ) const {
     float l = ( max_.x - min_.x );
     float m = ( max_.y - min_.y );
     float n = ( max_.z - min_.z );
     return 2.0f * ( l * ( m + n ) + m * n );
+}
+
+float AABB::contains(const AABB& aabb) const {
+    return (min_.x <= aabb.min_.x) &&
+           (max_.x >= aabb.max_.x) &&
+           (min_.y <= aabb.min_.y) &&
+           (max_.y >= aabb.max_.y) &&
+           (min_.z <= aabb.min_.z) &&
+           (max_.z >= aabb.max_.z);
+}
+
+glm::vec3 AABB::getCentroid( void ) const {
+    return glm::vec3(min_ + max_) * 0.5f;
 }
 
 bool AABB::intersect( const Ray &ray ) const
@@ -26,32 +38,36 @@ bool AABB::intersect( const Ray &ray ) const
     float divy;
     float divz;
 
-    divx = 1.0f / ray.direction_.x;
+    DISABLE_FEEXCEPTION_HANDLING();
+
+    divx = 1.0f / ray.getDirection().x;
     if ( divx >= 0.0f )
     {
-        tmin = ( min_.x - ray.origin_.x ) * divx;
-        tmax = ( max_.x - ray.origin_.x ) * divx;
+        tmin = ( min_.x - ray.getOrigin().x ) * divx;
+        tmax = ( max_.x - ray.getOrigin().x ) * divx;
     }
     else
     {
-        tmin = ( max_.x - ray.origin_.x ) * divx;
-        tmax = ( min_.x - ray.origin_.x ) * divx;
+        tmin = ( max_.x - ray.getOrigin().x ) * divx;
+        tmax = ( min_.x - ray.getOrigin().x ) * divx;
     }
 
-    divy = 1.0f / ray.direction_.y;
+    divy = 1.0f / ray.getDirection().y;
     if ( divy >= 0.0f )
     {
-        tymin = ( min_.y - ray.origin_.y ) * divy;
-        tymax = ( max_.y - ray.origin_.y ) * divy;
+        tymin = ( min_.y - ray.getOrigin().y ) * divy;
+        tymax = ( max_.y - ray.getOrigin().y ) * divy;
     }
     else
     {
-        tymin = ( max_.y - ray.origin_.y ) * divy;
-        tymax = ( min_.y - ray.origin_.y ) * divy;
+        tymin = ( max_.y - ray.getOrigin().y ) * divy;
+        tymax = ( min_.y - ray.getOrigin().y ) * divy;
     }
 
-    if ( ( tmin > tymax ) || ( tymin > tmax ) )
+    if ( ( tmin > tymax ) || ( tymin > tmax ) ) {
+        ENABLE_FEEXCEPTION_HANDLING();
         return false;
+    }
 
     if ( tymin > tmin )
         tmin = tymin;
@@ -59,20 +75,22 @@ bool AABB::intersect( const Ray &ray ) const
     if ( tymax < tmax )
         tmax = tymax;
 
-    divz = 1.0f / ray.direction_.z;
+    divz = 1.0f / ray.getDirection().z;
     if ( divz >= 0.0f )
     {
-        tzmin = ( min_.z - ray.origin_.z ) * divz;
-        tzmax = ( max_.z - ray.origin_.z ) * divz;
+        tzmin = ( min_.z - ray.getOrigin().z ) * divz;
+        tzmax = ( max_.z - ray.getOrigin().z ) * divz;
     }
     else
     {
-        tzmin = ( max_.z - ray.origin_.z ) * divz;
-        tzmax = ( min_.z - ray.origin_.z ) * divz;
+        tzmin = ( max_.z - ray.getOrigin().z ) * divz;
+        tzmax = ( min_.z - ray.getOrigin().z ) * divz;
     }
 
-    if ( ( tmin > tzmax ) || ( tzmin > tmax ) )
+    if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) {
+        ENABLE_FEEXCEPTION_HANDLING();
         return false;
+    }
 
     if ( tzmin > tmin )
         tmin = tzmin;
@@ -81,9 +99,10 @@ bool AABB::intersect( const Ray &ray ) const
         tmax  = tzmax;
 
     //intersection_record.t_ = tmax.x;
-    //intersection_record.position_ = ray.origin_ + ray.direction_ * t;
+    //intersection_record.position_ = ray.getOrigin() + ray.getDirection() * t;
     //intersection_record.normal_ = normal_;
     //intersection_record.material_ = material_;
 
+    ENABLE_FEEXCEPTION_HANDLING();
     return true;//tmax > 0.00001f;
 }

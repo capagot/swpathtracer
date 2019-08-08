@@ -1,47 +1,21 @@
-#ifndef SMOOTH_TRIANGLE_H_
-#define SMOOTH_TRIANGLE_H_
+#ifndef SMOOTH_TRIANGLE_H
+#define SMOOTH_TRIANGLE_H
 
-#include <glm/glm.hpp>
-#include "primitive.h"
-#include "ray.h"
+#include "triangle.h"
 
-class SmoothTriangle : public Primitive
-{
-public:
+class SmoothTriangle : public Triangle {
+   public:
+    SmoothTriangle(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &n0,
+                   const glm::vec3 &n1, const glm::vec3 &n2, long unsigned int material_id);
 
-    SmoothTriangle( void );
+    glm::vec3 getNormal(float u, float v) {
+        return glm::normalize(n0_ * (1.0f - u - v) + n1_ * u + n2_ * v);
+    }
 
-    SmoothTriangle( const glm::vec3 &v0,
-                    const glm::vec3 &v1,
-                    const glm::vec3 &v2,
-                    const glm::vec3 &n0,
-                    const glm::vec3 &n1,
-                    const glm::vec3 &n2,
-                    long unsigned int material_id );
-
-    bool intersect( const Ray &ray,
-                    IntersectionRecord &intersection_record );
-
-    AABB getAABB( void ) const;
-
-    virtual void printData( void ) const;
-
-    glm::vec3 v0_;
-
-    glm::vec3 v1_;
-
-    glm::vec3 v2_;
-
+   private:
     glm::vec3 n0_;
-
     glm::vec3 n1_;
-
     glm::vec3 n2_;
-
-private:
-
-    static const float kIntersectionTestEpsilon_;
 };
 
-#endif /* SMOOTH_TRIANGLE_H_ */
-
+#endif  // SMOOTH_TRIANGLE_H

@@ -1,175 +1,122 @@
 #include "pathtracer.h"
 #include "timer.h"
 
-PathTracer::PathTracer( Camera &camera,
-                        const Scene &scene,
-                        const glm::vec3 background_color,
-                        PathTerminationCriterion path_termination_criterion,
-                        unsigned int path_length,
-                        Sampler &sampler,
-                        Buffer &buffer,
-                        RNG< std::uniform_real_distribution, float, std::mt19937 > &rng ) :
-        Integrator{ camera,
-                    scene,
-                    background_color,
-                    path_termination_criterion,
-                    path_length,
-                    sampler,
-                    buffer },
-        rng_( rng )
-{
-    int num_threads = std::max( 1, omp_get_max_threads() );
-    for( int thread_id = 0; thread_id < num_threads; thread_id++ )
-    {
-        num_rays_.push_back( 0 );
-        num_intersection_tests_.push_back( 0 );
-        num_intersections_.push_back( 0 );
+PathTracer::PathTracer(Camera& camera, const Scene& scene, PathTerminationCriterion path_termination_criterion,
+                       int path_length, std::unique_ptr<PixelSampler> pixel_sampler,
+                       PRNG<std::uniform_real_distribution, float, std::mt19937>& prng)
+    : Integrator(camera, scene, Integrator::Type::PATHTRACER, std::move(pixel_sampler)),
+      path_length_(path_length),
+      path_termination_criterion_(path_termination_criterion),
+      prng_(prng) {}
+
+glm::vec3 PathTracer::traceRay(const Ray& world_ray, int depth, std::size_t& num_intersection_tests,
+                               std::size_t& num_intersections) {
+    IntersectionRecord intersection_record;
+    intersection_record.t_ = std::numeric_limits<float>::infinity();
+    glm::vec3 radiance(0.0f);
+
+    if ((path_termination_criterion_ == PathTerminationCriterion::MAX_DEPTH) && (depth >= path_length_))
+        return glm::vec3(0.0f);  // returns zero radiance
+
+    if (!scene_.intersect(world_ray, intersection_record, num_intersection_tests, num_intersections)) {
+        if (!depth)  // If it is a primary ray (depth == 0), returns the background color
+            return scene_.getBackgroundColor();
+        else  // If it is not a primary ray, returns zero radiance
+            return glm::vec3(0.0f);
     }
+
+    ONB local_frame(intersection_record.normal_);
+
+    glm::vec3 local_wo = glm::normalize(local_frame.getWorldToLocalMatrix() * -world_ray.getDirection());
+    glm::vec3 local_wi;
+    float pdf;
+    glm::vec3 bsdf;
+    glm::vec3 reflectance;
+
+    scene_.getMaterial(intersection_record.material_id_).evalBSDF(local_wo, bsdf, reflectance, pdf, local_wi);
+    glm::vec3 world_wi = local_frame.getLocalToWorldMatrix() * local_wi;
+    Ray world_new_ray = Ray(intersection_record.position_ + world_wi * 1e-3f, world_wi);
+    glm::vec3 emission = scene_.getMaterial(intersection_record.material_id_).getEmission();
+
+    float k = std::max(std::max(reflectance[0], reflectance[1]), reflectance[2]);
+
+    if ((path_termination_criterion_ == PathTerminationCriterion::RUSSIAN_ROULETTE) && (depth >= path_length_)) {
+        if ((prng_() < k) &&
+            (depth < 1000))  // if RR gets crazy and does not stop, force stopping it after 1000 bounces.
+            bsdf = bsdf / k;
+        else
+            return emission;
+    }
+
+    // Rendering Equation estimator
+    radiance =
+        emission +
+        (bsdf * traceRay(world_new_ray, depth + 1, num_intersection_tests, num_intersections) * local_wi.y) / pdf;
+
+    return radiance;
 }
 
-void PathTracer::integrate( void )
-{
-    // TODO: make t (time) a data member
-    Timer t;
-    t.start();
+void PathTracer::render() {
+    Timer timer;
+    int_tests_count_ = 0;
+    int_count_ = 0;
+    min_int_tests_count_pp_ = std::numeric_limits<std::size_t>::max();
+    max_int_tests_count_pp_ = 0;
+    min_int_count_pp_ = std::numeric_limits<std::size_t>::max();
+    max_int_count_pp_ = 0;
 
-    #pragma omp parallel for schedule( dynamic, 1 )
+// TODO: just debug... remove....
+#ifndef DEBUG
+    std::cout << "-----------------> " << omp_get_max_threads() << "\n";
+#endif
 
-    for ( std::size_t y = 0; y < buffer_.v_resolution_; y++ )
-    {
-        std::stringstream progress_stream;
-        progress_stream << "\r  progress .........................: "
-                        << std::fixed << std::setw( 6 )
-                        << std::setprecision( 2 )
-                        << 100.0f * y / ( buffer_.v_resolution_ - 1 )
-                        << "%";
+    timer.start();
 
-        int thread_id = omp_get_thread_num();
+    unsigned int x_ini = camera_.getImage().getViewportLeft();
+    unsigned int x_end = x_ini + camera_.getImage().getViewportWidth();
+    unsigned int y_ini = camera_.getImage().getViewportTop();
+    unsigned int y_end = y_ini + camera_.getImage().getViewportHeight();
 
-        std::clog << progress_stream.str();
+#ifndef DEBUG
+#pragma omp parallel for schedule(dynamic, 1) reduction(+ : int_tests_count_, int_count_) reduction(min: min_int_tests_count_pp_, min_int_count_pp_) reduction(max: max_int_tests_count_pp_, max_int_count_pp_)
+#endif
 
-        for ( std::size_t x = 0; x < buffer_.h_resolution_; x++ )
-        {
-            // Generate a set of 2D sampling points with coordinates in the interval
-            // [-0.5f, +0.5f). The instantiated sampler will define the number and
-            // actual sample distribution (regular, uniform,...).
-            sampler_.generateSamplesCoords();
+    for (unsigned int y = y_ini; y < y_end; ++y) {
+        printProgress(y);
 
-            for ( std::size_t samp = 0; samp < sampler_.size(); samp++ )
-            {
-                // Transform a point from the continuous screen space into the
-                // normalized screen space (that ranges from -1.0f to +1.0f along 'x'
-                // and 'y'). The value 0.5f is added to the pixel coordinates in
-                // screen space in order to have the pixel center as the reference
-                // for the sampling points distribution.
-                glm::vec2 pixel_cam_space = glm::vec2{ 2.0f * ( x + 0.5f + sampler_[samp].x ) / buffer_.h_resolution_ - 1.0f,
-                                                       2.0f * ( y + 0.5f + sampler_[samp].y ) / buffer_.v_resolution_ - 1.0f };
+        for (unsigned int x = x_ini; x < x_end; ++x) {
+            std::size_t curr_int_tests_count;
+            std::size_t curr_int_count;
 
-                // Generate the primary ray in world space from the normalized
-                // screen coordinates.
-                Ray ray{ camera_.getWorldSpaceRay( pixel_cam_space ) };
+            for (unsigned int sample = 0; sample < pixel_sampler_->getSPP(); ++sample) {
+                float x_screen = x + pixel_sampler_->getSample(sample).x;
+                float y_screen = y + pixel_sampler_->getSample(sample).y;
 
-                // Trace the ray path.
-                buffer_.buffer_data_[x][y] += integrate_recursive( ray, 0, thread_id );
+                Ray ray = camera_.getRay(x_screen, y_screen);
+                glm::vec3 radiance = traceRay(ray, 0, curr_int_tests_count, curr_int_count);
+
+                camera_.getImage().setPixelValue(x, y, camera_.getImage().getPixelValue(x, y) + radiance);
             }
 
-            // Compute the average radiance that falls onto the pixel (x,y).
-            buffer_.buffer_data_[x][y] /= sampler_.size();
+            camera_.getImage().setPixelValue(
+                x, y, camera_.getImage().getPixelValue(x, y) / static_cast<float>(pixel_sampler_->getSPP()));
+
+            // update integration statistics...
+            int_tests_count_ += curr_int_tests_count;
+            int_count_ += curr_int_count;
+            min_int_tests_count_pp_ = std::min(min_int_tests_count_pp_, curr_int_tests_count);
+            max_int_tests_count_pp_ = std::max(max_int_tests_count_pp_, curr_int_tests_count);
+            min_int_count_pp_ = std::min(min_int_count_pp_, curr_int_count);
+            max_int_count_pp_ = std::max(max_int_count_pp_, curr_int_count);
         }
     }
 
-    std::clog << std::endl;
-
-    t.stop();
-    std::clog << "  total rendering time .............: " << t.getElapsedSeconds() << " sec, " << t.getElapsedNanoSeconds() << " nsec." << std::endl;
+    timer.finish();
+    total_integration_time_ = timer.getElapsedTime();
+    std::cout << "====> Total rendering time: " << total_integration_time_ << " microseconds\n";
 }
 
-glm::vec3 PathTracer::integrate_recursive( const Ray &ray,
-                                            unsigned int depth,
-                                            int thread_id )
-{
-    IntersectionRecord intersection_record;
-    glm::vec3 spectrum{ 0.0f, 0.0f, 0.0f };
-    std::vector< glm::vec3 > w_r;
-    intersection_record.t_ = std::numeric_limits< float >::max();
-
-    if ( ( depth >= path_length_ ) && ( path_termination_criterion_ ==  PathTerminationCriterion::MAX_DEPTH ) )
-        return spectrum;
-
-    if ( !scene_.intersect( ray,
-                            intersection_record,
-                            num_intersection_tests_[ thread_id ],
-                            num_intersections_[ thread_id ] ) )
-    {
-        if ( !depth )
-            return background_color_;
-        else
-            return spectrum;
-    }
-
-    ONB tangent_frame;
-    tangent_frame.setFromV( intersection_record.normal_ );
-
-    glm::mat3x3 tangent_to_universe_space = tangent_frame.getBasisMatrix();
-    glm::mat3x3 universe_to_tangent_space = glm::transpose( tangent_to_universe_space );
-
-    glm::vec3 w_i = universe_to_tangent_space * -ray.direction_;
-
-    scene_.materials_[intersection_record.material_id_]->bsdf_->getNewDirection( w_i, w_r );
-
-    glm::vec3 new_dir = tangent_to_universe_space * w_r[ w_r.size() - 1 ];
-    Ray new_ray{ intersection_record.position_ + new_dir * 0.001f, new_dir };
-
-    glm::vec3 fr = scene_.materials_[intersection_record.material_id_]->bsdf_->fr( w_i, w_r );
-
-    float k = std::max( std::max( fr[0], fr[1] ), fr[2] );
-
-    if ( ( depth >= path_length_ ) && ( path_termination_criterion_ ==  PathTerminationCriterion::RUSSIAN_ROULETTE ) )
-    {
-        // TODO: biased fixed maximum depth set... fix this to be unbiased!!!
-        if ( ( rng_() < k ) && ( depth < 1000 ) )
-            fr *= 1.0f / k; 
-        else
-            return scene_.materials_[intersection_record.material_id_]->emitted_;
-    }
-
-    num_rays_[ thread_id ]++;
-
-    spectrum = scene_.materials_[intersection_record.material_id_]->emitted_ + 
-               fr * 
-               integrate_recursive( new_ray, ++depth, thread_id );// *
-               //w_r[ w_r.size() - 1 ].y;
-
-    return spectrum;
+void PathTracer::saveImageToFile() {
+    camera_.getImage().convertTosRGB();
+    camera_.getImage().saveToFile();
 }
-
-void PathTracer::printInfoPreRendering( void ) const
-{
-    std::cout << "  # of threads .....................: " << omp_get_max_threads() << std::endl;
-    std::cout << "  rendering algorithm ..............: brute force path tracing" << std::endl;
-}
-
-void PathTracer::printInfoPostRendering( void ) const
-{
-    long unsigned int num_rays = 0;
-    long unsigned int num_intersection_tests = 0;
-    long unsigned int num_intersections = 0;
-
-    for ( unsigned int thread_id = 0; thread_id < num_rays_.size(); thread_id++ )
-    {
-        num_rays += num_rays_[thread_id];
-        num_intersection_tests += num_intersection_tests_[thread_id];
-        num_intersections += num_intersections_[thread_id];
-    }
-
-    std::cout << "  total # of rays ..................: " << num_rays << std::endl;
-    std::cout << "  total # of intersection tests ....: " << num_intersection_tests << std::endl;
-    std::cout << "  total # of intersections .........: " << num_intersections
-                                                          << " ( ~"
-                                                          << std::fixed << std::setw( 6 )
-                                                          << std::setprecision( 2 )
-                                                          << static_cast< float >( num_intersections ) / num_intersection_tests * 100.0f
-                                                          << "% )"
-                                                          << std::endl;
-}
-

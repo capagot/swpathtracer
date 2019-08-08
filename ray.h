@@ -1,21 +1,21 @@
-#ifndef RAY_H_
-#define RAY_H_
+#ifndef RAY_H
+#define RAY_H
 
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
 
-class Ray
-{
-public:
+class Ray {
+   public:
+    Ray(const glm::vec3& origin, const glm::vec3& direction);
+    const glm::vec3& getOrigin() const {
+        return origin_;
+    }
+    const glm::vec3& getDirection() const {
+        return direction_;
+    }
 
-    Ray( void );
-
-    Ray( const glm::vec3 &origin,
-         const glm::vec3 &direction );
-
-    glm::vec3 origin_{ 0.0f, 0.0f, 0.0f };
-
-    glm::vec3 direction_{ 0.0f, 0.0f, -1.0f };
+   private:
+    glm::vec3 origin_;
+    glm::vec3 direction_;
 };
 
-#endif /* RAY_H_ */
-
+#endif  // RAY_H

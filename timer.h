@@ -1,31 +1,28 @@
-#ifndef TIMER_H_
-#define TIMER_H_
+#ifndef TIMER_H
+#define TIMER_H
 
+#include <chrono>
+#include <iomanip>
 #include <iostream>
-#include <time.h>
 
-class Timer
-{
-public:
+class Timer {
+   public:
+    Timer(){};
+    void start() {
+        start_time_ = std::chrono::steady_clock::now();
+    }
 
-    void start( void );
+    void finish() {
+        finish_time_ = std::chrono::steady_clock::now();
+    }
 
-    void stop( void );
+    long int getElapsedTime() {
+      return (std::chrono::duration_cast<std::chrono::microseconds>(finish_time_ - start_time_)).count();
+    }
 
-    __time_t getElapsedSeconds( void ) const;
-
-    __syscall_slong_t getElapsedNanoSeconds( void ) const;
-
-private:
-
-    void computeElapsedTime( void );
-
-    struct timespec time_start_;
-
-    struct timespec time_end_;
-
-    struct timespec elapsed_time_;
+   private:
+    std::chrono::steady_clock::time_point start_time_;
+    std::chrono::steady_clock::time_point finish_time_;
 };
 
-#endif /* TIMER_H_ */
-
+#endif  // PROFILER_H

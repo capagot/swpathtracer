@@ -1,43 +1,25 @@
+#include <iostream>
+
 #include "orthographic_camera.h"
 
-OrthographicCamera::OrthographicCamera( void )
-{ }
+OrthographicCamera::OrthographicCamera(const glm::vec3& position, const glm::vec3& look_at, const glm::vec3& up,
+                                       float min_x, float max_x, float min_y, float max_y,
+                                       std::unique_ptr<ImageBuffer> image_buffer)
+    : Camera::Camera(position, look_at, up, std::move(image_buffer), Type::ORTHOGRAPHIC),
+      min_x_(min_x),
+      max_x_(max_x),
+      min_y_(min_y),
+      max_y_(max_y),
+      window_width_(max_x_ - min_x_),
+      window_height_(max_y_ - min_y_),
+      aspect_(static_cast<float>(window_width_) / window_height_),
+      local_upper_left_corner_(min_x_, max_y_, 0.0f),
+      pixel_delta_x_(window_width_ / image_buffer_->getImageWidth()),
+      pixel_delta_y_(window_height_ / image_buffer_->getImageHeight()),
+      worl_ray_direction_(camera_onb_.getLocalToWorldMatrix() * glm::vec3(0.0f, 0.0f, -1.0f)) {}
 
-OrthographicCamera::OrthographicCamera( const float min_x,
-                                        const float max_x,
-                                        const float min_y,
-                                        const float max_y,
-                                        const glm::vec3 &position,
-                                        const glm::vec3 &up_vector,
-                                        const glm::vec3 &look_at ) :
-        Camera::Camera{ position,
-                        up_vector,
-                        look_at },
-        min_x_{ min_x },
-        max_x_{ max_x },
-        min_y_{ min_y },
-        max_y_{ max_y }
-{ }
-
-Ray OrthographicCamera::getWorldSpaceRay( const glm::vec2 &sample_coord ) const
-{
-    float alpha_x = ( sample_coord.x + 1.0f ) * 0.5f;
-    float alpha_y = ( sample_coord.y + 1.0f ) * 0.5f;
-
-    glm::vec3 origin{  ( 1.0f - alpha_x ) * min_x_ + alpha_x * max_x_,
-                      -( ( 1.0f - alpha_y ) * min_y_ + alpha_y * max_y_ ),
-                       0.0f };
-
-    //return Ray{ onb_.m_ * origin + position_, glm::normalize( onb_.m_* glm::vec3{ 0.0f, 0.0f, -1.0f } ) };
-    return Ray{ onb_.getBasisMatrix() * origin + position_, glm::normalize( onb_.getBasisMatrix()* glm::vec3{ 0.0f, 0.0f, -1.0f } ) };
+Ray OrthographicCamera::getRay(float x, float y) const {
+    glm::vec3 local_ray_origin = local_upper_left_corner_ + glm::vec3(x * pixel_delta_x_, y * -pixel_delta_y_, 0.0f);
+    glm::vec3 world_ray_origin = camera_onb_.getLocalToWorldMatrix() * local_ray_origin + position_;
+    return Ray(world_ray_origin, worl_ray_direction_);
 }
-
-void OrthographicCamera::printInfo( void ) const
-{
-    std::clog << "Orthographic Camera Information" << std::endl;
-    std::clog << "-------------------------------" << std::endl;
-
-    std::clog << " [ min_x_ , max_x_ ] ...........: [" << min_x_ << ", " << max_x_ << "]" << std::endl;
-    std::clog << " [ min_y_ , max_y_ ] ...........: [" << min_y_ << ", " << max_y_ << "]" << std::endl;
-}
-

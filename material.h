@@ -1,26 +1,21 @@
-#ifndef MATERIAL_H_
-#define MATERIAL_H_
+#ifndef MATERIAL_H
+#define MATERIAL_H
 
-#include <memory>
+#include <glm/vec3.hpp>
 
-#include "lambertian.h"
-#include "bsdf.h"
+#include "layered_bsdf.h"
 
-class Material
-{
-public:
+class Material {
+   public:
+    Material(const LayeredBSDF& layered_bsdf, const glm::vec3& emission);
+    void evalBSDF(const glm::vec3& local_wo, glm::vec3& bsdf, glm::vec3& reflectance, float& pdf, glm::vec3& local_wi) const;
+    const glm::vec3& getEmission() const {
+        return emission_;
+    }
 
-    using MaterialUniquePtr = std::unique_ptr< Material >;
-
-    Material( void );
-
-    Material( BSDF::BSDFUniquePtr bsdf,
-              const glm::vec3 &emitted );
-
-    BSDF::BSDFUniquePtr bsdf_;
-
-    glm::vec3 emitted_;
+   private:
+    const LayeredBSDF& layered_bsdf_;
+    const glm::vec3& emission_;
 };
 
-#endif /* MATERIAL_H_ */
-
+#endif  // MATERIAL_H

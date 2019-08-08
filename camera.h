@@ -1,47 +1,49 @@
-#ifndef CAMERA_H_
-#define CAMERA_H_
+#ifndef CAMERA_H
+#define CAMERA_H
 
-#include <iostream>
-#include <iomanip>
+#include <memory>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include "image_buffer.h"
 #include "onb.h"
 #include "ray.h"
 
-class Camera
-{
-public:
+class Camera {
+   public:
+    enum class Type { NONE, ORTHOGRAPHIC, PINHOLE };
 
-    Camera( void );
+    Camera(const glm::vec3& position, const glm::vec3& look_at, const glm::vec3& up,
+           std::unique_ptr<ImageBuffer> image_buffer, Type camera_type);
+    virtual ~Camera(){};
+    ImageBuffer& getImage() {
+        return (*image_buffer_.get());
+    };
+    virtual Ray getRay(float x, float y) const = 0;
+    Type getType() const {
+        return type_;
+    }
+    const glm::vec3& getPosition() const {
+        return position_;
+    }
+    const glm::vec3& getLookAt() const {
+        return look_at_;
+    }
+    const glm::vec3& getUp() const {
+        return up_;
+    }
+    const glm::vec3& getDirection() const {
+        return direction_;
+    }
 
-    Camera( const glm::vec3 &position,
-            const glm::vec3 &up,
-            const glm::vec3 &look_at );
-
-    virtual ~Camera( void );
-
-    void setPosition( const glm::vec3 &position );
-
-    void setUp( const glm::vec3 &up );
-
-    void setLookAt( const glm::vec3 &look_at );
-
-    virtual Ray getWorldSpaceRay( const glm::vec2 &sample_coord ) const = 0;
-
-    virtual void printInfo( void ) const = 0;
-
-//private:
-
-    glm::vec3 up_{ 0.0f, 1.0f, 0.0f };   // up vector (usually equal to universe Y axis: [0, 1, 0]).
-
-    glm::vec3 look_at_{ 0.0f, 0.0f, -1.0f };    // point the camera is looking at.
-
-    glm::vec3 position_{ 0.0f, 0.0f, 0.0f };    // position of the camera in the universe space.
-
-    glm::vec3 direction_{ 0.0f, 0.0f, -1.0f };  // direction the camera is looking.
-
-    ONB onb_;                                   //  orthonormal RHS basis
+   protected:
+    Type type_;
+    glm::vec3 position_;
+    glm::vec3 look_at_;
+    glm::vec3 up_;
+    glm::vec3 direction_;
+    ONB camera_onb_;
+    std::unique_ptr<ImageBuffer> image_buffer_;
 };
 
-#endif /* CAMERA_H_ */
-
+#endif  // CAMERA_H

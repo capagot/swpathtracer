@@ -1,18 +1,10 @@
 #include "integrator.h"
 
-Integrator::Integrator( Camera &camera,
-                        const Scene &scene,
-                        const glm::vec3 background_color,
-                        PathTerminationCriterion path_termination_criterion,
-                        unsigned int path_length,
-                        Sampler &sampler,
-                        Buffer &buffer ) :
-        camera_( camera ),
-        scene_( scene ),
-        background_color_{ background_color },
-        path_termination_criterion_{ path_termination_criterion },
-        path_length_{ path_length },
-        sampler_( sampler ),
-        buffer_( buffer )
-{ }
+Integrator::Integrator(Camera& camera, const Scene& scene, Type type, std::unique_ptr<PixelSampler> pixel_sampler)
+    : type_(type),
+      camera_(camera),
+      scene_(scene),
+      pixel_sampler_(std::move(pixel_sampler)),
+      total_integration_time_(0) {}
 
+Integrator::~Integrator() {}

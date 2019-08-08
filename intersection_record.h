@@ -1,17 +1,14 @@
-#ifndef INTERSECTION_RECORD_H_
-#define INTERSECTION_RECORD_H_
+#ifndef INTERSECTION_RECORD_H
+#define INTERSECTION_RECORD_H
 
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
 
-#include "material.h"
-
-struct IntersectionRecord
-{
+struct IntersectionRecord {
     float t_;
     glm::vec3 position_;
     glm::vec3 normal_;
-    long unsigned int material_id_;
+    std::size_t material_id_;
+    std::size_t primitive_id_;
 };
 
-#endif /* INTERSECTION_RECORD_H_ */
-
+#endif  // INTERSECTION_RECORD_H

@@ -1,0 +1,13 @@
+require "registervars"
+require "materials"
+require "bsdfs"
+require "layered_bsdfs"
+require "emissions"
+require "objects"
+--require "meshes"
+require "cameras"
+require "pixel_samplers"
+require "image_buffers"
+require "global_settings"
+require "integrators"
+

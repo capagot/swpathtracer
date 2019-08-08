@@ -1,33 +1,24 @@
-#ifndef PRIMITIVE_H_
-#define PRIMITIVE_H_
+#ifndef PRIMITIVE_H
+#define PRIMITIVE_H
 
 #include <memory>
+#include <vector>
 
-#include "ray.h"
-#include "intersection_record.h"
-#include "lambertian.h"
 #include "aabb.h"
+#include "intersection_record.h"
+#include "ray.h"
 
-class Primitive
-{
-public:
-
-    using PrimitiveUniquePtr = std::unique_ptr< Primitive >;
-
-    Primitive( void );
-
-    Primitive( long unsigned int material_id );
-
-    virtual ~Primitive( void );
-
-    virtual bool intersect( const Ray &ray,
-                            IntersectionRecord &intersection_record ) = 0;
-
-    virtual AABB getAABB( void ) const = 0;
-
-    virtual void printData( void ) const = 0;
+class Primitive {
+   public:
+    Primitive(long unsigned int material_id);
+    virtual ~Primitive(void);
+    virtual bool intersect(const Ray& ray, IntersectionRecord& intersection_record) = 0;
+    virtual bool clipAgainstAABB(const AABB& aabb, std::vector<glm::vec3>& new_vertex_list, AABB& new_aabb,
+                                 glm::vec3& centroid) = 0;
+    virtual AABB getAABB() const = 0;
+    virtual glm::vec3 getCentroid() const = 0;
 
     long unsigned int material_id_;
 };
 
-#endif /* PRIMITIVE_H_ */
+#endif  // PRIMITIVE_H
