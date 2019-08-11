@@ -4,6 +4,7 @@
 #include <glm/vec3.hpp>
 
 namespace lb {
+
 struct Camera {
     enum class Type { NONE, ORTHOGRAPHIC, PINHOLE };
 
@@ -16,6 +17,7 @@ struct Camera {
     glm::vec3 up_;
     Type type_;
 };
+
 }  // namespace lb
 
 #endif  // LUA_BIND_CAMERA_H

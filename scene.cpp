@@ -1,11 +1,33 @@
 #include "scene.h"
 
-Scene::Scene(std::unique_ptr<AccelerationStructure> acceleration_structure, const glm::vec3& background_color)
-    : acceleration_structure_(std::move(acceleration_structure)), background_color_(background_color) {
-    acceleration_structure_->attachPrimitiveList(&primitives_);
+Scene::Scene(std::unique_ptr<AccelStructure> accel_structure, const glm::vec3& background_color)
+    : accel_structure_(std::move(accel_structure)), background_color_(background_color) {
+    accel_structure_->attachPrimitiveList(&primitives_);
 }
 
 Scene::~Scene() {}
+
+void Scene::addBSDF(std::unique_ptr<BSDF> bsdf) {
+    bsdfs_.push_back(std::move(bsdf));
+}
+
+void Scene::addLayeredBSDF(const LayeredBSDF& layered_bsdf) {
+    layered_bsdfs_.push_back(layered_bsdf);
+}
+
+void Scene::addEmission(const glm::vec3& emission) {
+    emissions_.push_back(emission);
+}
+
+void Scene::addMaterial(const Material& material) {
+    materials_.push_back(material);
+}
+
+void Scene::addPrimitive(std::unique_ptr<Primitive> primitive) {
+    updateSceneExtents(primitive->getAABB().getMin());
+    updateSceneExtents(primitive->getAABB().getMax());
+    primitives_.push_back(std::move(primitive));
+}
 
 void Scene::loadMesh(const std::string& filename, long unsigned int material_id, int assimp_post_processes) {
     Assimp::Importer assimp_importer;
@@ -56,11 +78,11 @@ void Scene::updateSceneExtents(const glm::vec3& vertex) {
     z_max_ = std::max(z_max_, vertex.z);
 }
 
-void Scene::buildAccelerationStructure() {
-    acceleration_structure_->build();
+void Scene::buildAccelStructure() {
+    accel_structure_->build();
 }
 
 bool Scene::intersect(const Ray& ray, IntersectionRecord& intersection_record, std::size_t& num_intersection_tests,
                       std::size_t& num_intersections) const {
-    return acceleration_structure_->intersect(ray, intersection_record, num_intersection_tests, num_intersections);
+    return accel_structure_->intersect(ray, intersection_record, num_intersection_tests, num_intersections);
 }

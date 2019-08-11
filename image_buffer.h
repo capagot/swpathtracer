@@ -10,33 +10,33 @@ class ImageBuffer {
    public:
     ImageBuffer(unsigned int width, unsigned int height, unsigned int viewport_top, unsigned int viewport_left,
                 unsigned int viewport_width, unsigned int viewport_height, const std::string& file_name);
-    unsigned int getImageWidth() const {
+    inline unsigned int getImageWidth() const {
         return width_;
     }
-    unsigned int getImageHeight() const {
+    inline unsigned int getImageHeight() const {
         return height_;
     }
-    unsigned int getViewportTop() const {
+    inline unsigned int getViewportTop() const {
         return viewport_top_;
     }
-    unsigned int getViewportLeft() const {
+    inline unsigned int getViewportLeft() const {
         return viewport_left_;
     }
-    unsigned int getViewportWidth() const {
+    inline unsigned int getViewportWidth() const {
         return viewport_width_;
     }
-    unsigned int getViewportHeight() const {
+    inline unsigned int getViewportHeight() const {
         return viewport_height_;
     }
-    const glm::vec3& getPixelValue(unsigned int x, unsigned int y) const;
+    inline const glm::vec3& getPixelValue(unsigned int x, unsigned int y) const {
+        return pixel_data_[x][y];
+    }
     void setPixelValue(unsigned int x, unsigned int y, const glm::vec3& value);
     void convertTosRGB();
     void saveToFile() const;
 
    private:
-    float clamp(float x) const {
-        return std::min(std::max(x, 0.0f), 1.0f);
-    }
+    float clamp(float x) const;
 
     unsigned int width_;
     unsigned int height_;

@@ -3,19 +3,16 @@
 
 #include <fenv.h>
 #include <iostream>
-#include "cook_torrance_bsdf_sampler.h"
-#include "cosine_bsdf_sampler.h"
-#include "refraction_bsdf_sampler.h"
-#include "smooth_specular_bsdf_sampler.h"
-#include "uniform_bsdf_sampler.h"
 #include "cmd_line_options.h"
 #include "cook_torrance.h"
+#include "cook_torrance_bsdf_sampler.h"
 #include "core.h"
+#include "cosine_bsdf_sampler.h"
 #include "depth_raycaster.h"
 #include "fresnel_schlick.h"
 #include "global_settings.h"
 #include "image_buffer.h"
-#include "intersection_test_count_raycaster.h"
+#include "int_test_count_raycaster.h"
 #include "jittered_pixel_sampler.h"
 #include "lambertian.h"
 #include "layered_bsdf.h"
@@ -26,20 +23,23 @@
 #include "pathtracer.h"
 #include "pinhole_camera.h"
 #include "prng.h"
+#include "refraction_bsdf_sampler.h"
 #include "regular_pixel_sampler.h"
 #include "scene.h"
 #include "smooth_conductor.h"
 #include "smooth_dielectric.h"
+#include "smooth_specular_bsdf_sampler.h"
 #include "smooth_triangle.h"
 #include "sphere.h"
 #include "triangle.h"
+#include "uniform_bsdf_sampler.h"
 #include "uniform_pixel_sampler.h"
 
 class SwpathtracerApp {
    public:
-    SwpathtracerApp(){};
-    ~SwpathtracerApp(){};
-    void run(int argc, char** argv);
+    SwpathtracerApp(int argc, char** argv);
+    ~SwpathtracerApp();
+    void run();
 
    private:
     void printAppInfo();

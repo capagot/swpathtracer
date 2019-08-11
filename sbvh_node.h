@@ -1,9 +1,9 @@
 #ifndef SBVH_NODE_H
 #define SBVH_NODE_H
 
-#include <vector>
-#include <memory>
 #include <algorithm>
+#include <memory>
+#include <vector>
 
 #include "primitive_ref.h"
 

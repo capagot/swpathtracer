@@ -15,10 +15,6 @@ ImageBuffer::ImageBuffer(unsigned int width, unsigned int height, unsigned int v
         for (unsigned int x = 0; x < width_; ++x) pixel_data_[x][y] = glm::vec3(0.0f);
 }
 
-const glm::vec3& ImageBuffer::getPixelValue(unsigned int x, unsigned int y) const {
-    return pixel_data_[x][y];
-}
-
 void ImageBuffer::setPixelValue(unsigned int x, unsigned int y, const glm::vec3& value) {
     pixel_data_[x][y] = value;
 }
@@ -48,4 +44,8 @@ void ImageBuffer::saveToFile() const {
     }
 
     image_file.close();
+}
+
+float ImageBuffer::clamp(float x) const {
+    return std::min(std::max(x, 0.0f), 1.0f);
 }

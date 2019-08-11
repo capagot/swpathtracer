@@ -8,20 +8,20 @@ class OrthographicCamera : public Camera {
    public:
     OrthographicCamera(const glm::vec3& position, const glm::vec3& look_at, const glm::vec3& up, float min_x,
                        float max_x, float min_y, float max_y, std::unique_ptr<ImageBuffer> image_buffer);
-    Ray getRay(float x, float y) const;
-    float getMinX() const {
+    Ray getRay(float x, float y) const override;
+    inline float getMinX() const {
         return min_x_;
     }
-    float getMaxX() const {
+    inline float getMaxX() const {
         return max_x_;
     }
-    float getMinY() const {
+    inline float getMinY() const {
         return min_y_;
     }
-    float getMaxY() const {
+    inline float getMaxY() const {
         return max_y_;
     }
-    float getAspect() const {
+    inline float getAspect() const {
         return aspect_;
     }
 

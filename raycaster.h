@@ -9,6 +9,20 @@
 #include "regular_pixel_sampler.h"
 #include "timer.h"
 
+/*
+ * The RayCaster class template implements a common interface for all ray casters. It assumes that all ray
+ * casters shoot only one ray per pixel, through their centers, and that each ray will store some
+ * data to its corresponding position on a target buffer.
+ *
+ * Since all ray casters shoot rays through the centers of the corresponding pixels, the class template
+ * instantiate a RegularPixelSampler, which is set up to use just one sample.
+ *
+ * Ray casters may differ, however, with respect to the type of data that may be returned by the rays.
+ * For instance, depending on the ray caster, the ray may return the distance to, or the normal vector
+ * at, the closest hit point. The template parameter refers exactly to the type of data that is to be returned by
+ * the rays, and will be used, among other things, to define the type the elements of the target buffer.
+ */
+
 template <class T>
 class RayCaster : public Integrator {
    public:

@@ -24,8 +24,7 @@ void DepthRayCaster::saveImageToFile() {
         for (unsigned int y = 0; y < camera_.getImage().getImageHeight(); ++y)
             if (buffer_[x][y] != -1.0f) {  // if it is not background...
                 if (depth_range)
-                    camera_.getImage().setPixelValue(
-                        x, y, glm::vec3((buffer_[x][y] - min_depth_) / depth_range));
+                    camera_.getImage().setPixelValue(x, y, glm::vec3((buffer_[x][y] - min_depth_) / depth_range));
                 else
                     camera_.getImage().setPixelValue(x, y, glm::vec3(1.0f));
             } else  //  if it is background, paint with black

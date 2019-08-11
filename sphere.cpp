@@ -4,7 +4,7 @@ Sphere::Sphere(const glm::vec3& center, float radius, long unsigned int material
     : Primitive(material_id), center_(center), radius_(radius) {}
 
 bool Sphere::intersect(const Ray& ray, IntersectionRecord& intersection_record) {
-    /* Efficient ray-sphere intersection algorithm presented in the article:
+    /* Efficient ray-sphere intersection algorithm described in:
      *
      *     "Intersection of a Ray with a Sphere".
      *     Jeff Hultquist.
@@ -29,35 +29,32 @@ bool Sphere::intersect(const Ray& ray, IntersectionRecord& intersection_record) 
     }
 
     // TODO: add reference to the intersected primitive
-    intersection_record.t_ = (t1 > 0.00001f) ? t1 : t2;
+    intersection_record.t_ = (t1 > kIntersectionTestEpsilon_) ? t1 : t2;
     intersection_record.position_ = ray.getOrigin() + intersection_record.t_ * ray.getDirection();
     intersection_record.normal_ = glm::normalize(intersection_record.position_ - center_);
-    intersection_record.material_id_ = material_id_;
+    intersection_record.material_id_ = getMaterialID();
 
     return true;
 }
 
-bool Sphere::clipAgainstAABB(const AABB& aabb,
-                     std::vector<glm::vec3>& new_vertex_list,
-                     AABB& new_aabb,
-                     glm::vec3& centroid) {
+bool Sphere::clipAgainstAABB(const AABB& aabb, std::vector<glm::vec3>& new_vertex_list, AABB& new_aabb,
+                             glm::vec3& centroid) {
     (void)new_vertex_list;
     (void)centroid;
 
     return getAABB().getIntersection(aabb, new_aabb);
 }
 
-AABB Sphere::getAABB( void ) const
-{
+AABB Sphere::getAABB(void) const {
     AABB aabb;
 
-    aabb.min_ = center_ - radius_;
-    aabb.max_ = center_ + radius_;
-    aabb.centroid_ = center_;
+    aabb.setMin(center_ - radius_);
+    aabb.setMax(center_ + radius_);
+    //aabb.centroid_ = center_;
 
     return aabb;
 }
 
-glm::vec3 Sphere::getCentroid( void ) const {
+glm::vec3 Sphere::getCentroid(void) const {
     return center_;
 }

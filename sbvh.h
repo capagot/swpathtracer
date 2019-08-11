@@ -10,13 +10,13 @@
 #include <queue>
 #include <sstream>
 
-#include "acceleration_structure.h"
+#include "accel_structure.h"
 #include "primitive.h"
 #include "primitive_ref.h"
 #include "sbvh_node.h"
 #include "timer.h"
 
-struct StructureStatsSBVH : StructureStats {
+struct StatsSBVH : Stats {
     std::size_t num_nodes_ = 0;
     std::size_t num_inner_nodes_ = 0;
     std::size_t num_leaf_nodes_ = 0;
@@ -28,7 +28,7 @@ struct StructureStatsSBVH : StructureStats {
     std::size_t num_unreferenced_primitives_ = 0;
 };
 
-class SBVH : public AccelerationStructure {
+class SBVH : public AccelStructure {
    public:
     struct SplitPlane {
         float offset_ = 0.0f;
@@ -50,7 +50,7 @@ class SBVH : public AccelerationStructure {
 
     SBVH(float alpha);
     void build();
-    const StructureStatsSBVH& getStatistics() const {
+    const StatsSBVH& getStatistics() const {
         return statistics_;
     }
     void printProgress() {
@@ -93,7 +93,7 @@ class SBVH : public AccelerationStructure {
     float alpha_;
     int progress_indicator_ = 0;
     std::size_t primitives_inserted_ = 0;
-    StructureStatsSBVH statistics_;
+    StatsSBVH statistics_;
 };
 
 #endif  // SBVH_H

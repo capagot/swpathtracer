@@ -1,7 +1,8 @@
-#ifndef LUA_IMAGE_BUFFER_H
-#define LUA_IMAGE_BUFFER_H
+#ifndef LUA_BIND_IMAGE_BUFFER_H
+#define LUA_BIND_IMAGE_BUFFER_H
 
 namespace lb {
+
 struct ImageBuffer {
     ImageBuffer(unsigned int width, unsigned int height, unsigned int viewport_top, unsigned int viewport_left,
                 unsigned int viewport_width, unsigned int viewport_height, const std::string& file_name)
@@ -21,6 +22,7 @@ struct ImageBuffer {
     unsigned int viewport_height_;
     std::string file_name_;
 };
+
 }  // namespace lb
 
-#endif  // LUA_IMAGE_BUFFER_H
+#endif  // LUA_BIND_IMAGE_BUFFER_H

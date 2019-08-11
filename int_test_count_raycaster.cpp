@@ -1,13 +1,13 @@
-#include "intersection_test_count_raycaster.h"
+#include "int_test_count_raycaster.h"
 
-IntersectionTestCountRayCaster::IntersectionTestCountRayCaster(Camera& camera, const Scene& scene,
-                                                               long int prescribed_min_int_tests_count,
-                                                               long int prescribed_max_int_tests_count)
+IntTestCountRayCaster::IntTestCountRayCaster(Camera& camera, const Scene& scene,
+                                             long int prescribed_min_int_tests_count,
+                                             long int prescribed_max_int_tests_count)
     : RayCaster(camera, scene, Integrator::Type::INTERSECTION_TEST_COUNT_RAYCASTER),
       prescribed_min_int_tests_count_(prescribed_min_int_tests_count),
       prescribed_max_int_tests_count_(prescribed_max_int_tests_count) {}
 
-float IntersectionTestCountRayCaster::Hue2RGB(float v1, float v2, float h) const {
+float IntTestCountRayCaster::Hue2RGB(float v1, float v2, float h) const {
     if (h < 0.0f) h += 1.0f;
     if (h > 1.0f) h -= 1.0f;
     if ((6.0f * h) < 1.0f) return v1 + (v2 - v1) * 6.0f * h;
@@ -17,7 +17,7 @@ float IntersectionTestCountRayCaster::Hue2RGB(float v1, float v2, float h) const
     return v1;
 }
 
-void IntersectionTestCountRayCaster::saveImageToFile() {
+void IntTestCountRayCaster::saveImageToFile() {
     std::size_t min_int_tests_count_pp =
         (prescribed_min_int_tests_count_ != -1) ? prescribed_min_int_tests_count_ : min_int_tests_count_pp_;
     std::size_t max_int_tests_count_pp =
@@ -39,7 +39,7 @@ void IntersectionTestCountRayCaster::saveImageToFile() {
             camera_.getImage().setPixelValue(x, y, glm::vec3(value));
         }
 
-    // heat map color determination
+    // heat map color computation
     for (unsigned int x = 0; x < camera_.getImage().getImageWidth(); ++x) {
         for (unsigned int y = 0; y < camera_.getImage().getImageHeight(); ++y) {
             float t = camera_.getImage().getPixelValue(x, y)[0];
@@ -72,15 +72,14 @@ void IntersectionTestCountRayCaster::saveImageToFile() {
     camera_.getImage().saveToFile();
 }
 
-long int IntersectionTestCountRayCaster::getHitValue(const IntersectionRecord& intersection_record,
-                                                     std::size_t num_intersection_tests,
-                                                     std::size_t num_intersections) const {
-    (void)intersection_record;
-    (void)num_intersections;
+long int IntTestCountRayCaster::getHitValue(const IntersectionRecord& int_record, std::size_t num_int_tests,
+                                            std::size_t num_ints) const {
+    (void)int_record;
+    (void)num_ints;
 
-    return num_intersection_tests;
+    return num_int_tests;
 }
 
-long int IntersectionTestCountRayCaster::getMissValue(std::size_t num_intersection_tests) const {
-    return num_intersection_tests;
+long int IntTestCountRayCaster::getMissValue(std::size_t num_int_tests) const {
+    return num_int_tests;
 }

@@ -9,11 +9,11 @@ class PinholeCamera : public Camera {
    public:
     PinholeCamera(const glm::vec3& position, const glm::vec3& look_at, const glm::vec3& up, float vertical_fov_degrees,
                   std::unique_ptr<ImageBuffer> image_buffer);
-    Ray getRay(float x, float y) const;
-    float getAspect() const {
+    Ray getRay(float x, float y) const override;
+    inline float getAspect() const {
         return aspect_;
     }
-    float getVFov() const {
+    inline float getVFov() const {
         return vertical_fov_degrees_;
     }
 

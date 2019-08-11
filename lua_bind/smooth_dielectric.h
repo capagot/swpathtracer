@@ -4,12 +4,13 @@
 #include "bsdf.h"
 
 namespace lb {
+
 struct SmoothDielectric : public BSDF {
-    SmoothDielectric(float ior, BSDFSamplerType bsdf_sampler_type)
-        : BSDF(Type::SMOOTH_DIELECTRIC, bsdf_sampler_type), ior_(ior) {}
+    SmoothDielectric(float ior, SamplerType sampler_type) : BSDF(Type::SMOOTH_DIELECTRIC, sampler_type), ior_(ior) {}
 
     float ior_;
 };
+
 }  // namespace lb
 
 #endif  // LUA_BIND_SMOOTH_DIELECTRIC_H

@@ -61,11 +61,11 @@ Camera{
 
 PixelSampler{
     type = "jittered", -- "uniform", "regular", "jittered"
-    spp = 4 -- * 4 --* 4 * 4 --* 4 --* 4 --* 4 --* 4
+    spp = 4 * 4 * 4 * 4 --* 4 --* 4 --* 4 --* 4
 }
 
-local image_width = 128 --1584 / 2
-local image_height = 128 --396 / 2
+local image_width = 128--1584 / 2
+local image_height = 128--396 / 2
 
 ImageBuffer{
     width = image_width,
@@ -89,8 +89,8 @@ GlobalSettings{
 
 -- Integrator{
 --    type = "ray-caster",
---    pixel_value = "normal",
---    --pixel_value = "depth",
+--    --pixel_value = "normal",
+--    pixel_value = "depth",
 --    --minimum_depth = 0, -- will be considered as 0
 --    --maximum_depth = 100 -- will be considered as 1
 --    -- pixel_value = "intersection-test-count",

@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef CORE_H
+#define CORE_H
 
 #define PI_f 3.141592653589793238462643383279502884f
 #define DEG_TO_RAD PI_f / 180.0f
@@ -23,4 +23,4 @@
     #define APP_BUILD_MODE "Release"
 #endif // DEBUG
 
-#endif  // UTILS_H
+#endif  // CORE_H

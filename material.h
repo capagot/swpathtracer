@@ -8,8 +8,9 @@
 class Material {
    public:
     Material(const LayeredBSDF& layered_bsdf, const glm::vec3& emission);
-    void evalBSDF(const glm::vec3& local_wo, glm::vec3& bsdf, glm::vec3& reflectance, float& pdf, glm::vec3& local_wi) const;
-    const glm::vec3& getEmission() const {
+    void evalBSDF(const glm::vec3& local_wo, glm::vec3& bsdf, glm::vec3& reflectance, float& pdf,
+                  glm::vec3& local_wi) const;
+    inline const glm::vec3& getEmission() const {
         return emission_;
     }
 

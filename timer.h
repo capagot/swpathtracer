@@ -8,16 +8,16 @@
 class Timer {
    public:
     Timer(){};
-    void start() {
+    inline void start() {
         start_time_ = std::chrono::steady_clock::now();
     }
 
-    void finish() {
+    inline void finish() {
         finish_time_ = std::chrono::steady_clock::now();
     }
 
-    long int getElapsedTime() {
-      return (std::chrono::duration_cast<std::chrono::microseconds>(finish_time_ - start_time_)).count();
+    inline long int getElapsedTime() {
+        return (std::chrono::duration_cast<std::chrono::microseconds>(finish_time_ - start_time_)).count();
     }
 
    private:

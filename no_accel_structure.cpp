@@ -1,13 +1,13 @@
-#include "no_acceleration_structure.h"
+#include "no_accel_structure.h"
 
-NoAccelerationStructure::NoAccelerationStructure() : AccelerationStructure(AccelerationStructure::Type::NONE) {}
+NoAccelStructure::NoAccelStructure() : AccelStructure(AccelStructure::Type::NONE) {}
 
-NoAccelerationStructure::~NoAccelerationStructure() {}
+NoAccelStructure::~NoAccelStructure() {}
 
-void NoAccelerationStructure::build() {}
+void NoAccelStructure::build() {}
 
-bool NoAccelerationStructure::intersect(const Ray& ray, IntersectionRecord& intersection_record,
-                                        std::size_t& num_intersection_tests, std::size_t& num_intersections) const {
+bool NoAccelStructure::intersect(const Ray& ray, IntersectionRecord& intersection_record,
+                                 std::size_t& num_intersection_tests, std::size_t& num_intersections) const {
     IntersectionRecord tmp_intersection_record;
     intersection_record.t_ = std::numeric_limits<float>::infinity();
     bool intersection_result = false;

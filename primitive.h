@@ -17,7 +17,11 @@ class Primitive {
                                  glm::vec3& centroid) = 0;
     virtual AABB getAABB() const = 0;
     virtual glm::vec3 getCentroid() const = 0;
+    inline long unsigned int getMaterialID() const {
+        return material_id_;
+    }
 
+   private:
     long unsigned int material_id_;
 };
 

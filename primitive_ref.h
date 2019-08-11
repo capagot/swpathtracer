@@ -4,7 +4,7 @@
 #include "aabb.h"
 
 /*
- * Each reference is described by the actual primitive id (id_), an aabb (aabb_) and
+ * Each reference is composed by the actual primitive id (id_), an aabb (aabb_) and
  * the centroid (poly_centroid_) of the portion of the primitive (an n-sided polygon)
  * bounded by the aabb.
  */
