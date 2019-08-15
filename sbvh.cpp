@@ -3,7 +3,11 @@
 SBVH::SBVH(float alpha)
     : AccelStructure(((alpha == std::numeric_limits<float>::infinity()) ? AccelStructure::Type::BVH_SAH
                                                                         : AccelStructure::Type::SBVH_SAH)),
-      alpha_(alpha) {}
+      cost_intersec_tri_(1.0f),
+      cost_intersec_aabb_(1.2f),
+      alpha_(alpha),
+      progress_indicator_(0),
+      primitives_inserted_(0) {}
 
 void SBVH::build() {
     if (primitives_->size() > 0) {

@@ -17,40 +17,59 @@
 #include "timer.h"
 
 struct StatsSBVH : Stats {
-    std::size_t num_nodes_ = 0;
-    std::size_t num_inner_nodes_ = 0;
-    std::size_t num_leaf_nodes_ = 0;
-    std::size_t tree_height_ = 0;
-    std::size_t num_object_splits_ = 0;
-    std::size_t num_spatial_splits_ = 0;
+    StatsSBVH()
+        : num_nodes_(0),
+          num_inner_nodes_(0),
+          num_leaf_nodes_(0),
+          tree_height_(0),
+          num_object_splits_(0),
+          num_spatial_splits_(0),
+          min_num_primitives_leaf_(std::numeric_limits<std::size_t>::max()),
+          max_num_primitives_leaf_(0),
+          num_unreferenced_primitives_(0) {}
+
+    std::size_t num_nodes_;
+    std::size_t num_inner_nodes_;
+    std::size_t num_leaf_nodes_;
+    std::size_t tree_height_;
+    std::size_t num_object_splits_;
+    std::size_t num_spatial_splits_;
     std::size_t min_num_primitives_leaf_ = std::numeric_limits<std::size_t>::max();
-    std::size_t max_num_primitives_leaf_ = 0;
-    std::size_t num_unreferenced_primitives_ = 0;
+    std::size_t max_num_primitives_leaf_;
+    std::size_t num_unreferenced_primitives_;
 };
 
 class SBVH : public AccelStructure {
    public:
     struct SplitPlane {
-        float offset_ = 0.0f;
+        SplitPlane()
+            : offset_(0.0f),
+              num_left_prim_refs_(0),
+              num_right_prim_refs_(0),
+              sah_cost_(std::numeric_limits<float>::infinity()) {}
+
+        float offset_;
         AABB left_aabb_;
         AABB right_aabb_;
         float left_area_;
         float right_area_;
-        long int num_left_prim_refs_ = 0;
-        long int num_right_prim_refs_ = 0;
-        float sah_cost_ = std::numeric_limits<float>::infinity();
+        long int num_left_prim_refs_;
+        long int num_right_prim_refs_;
+        float sah_cost_;
     };
 
     struct Bin {
+        Bin() : has_aabb_(false) {}
+
         AABB aabb_;
-        bool has_aabb_ = false;
+        bool has_aabb_;
         std::vector<long int> in_primitive_refs_;
         std::vector<long int> out_primitive_refs_;
     };
 
     SBVH(float alpha);
-    void build();
-    const StatsSBVH& getStatistics() const {
+    void build() override;
+    inline const StatsSBVH& getStatistics() const override {
         return statistics_;
     }
     void printProgress() {
@@ -75,7 +94,7 @@ class SBVH : public AccelStructure {
         progress_indicator_ %= 4;
     }
     bool intersect(const Ray& ray, IntersectionRecord& intersection_record, long unsigned int& num_intersection_tests,
-                   long unsigned int& num_intersections) const;
+                   long unsigned int& num_intersections) const override;
     void dumpTree(const std::string& file_name) const;
     void collectTreeStatistics();
 
@@ -88,11 +107,11 @@ class SBVH : public AccelStructure {
 
     std::unique_ptr<SBVHNode> root_node_;
     float aabb_intersection_epsilon_;
-    float cost_intersec_tri_ = 1.0f;
-    float cost_intersec_aabb_ = 1.2f;
+    float cost_intersec_tri_;
+    float cost_intersec_aabb_;
     float alpha_;
-    int progress_indicator_ = 0;
-    std::size_t primitives_inserted_ = 0;
+    int progress_indicator_;
+    std::size_t primitives_inserted_;
     StatsSBVH statistics_;
 };
 

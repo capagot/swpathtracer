@@ -6,6 +6,7 @@
 #include "triangle.h"
 
 namespace lb {
+
 struct SmoothTriangle : public Triangle {
     SmoothTriangle(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& n0,
                    const glm::vec3& n1, const glm::vec3& n2, long unsigned int material_id)
@@ -15,6 +16,7 @@ struct SmoothTriangle : public Triangle {
     glm::vec3 n1_;
     glm::vec3 n2_;
 };
+
 }  // namespace lb
 
 #endif  // LUA_BIND_SMOOTH_TRIANGLE_H

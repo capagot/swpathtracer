@@ -6,6 +6,7 @@
 #include "object.h"
 
 namespace lb {
+
 struct Sphere : public Object {
     Sphere(const glm::vec3& center, float radius, long unsigned int material_id)
         : Object(material_id, Type::SPHERE), center_(center), radius_(radius) {}
@@ -13,6 +14,7 @@ struct Sphere : public Object {
     glm::vec3 center_;
     float radius_;
 };
+
 }  // namespace lb
 
 #endif  // LUA_BIND_SPHERE_H

@@ -3,7 +3,6 @@
 
 #include <glm/vec3.hpp>
 
-#include "plane.h"
 #include "primitive.h"
 #include "ray.h"
 
@@ -24,6 +23,14 @@ class Triangle : public Primitive {
                          glm::vec3& centroid) override;
 
    private:
+    struct Plane {
+    public:
+        Plane(const glm::vec3 &normal, const glm::vec3 &point) : normal_(normal),
+                                                                point_(point) {};
+        glm::vec3 normal_;
+        glm::vec3 point_;
+    };
+
     enum class PointPosition { IN_FRONT, BEHIND, ON_PLANE };  // used to clip triangle during SBVH construction
 
     PointPosition classifyPointToPlane(const glm::vec3& point, const Plane& plane);

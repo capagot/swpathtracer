@@ -12,8 +12,7 @@ As a way to record and share information about the evolution of the project, I'v
 - Input and configuration through Lua scripts.
 - Sphere, triangle and smooth triangle primitives.
 - Mesh loading through Assimp.
-- SAH-based BVH rendering acceleration.
-- (NEW and Experimental!) SAH-based SBVH for rendering acceleration.
+- SAH-based BVH rendering acceleration (SBVH is experimental and still buggy).
 - Perfectly diffuse (Lambertian) surfaces.
 - Rough conductors described by a Cook-Torrance-based microfacet model.
 - Smooth conductors.
@@ -23,7 +22,7 @@ As a way to record and share information about the evolution of the project, I'v
 - Importance sampled BSDFs.
 - Radiances and reflectances stored as RGB tuples.
 - Naïve (brute force) path tracing.
-- (NEW) Three ray casters for normal, depth and hit count rendering.
+- (NEW) Three ray casters for normal, depth and hit test/count rendering.
 - Path termination through fixed maximum depth or russian roulette.
 - Regular, uniform and jittered box-filtered pixel samplers.
 - Output in PPM (Portable Pixel Map) file format.

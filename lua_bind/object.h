@@ -2,6 +2,7 @@
 #define LUA_BIND_OBJECT_H
 
 namespace lb {
+
 struct Object {
     enum class Type { NONE, TRIANGLE, SMOOTH_TRIANGLE, SPHERE, MESH, SMOOTH_MESH };
 
@@ -11,6 +12,7 @@ struct Object {
     long unsigned int material_id_;
     Type type_;
 };
+
 }  // namespace lb
 
 #endif  // LUA_BIND_OBJECT_H

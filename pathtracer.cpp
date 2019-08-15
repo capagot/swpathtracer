@@ -65,10 +65,8 @@ void PathTracer::render() {
     min_int_count_pp_ = std::numeric_limits<std::size_t>::max();
     max_int_count_pp_ = 0;
 
-// TODO: just debug... remove....
-#ifndef DEBUG
-    std::cout << "-----------------> " << omp_get_max_threads() << "\n";
-#endif
+    std::cout << "+---- Rendering ---------------------------------------------------------------+\n";
+    std::cout << "  Threads ........................: " << omp_get_max_threads() << "\n";
 
     timer.start();
 
@@ -113,10 +111,29 @@ void PathTracer::render() {
 
     timer.finish();
     total_integration_time_ = timer.getElapsedTime();
-    std::cout << "====> Total rendering time: " << total_integration_time_ << " microseconds\n";
+
+    std::cout << "\n";
+    std::cout << "  Statistics :\n";
+    std::cout << "    Total rendering time .........: " << total_integration_time_ << "\n";
+    std::cout << "    Intersection tests ...........: " << int_tests_count_ << "\n";
+    std::cout << "      Min intersection tests pp ..: " << min_int_tests_count_pp_ << "\n";
+    std::cout << "      Max intersection tests pp ..: " << max_int_tests_count_pp_ << "\n";
+    std::cout << "    Intersections ................: " << int_count_ << std::fixed << std::setprecision(2) << " ("
+              << (100.0f * int_count_) / int_tests_count_ << "% of all intersection tests)\n";
+    std::cout << "      Min intersections pp .......: " << min_int_count_pp_ << "\n";
+    std::cout << "      Max intersections pp .......: " << max_int_count_pp_ << "\n";
+    std::cout << "+------------------------------------------------------------------------------+\n";
 }
 
 void PathTracer::saveImageToFile() {
     camera_.getImage().convertTosRGB();
     camera_.getImage().saveToFile();
+}
+
+void PathTracer::printProgress(unsigned int y) {
+    std::stringstream progress_stream;
+    progress_stream << "\r  Progress .......................: " << std::fixed << std::setw(6) << std::setprecision(2)
+                    << 100.0f * y / (camera_.getImage().getViewportTop() + camera_.getImage().getViewportHeight() - 1)
+                    << "%";
+    std::clog << progress_stream.str();
 }

@@ -29,6 +29,7 @@
 #include "triangle.h"
 
 namespace lb {  // lb = 'l'ua 'b'ind
+
 class LuaBind {
    public:
     LuaBind(){};
@@ -57,6 +58,7 @@ class LuaBind {
 
     lua_State* lua_state_ = nullptr;
 };
+
 }  // namespace lb
 
 #endif  // LUA_BIND_LUA_BIND_H

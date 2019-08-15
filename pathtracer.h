@@ -27,15 +27,7 @@ class PathTracer : public Integrator {
     }
 
    private:
-    void printProgress(unsigned int y) {
-        std::stringstream progress_stream;
-        progress_stream << "\r  progress .........................: " << std::fixed << std::setw(6)
-                        << std::setprecision(2)
-                        << 100.0f * y /
-                               (camera_.getImage().getViewportTop() + camera_.getImage().getViewportHeight() - 1)
-                        << "%";
-        std::clog << progress_stream.str();
-    }
+    void printProgress(unsigned int y);
 
     // When PathTerminationCriterion == MAX_DEPTH, path_length_ defined the maximum path length (or recursion level).
     // When PathTerminationCriterion == RUSSIAN_ROULETTE, path_length_ sets tha minimum path length (or recursion level)

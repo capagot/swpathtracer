@@ -61,7 +61,7 @@ Camera{
 
 PixelSampler{
     type = "jittered", -- "uniform", "regular", "jittered"
-    spp = 4 * 4 * 4 * 4 --* 4 --* 4 --* 4 --* 4
+    spp = 4 * 4-- * 4 * 4 --* 4 --* 4 --* 4 --* 4
 }
 
 local image_width = 128--1584 / 2

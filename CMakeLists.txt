@@ -52,7 +52,6 @@ add_executable(swpathtracer
                ${PROJECT_SOURCE_DIR}/int_test_count_raycaster.cpp
                ${PROJECT_SOURCE_DIR}/ray.cpp
                ${PROJECT_SOURCE_DIR}/sbvh.cpp
-               ${PROJECT_SOURCE_DIR}/sbvh_node.cpp
                ${PROJECT_SOURCE_DIR}/no_accel_structure.cpp
                ${PROJECT_SOURCE_DIR}/scene.cpp
                ${PROJECT_SOURCE_DIR}/smooth_triangle.cpp

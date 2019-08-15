@@ -4,6 +4,7 @@
 #include <glm/vec3.hpp>
 
 namespace lb {
+
 struct PixelSampler {
     enum class Type { NONE, UNIFORM, REGULAR, JITTERED };
 
@@ -12,6 +13,7 @@ struct PixelSampler {
     Type type_;
     std::size_t spp_;
 };
+
 }  // namespace lb
 
 #endif  // LUA_BIND_PIXEL_SAMPLER_H

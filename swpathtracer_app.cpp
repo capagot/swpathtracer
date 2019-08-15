@@ -83,51 +83,6 @@ void SwpathtracerApp::loadScene(const lb::LuaBind& lua_bind) {
     loadMaterials(lua_bind);
     loadPrimitives(lua_bind);
     printSceneInfo();
-
-    std::cout << "+---- Acceleration structure --------------------------------------------------+\n";
-    std::cout << "  Type: ";
-
-    std::string accel_type;
-    if (scene_->getAccelStructureType() == AccelStructure::Type::NONE)
-        std::cout << "none (array)\n";
-    else if (scene_->getAccelStructureType() == AccelStructure::Type::BVH_SAH)
-        std::cout << "SAH-based BVH\n";
-    else if (scene_->getAccelStructureType() == AccelStructure::Type::SBVH_SAH)
-        std::cout << "SAH-based SBVH\n";
-
-    scene_->buildAccelStructure();
-
-    if (scene_->getAccelStructureType() == AccelStructure::Type::NONE) {
-        const StatsNoAccel* stats = static_cast<const StatsNoAccel*>(&scene_->getAccelStructure().getStatistics());
-        std::cout << "  Build time: " << stats->build_time_ << " usec\n";
-        std::cout << "  Primitives: " << stats->num_references_ << "\n";
-    } else if (scene_->getAccelStructureType() == AccelStructure::Type::BVH_SAH) {
-        const StatsSBVH* stats = static_cast<const StatsSBVH*>(&scene_->getAccelStructure().getStatistics());
-        std::cout << "  Build time: " << stats->build_time_ << " usec\n";
-        std::cout << "  References: " << stats->num_references_ << "\n";
-        std::cout << "  Tree height: " << stats->tree_height_ << "\n";
-        std::cout << "  Nodes: " << stats->num_nodes_ << "\n";
-        std::cout << "    Inner nodes: " << stats->num_inner_nodes_ << "\n";
-        std::cout << "    Leaf nodes: " << stats->num_leaf_nodes_ << "\n";
-        std::cout << "  Min/max refs per leaf node: " << stats->min_num_primitives_leaf_ << " / "
-                  << stats->max_num_primitives_leaf_ << "\n";
-        std::cout << "  Unreferenced primitives: " << stats->num_unreferenced_primitives_ << "\n";
-    } else if (scene_->getAccelStructureType() == AccelStructure::Type::SBVH_SAH) {
-        const StatsSBVH* stats = static_cast<const StatsSBVH*>(&scene_->getAccelStructure().getStatistics());
-        std::cout << "  Build time: " << stats->build_time_ << " usec\n";
-        std::cout << "  Object / spatial splits: " << stats->num_object_splits_ << " / " << stats->num_spatial_splits_
-                  << "\n";
-        std::cout << "  References: " << stats->num_references_ << "\n";
-        std::cout << "  Tree height: " << stats->tree_height_ << "\n";
-        std::cout << "  Nodes: " << stats->num_nodes_ << "\n";
-        std::cout << "    Inner nodes: " << stats->num_inner_nodes_ << "\n";
-        std::cout << "    Leaf nodes: " << stats->num_leaf_nodes_ << "\n";
-        std::cout << "  Min/max refs per leaf node: " << stats->min_num_primitives_leaf_ << " / "
-                  << stats->max_num_primitives_leaf_ << "\n";
-        std::cout << "  Unreferenced primitives: " << stats->num_unreferenced_primitives_ << "\n";
-    }
-
-    std::cout << "+------------------------------------------------------------------------------+\n";
 }
 
 void SwpathtracerApp::loadBSDFs(const lb::LuaBind& lua_bind) {
@@ -300,26 +255,28 @@ void SwpathtracerApp::printCameraInfo() const {
     std::cout << "+---- Camera ------------------------------------------------------------------+\n";
 
     if (camera_->getType() == Camera::Type::ORTHOGRAPHIC)
-        std::cout << "  Type: orthographic\n";
+        std::cout << "  Type ...........................: orthographic\n";
     else if (camera_->getType() == Camera::Type::PINHOLE)
-        std::cout << "  Type: pinhole\n";
+        std::cout << "  Type ...........................: pinhole\n";
 
-    std::cout << "  Position: [" << camera_->getPosition()[0] << ", " << camera_->getPosition()[1] << ", "
-              << camera_->getPosition()[2] << "]\n";
-    std::cout << "  Look at: [" << camera_->getLookAt()[0] << ", " << camera_->getLookAt()[1] << ", "
-              << camera_->getLookAt()[2] << "]\n";
-    std::cout << "  Up: [" << camera_->getUp()[0] << ", " << camera_->getUp()[1] << ", " << camera_->getUp()[2]
-              << "]\n";
+    std::cout << "  Position .......................: [" << camera_->getPosition()[0] << ", "
+              << camera_->getPosition()[1] << ", " << camera_->getPosition()[2] << "]\n";
+    std::cout << "  Look at ........................: [" << camera_->getLookAt()[0] << ", " << camera_->getLookAt()[1]
+              << ", " << camera_->getLookAt()[2] << "]\n";
+    std::cout << "  Up .............................: [" << camera_->getUp()[0] << ", " << camera_->getUp()[1] << ", "
+              << camera_->getUp()[2] << "]\n";
 
     if (camera_->getType() == Camera::Type::ORTHOGRAPHIC) {
         OrthographicCamera* ortho_cam = dynamic_cast<OrthographicCamera*>(camera_.get());
-        std::cout << "  Aspect: " << ortho_cam->getAspect() << "\n";
-        std::cout << "  Window x range: [" << ortho_cam->getMinX() << ", " << ortho_cam->getMaxX() << "]\n";
-        std::cout << "  Window y range: [" << ortho_cam->getMinY() << ", " << ortho_cam->getMaxY() << "]\n";
+        std::cout << "  Aspect .........................: " << ortho_cam->getAspect() << "\n";
+        std::cout << "  Window x range .................: [" << ortho_cam->getMinX() << ", " << ortho_cam->getMaxX()
+                  << "]\n";
+        std::cout << "  Window y range .................: [" << ortho_cam->getMinY() << ", " << ortho_cam->getMaxY()
+                  << "]\n";
     } else if (camera_->getType() == Camera::Type::PINHOLE) {
         PinholeCamera* pinhole_cam_ptr = dynamic_cast<PinholeCamera*>(camera_.get());
-        std::cout << "  Aspect: " << pinhole_cam_ptr->getAspect() << "\n";
-        std::cout << "  Vertical FOV: " << pinhole_cam_ptr->getVFov() << "\n";
+        std::cout << "  Aspect .........................: " << pinhole_cam_ptr->getAspect() << "\n";
+        std::cout << "  Vertical FOV ...................: " << pinhole_cam_ptr->getVFov() << "\n";
     }
 
     std::cout << "+------------------------------------------------------------------------------+\n";
@@ -327,21 +284,67 @@ void SwpathtracerApp::printCameraInfo() const {
 
 void SwpathtracerApp::printSceneInfo() const {
     std::cout << "+---- Scene -------------------------------------------------------------------+\n";
-    std::cout << "  BSDFs: " << scene_->getNumBSDFs() << "\n";
-    std::cout << "  Layered BSDFs: " << scene_->getNumLayeredBSDFs() << "\n";
-    std::cout << "  Emissions: " << scene_->getNumEmissions() << "\n";
-    std::cout << "  Materials: " << scene_->getNumMaterials() << "\n";
-    std::cout << "  Primitives: " << scene_->getNumPrimitives() << "\n";
-    std::cout << "  Scene extents: \n"
-              << "    x: [" << scene_->x_min_ << ", " << scene_->x_max_ << "]\n"
-              << "    y: [" << scene_->y_min_ << ", " << scene_->y_max_ << "]\n"
-              << "    z: [" << scene_->z_min_ << ", " << scene_->z_max_ << "]\n";
+    std::cout << "  Background color ...............: [" << scene_->getBackgroundColor()[0] << ", "
+              << scene_->getBackgroundColor()[1] << ", " << scene_->getBackgroundColor()[2] << "]\n";
+    std::cout << "  BSDFs ..........................: " << scene_->getNumBSDFs() << "\n";
+    std::cout << "  Layered BSDFs ..................: " << scene_->getNumLayeredBSDFs() << "\n";
+    std::cout << "  Emissions ......................: " << scene_->getNumEmissions() << "\n";
+    std::cout << "  Materials ......................: " << scene_->getNumMaterials() << "\n";
+    std::cout << "  Primitives .....................: " << scene_->getNumPrimitives() << "\n";
+    std::cout << "  Scene extents : \n"
+              << "    x ............................: [" << scene_->x_min_ << ", " << scene_->x_max_ << "]\n"
+              << "    y ............................: [" << scene_->y_min_ << ", " << scene_->y_max_ << "]\n"
+              << "    z ............................: [" << scene_->z_min_ << ", " << scene_->z_max_ << "]\n";
+    std::cout << "+------------------------------------------------------------------------------+\n";
+    std::cout << "+---- Acceleration structure --------------------------------------------------+\n";
+    std::cout << "  Type ...........................: ";
+
+    std::string accel_type;
+    if (scene_->getAccelStructureType() == AccelStructure::Type::NONE)
+        std::cout << "none (array)\n";
+    else if (scene_->getAccelStructureType() == AccelStructure::Type::BVH_SAH)
+        std::cout << "SAH-based BVH\n";
+    else if (scene_->getAccelStructureType() == AccelStructure::Type::SBVH_SAH)
+        std::cout << "SAH-based SBVH\n";
+
+    scene_->buildAccelStructure();
+
+    if (scene_->getAccelStructureType() == AccelStructure::Type::NONE) {
+        const StatsNoAccel* stats = static_cast<const StatsNoAccel*>(&scene_->getAccelStructure().getStatistics());
+        std::cout << "  Build time .....................: " << stats->build_time_ << " usec\n";
+        std::cout << "  Primitives ...........................: " << stats->num_references_ << "\n";
+    } else if (scene_->getAccelStructureType() == AccelStructure::Type::BVH_SAH) {
+        const StatsSBVH* stats = static_cast<const StatsSBVH*>(&scene_->getAccelStructure().getStatistics());
+        std::cout << "  Build time .....................: " << stats->build_time_ << " usec\n";
+        std::cout << "  References .....................: " << stats->num_references_ << "\n";
+        std::cout << "  Tree height ....................: " << stats->tree_height_ << "\n";
+        std::cout << "  Nodes ..........................: " << stats->num_nodes_ << "\n";
+        std::cout << "    Inner nodes ..................: " << stats->num_inner_nodes_ << "\n";
+        std::cout << "    Leaf nodes ...................: " << stats->num_leaf_nodes_ << "\n";
+        std::cout << "  Min/max refs per leaf node .....: " << stats->min_num_primitives_leaf_ << " / "
+                  << stats->max_num_primitives_leaf_ << "\n";
+        std::cout << "  Unreferenced primitives ........: " << stats->num_unreferenced_primitives_ << "\n";
+    } else if (scene_->getAccelStructureType() == AccelStructure::Type::SBVH_SAH) {
+        const StatsSBVH* stats = static_cast<const StatsSBVH*>(&scene_->getAccelStructure().getStatistics());
+        std::cout << "  Build time .....................: " << stats->build_time_ << " usec\n";
+        std::cout << "  Object / spatial splits ........: " << stats->num_object_splits_ << " / "
+                  << stats->num_spatial_splits_ << "\n";
+        std::cout << "  References .....................: " << stats->num_references_ << "\n";
+        std::cout << "  Tree height ....................: " << stats->tree_height_ << "\n";
+        std::cout << "  Nodes ..........................: " << stats->num_nodes_ << "\n";
+        std::cout << "    Inner nodes ..................: " << stats->num_inner_nodes_ << "\n";
+        std::cout << "    Leaf nodes ...................: " << stats->num_leaf_nodes_ << "\n";
+        std::cout << "  Min/max refs per leaf node .....: " << stats->min_num_primitives_leaf_ << " / "
+                  << stats->max_num_primitives_leaf_ << "\n";
+        std::cout << "  Unreferenced primitives ........: " << stats->num_unreferenced_primitives_ << "\n";
+    }
+
     std::cout << "+------------------------------------------------------------------------------+\n";
 }
 
 void SwpathtracerApp::printIntegratorInfo() const {
     std::cout << "+---- Integrator --------------------------------------------------------------+\n";
-    std::cout << "  Type: ";
+    std::cout << "  Type ...........................: ";
 
     if (integrator_->getType() == Integrator::Type::NORMAL_RAYCASTER) {
         std::cout << "Normal Ray Caster\n";
@@ -352,7 +355,7 @@ void SwpathtracerApp::printIntegratorInfo() const {
     } else if (integrator_->getType() == Integrator::Type::PATHTRACER) {
         std::cout << "Forward Path Tracer\n";
         PathTracer* path_tracer = dynamic_cast<PathTracer*>(integrator_.get());
-        std::cout << "  Path termination criterion: ";
+        std::cout << "  Path termination criterion .....: ";
 
         if (path_tracer->getPathTerminationCriterion() == PathTracer::PathTerminationCriterion::MAX_DEPTH)
             std::cout << "maximum depth (path length = " << path_tracer->getPathLength() << ")\n";
@@ -360,9 +363,9 @@ void SwpathtracerApp::printIntegratorInfo() const {
             std::cout << "Russian Roulette (starting after " << path_tracer->getPathLength() << " bounce(s))\n";
     }
 
-    std::cout << "  spp: " << integrator_->getPixelSampler().getSPP() << "\n";
+    std::cout << "  spp ............................: " << integrator_->getPixelSampler().getSPP() << "\n";
 
-    std::cout << "  Pixel sampler: ";
+    std::cout << "  Pixel sampler ..................: ";
     if (integrator_->getPixelSampler().getType() == PixelSampler::Type::UNIFORM)
         std::cout << "uniform (box filter)\n";
     else if (integrator_->getPixelSampler().getType() == PixelSampler::Type::REGULAR)
@@ -372,39 +375,6 @@ void SwpathtracerApp::printIntegratorInfo() const {
 
     std::cout << "+------------------------------------------------------------------------------+\n";
 }
-
-// void SwpathtracerApp::printPreRenderingInfo() {
-
-//     std::cout << "+---- Integrator --------------------------------------------------------------+\n";
-//     std::cout << "|  Type: ";
-
-//     std::cout << "+------------------------------------------------------------------------------+\n";
-
-//     // print integrator info ///////////////////////////////////////////////////////
-//     // std::cout << "Integrator:\n";
-//     // if (integrator_->getType() == Integrator::Type::RAYCASTER) {
-//     //     RayCaster* ray_caster_ptr = dynamic_cast<RayCaster*>(integrator_.get());
-//     //     std::cout << "    Type: ray caster\n";
-//     // } else if (integrator_->getType() == Integrator::Type::PATHTRACER) {
-//     //     PathTracer* path_tracer_ptr = dynamic_cast<PathTracer*>(integrator_.get());
-//     //     std::cout << "    Type: path tracer\n";
-//     // }
-
-//     //std::cout << "Num threads:" << omp_get_max_threads() << "\n";
-// }
-
-// void SwpathtracerApp::printPostRenderingInfo() {
-//     // std::cout << "Rendering statistics:\n";
-//     // std::cout << "    Intersection tests:\n";
-//     // std::cout << "        min intersection tests pp: " << integrator_->getMinIntersectionTestsPerPixel() << "\n";
-//     // std::cout << "        max intersection tests pp: " << integrator_->getMaxIntersectionTestsPerPixel() << "\n";
-//     // std::cout << "        num intersection tests: " << integrator_->getNumIntersectionTests() << "\n";
-//     // std::cout << "    Intersections:\n";
-//     // std::cout << "        min intersections pp: " << integrator_->getMinIntersectionsPerPixel() << "\n";
-//     // std::cout << "        max intersections pp: " << integrator_->getMaxIntersectionsPerPixel() << "\n";
-//     // std::cout << "        num intersections: " << integrator_->getNumIntersections() << "\n";
-
-// }
 
 void SwpathtracerApp::render() {
     integrator_->render();

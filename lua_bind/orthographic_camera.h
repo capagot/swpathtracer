@@ -6,6 +6,7 @@
 #include "camera.h"
 
 namespace lb {
+
 struct OrthographicCamera : public Camera {
     OrthographicCamera(glm::vec3 position, glm::vec3 look_at, glm::vec3 up, float min_x, float max_x, float min_y,
                        float max_y)
@@ -20,6 +21,7 @@ struct OrthographicCamera : public Camera {
     float min_y_;
     float max_y_;
 };
+
 }  // namespace lb
 
 #endif  // LUA_BIND_ORTHOGRAPHIC_CAMERA_H

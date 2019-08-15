@@ -6,6 +6,7 @@
 #include "object.h"
 
 namespace lb {
+
 struct Triangle : public Object {
     Triangle(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, long unsigned int material_id,
              Type type = Type::TRIANGLE)
@@ -15,6 +16,7 @@ struct Triangle : public Object {
     glm::vec3 v1_;
     glm::vec3 v2_;
 };
+
 }  // namespace lb
 
 #endif  // LUA_BIND_TRIANGLE_H
