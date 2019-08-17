@@ -1,22 +1,52 @@
+require "validation"
+
 function Camera( self )
-    _G["__RENDERER_ELEMENTS__"]["__CAMERA__"] = self
---[[    _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].type = self.type
-    if (self.type == "pinhole") then
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].position = self.position
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].up = self.up
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].look_at = self.look_at
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].aspect = self.aspect
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].fov = self.fov
+    if (not CheckStringField(self, "type", "pinhole", {"pinhole", "orthographic"})) then
+        print("Lua ERROR: Camera type  is wrong. Exiting...")
+        os.exit()
     end
 
-    if (self.type == "orthographic") then
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].position = self.position
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].up = self.up
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].look_at = self.look_at
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].aspect = self.aspect
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].min_x = self.min_x
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].max_x = self.max_x
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].min_y = self.min_y
-        _G["__RENDERER_ELEMENTS__"]["__CAMERA__"].max_y = self.max_y
-    end--]]
+    if (not CheckVector3Field(self, "position", {0, 0, 5})) then
+        print("Lua ERROR: Camera position vector is wrong. Exiting...")
+        os.exit()
+    end
+
+    if (not CheckVector3Field(self, "look_at", {0, 0, 0})) then
+        print("Lua ERROR: Camera 'look at' vector is wrong. Exiting...")
+        os.exit()
+    end
+
+    if (not CheckVector3Field(self, "up", {0, 1, 0})) then
+        print("Lua ERROR: Camera up vector is wrong. Exiting...")
+        os.exit()
+    end
+
+    if (self.type == "pinhole") then
+        if (not CheckNumberField(self, "fov", 55)) then
+            print("Lua ERROR: Camera up vector is wrong. Exiting...")
+            os.exit()
+        end
+    else
+        if (not CheckNumberField(self, "min_x")) then
+            print("Lua ERROR: Camera min_x is wrong. Exiting...")
+            os.exit()
+        end
+
+        if (not CheckNumberField(self, "max_x")) then
+            print("Lua ERROR: Camera max_x is wrong. Exiting...")
+            os.exit()
+        end
+
+        if (not CheckNumberField(self, "min_y")) then
+            print("Lua ERROR: Camera min_y is wrong. Exiting...")
+            os.exit()
+        end
+
+        if (not CheckNumberField(self, "max_y")) then
+            print("Lua ERROR: Camera max_y is wrong. Exiting...")
+            os.exit()
+        end
+    end
+        
+    _G["__RENDERER_ELEMENTS__"]["__CAMERA__"] = self
 end

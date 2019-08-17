@@ -33,7 +33,8 @@ void Scene::loadMesh(const std::string& filename, long unsigned int material_id,
     Assimp::Importer assimp_importer;
     const aiScene* assimp_scene_ = assimp_importer.ReadFile(filename, assimp_post_processes);
 
-    if (!assimp_scene_) std::cerr << assimp_importer.GetErrorString() << std::endl;
+    if (!assimp_scene_)
+        throw std::runtime_error(assimp_importer.GetErrorString());
 
     if (assimp_scene_->HasMeshes()) {
         for (unsigned int mesh_id = 0; mesh_id < assimp_scene_->mNumMeshes; mesh_id++) {
