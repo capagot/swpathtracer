@@ -8,7 +8,7 @@ end
 
 function Emission(self)
     if (not CheckVector3(self)) then
-        print("Lua ERROR: Emission vector is wrong. Exiting...")
+        print("Lua ERROR: Invalid emission value. Exiting...")
         os.exit()
     end
 

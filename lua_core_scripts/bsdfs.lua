@@ -12,12 +12,12 @@ function Lambertian(self)
     self.type = "lambertian"
 
     if (not CheckVector3Field(self, "kd", {0.75, 0.75, 0.75})) then
-        print("Lua ERROR: Lambertian reflectance (kd field) is wrong. Exiting...")
+        print("Lua ERROR: Invalid lambertian reflectance (kd field). Exiting...")
         os.exit()
     end
 
     if (not CheckStringField(self, "bsdf_sampler", "importance", bsdf_samplers)) then
-        print("Lua ERROR: BSDF sampler is wrong. Exiting...")
+        print("Lua ERROR: Invalid lambertian BSDF sampler. Exiting...")
         os.exit()
     end
 
@@ -28,12 +28,12 @@ function SmoothConductor(self)
     self.type = "smooth_conductor"
 
     if (not CheckVector3Field(self, "reflectance_at_normal_incidence", {0.99, 0.99, 0.99})) then
-        print("Lua ERROR: Smooth conductor reflectance at normal incidence is wrong. Exiting...")
+        print("Lua ERROR: Invalid smooth conductor reflectance at normal incidence. Exiting...")
         os.exit()
     end
 
     if (not CheckStringField(self, "bsdf_sampler", "importance", bsdf_samplers)) then
-        print("Lua ERROR: BSDF sampler is wrong. Exiting...")
+        print("Lua ERROR: Invalid smooth conductor BSDF sampler. Exiting...")
         os.exit()
     end
 
@@ -44,12 +44,12 @@ function SmoothDielectric(self)
     self.type = "smooth_dielectric"
 
     if (not CheckNumberField(self, "ior", 1.5)) then
-        print("Lua ERROR: Smooth dielectric IOR is wrong. Exiting...")
+        print("Lua ERROR: Invalid smooth dielectric IOR. Exiting...")
         os.exit()
     end
 
     if (not CheckStringField(self, "bsdf_sampler", "importance", bsdf_samplers)) then
-        print("Lua ERROR: BSDF sampler is wrong. Exiting...")
+        print("Lua ERROR: Invalid smooth dielectric BSDF sampler. Exiting...")
         os.exit()
     end
 
@@ -60,17 +60,17 @@ function CookTorrance(self)
     self.type = "cook_torrance"
 
     if (not CheckNumberField(self, "roughness", 0.2)) then
-        print("Lua ERROR: Cook-Torrance roughness is wrong. Exiting...")
+        print("Lua ERROR: Invalid Cook-Torrance roughness. Exiting...")
         os.exit()
     end
 
     if (not CheckVector3Field(self, "reflectance_at_normal_incidence", {0.99, 0.99, 0.99})) then
-        print("Lua ERROR: Cook-Torrance reflectance at normal incidence is wrong. Exiting...")
+        print("Lua ERROR: Invalid Cook-Torrance reflectance at normal incidence. Exiting...")
         os.exit()
     end
 
     if (not CheckStringField(self, "bsdf_sampler", "importance", bsdf_samplers)) then
-        print("Lua ERROR: BSDF sampler is wrong. Exiting...")
+        print("Lua ERROR: Invalid Cook-Torrance BSDF sampler. Exiting...")
         os.exit()
     end
 

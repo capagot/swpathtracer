@@ -2,25 +2,25 @@ require "validation"
 
 function Integrator( self )
     if (not CheckStringField(self, "type", "ray-caster", {"ray-caster", "path-tracer"})) then
-        print("Lua ERROR: Integrator type  is wrong. Exiting...")
+        print("Lua ERROR: Invalid integrator type. Exiting...")
         os.exit()
     end
 
     if (self.type == "path-tracer") then
         if (not CheckStringField(self, "path_termination", "russian-roulette", {"max-length", "russian-roulette"})) then
-            print("Lua ERROR: Integrator path termination criterion is wrong. Exiting...")
+            print("Lua ERROR: Invalid integrator path termination criterion. Exiting...")
             os.exit()
         end    
 
         if (not CheckNumberField(self, "path_length", 5)) then
-            print("Lua ERROR: Integrator path length is wrong. Exiting...")
+            print("Lua ERROR: Invalid integrator path length. Exiting...")
             os.exit()
         end
     end
 
     if (self.type == "ray-caster") then
         if (not CheckStringField(self, "pixel_value", "normal", {"depth", "normal", "intersection-test-count"})) then
-            print("Lua ERROR: Ray caster type (pixel format) is wrong. Exiting...")
+            print("Lua ERROR: Invalid ray caster type (pixel format). Exiting...")
             os.exit()
         end    
     end

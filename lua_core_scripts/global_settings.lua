@@ -2,12 +2,12 @@ require "validation"
 
 function GlobalSettings( self )
     if (not CheckStringField(self, "acceleration_structure", "bvh-sah", {"none", "bvh-sah"})) then
-        print("Lua ERROR: Acceleration structure is wrong. Exiting...")
+        print("Lua ERROR: Invalid acceleration structure. Exiting...")
         os.exit()
     end
 
     if (not CheckVector3Field(self, "background_color", {0, 0, 0})) then
-        print("Lua ERROR: Image background color is wrong. Exiting...")
+        print("Lua ERROR: Invalid image background color. Exiting...")
         os.exit()
     end
 
