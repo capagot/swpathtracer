@@ -66,7 +66,12 @@ void PathTracer::render() {
     max_int_count_pp_ = 0;
 
     std::cout << "+---- Rendering ---------------------------------------------------------------+\n";
+
+#ifndef DEBUG    
     std::cout << "  Threads ........................: " << omp_get_max_threads() << "\n";
+#else
+    std::cout << "  Threads ........................: 1\n";
+#endif 
 
     timer.start();
 
