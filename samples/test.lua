@@ -1,5 +1,5 @@
-package.path = package.path .. ';../lua_core_scripts/?.lua'
-package.path = package.path .. ';./lua_core_scripts/?.lua'
+package.path = package.path .. ';../lua_core/?.lua'
+package.path = package.path .. ';./lua_core/?.lua'
 
 require "core"
 
