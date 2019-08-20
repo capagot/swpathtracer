@@ -65,7 +65,8 @@ void PathTracer::render() {
     min_int_count_pp_ = std::numeric_limits<std::size_t>::max();
     max_int_count_pp_ = 0;
 
-    std::cout << "+---- Rendering ---------------------------------------------------------------+\n";
+    std::cout << "Rendering\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
 
 #ifndef DEBUG    
     std::cout << "  Threads ........................: " << omp_get_max_threads() << "\n";
@@ -127,7 +128,7 @@ void PathTracer::render() {
               << (100.0f * int_count_) / int_tests_count_ << "% of all intersection tests)\n";
     std::cout << "      Min intersections pp .......: " << min_int_count_pp_ << "\n";
     std::cout << "      Max intersections pp .......: " << max_int_count_pp_ << "\n";
-    std::cout << "+------------------------------------------------------------------------------+\n";
+    std::cout << "\n";
 }
 
 void PathTracer::saveImageToFile() {

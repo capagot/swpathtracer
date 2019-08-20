@@ -252,7 +252,8 @@ void SwpathtracerApp::loadIntegrator(const lb::LuaBind& lua_bind) {
 }
 
 void SwpathtracerApp::printCameraInfo() const {
-    std::cout << "+---- Camera ------------------------------------------------------------------+\n";
+    std::cout << "Camera\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
 
     if (camera_->getType() == Camera::Type::ORTHOGRAPHIC)
         std::cout << "  Type ...........................: orthographic\n";
@@ -279,11 +280,12 @@ void SwpathtracerApp::printCameraInfo() const {
         std::cout << "  Vertical FOV ...................: " << pinhole_cam_ptr->getVFov() << "\n";
     }
 
-    std::cout << "+------------------------------------------------------------------------------+\n";
+    std::cout << "\n";
 }
 
 void SwpathtracerApp::printSceneInfo() const {
-    std::cout << "+---- Scene -------------------------------------------------------------------+\n";
+    std::cout << "Scene\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
     std::cout << "  Background color ...............: [" << scene_->getBackgroundColor()[0] << ", "
               << scene_->getBackgroundColor()[1] << ", " << scene_->getBackgroundColor()[2] << "]\n";
     std::cout << "  BSDFs ..........................: " << scene_->getNumBSDFs() << "\n";
@@ -295,8 +297,9 @@ void SwpathtracerApp::printSceneInfo() const {
               << "    x ............................: [" << scene_->x_min_ << ", " << scene_->x_max_ << "]\n"
               << "    y ............................: [" << scene_->y_min_ << ", " << scene_->y_max_ << "]\n"
               << "    z ............................: [" << scene_->z_min_ << ", " << scene_->z_max_ << "]\n";
-    std::cout << "+------------------------------------------------------------------------------+\n";
-    std::cout << "+---- Acceleration structure --------------------------------------------------+\n";
+    std::cout << "\n";
+    std::cout << "Acceleration structure\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
     std::cout << "  Type ...........................: ";
 
     std::string accel_type;
@@ -339,11 +342,12 @@ void SwpathtracerApp::printSceneInfo() const {
         std::cout << "  Unreferenced primitives ........: " << stats->num_unreferenced_primitives_ << "\n";
     }
 
-    std::cout << "+------------------------------------------------------------------------------+\n";
+    std::cout << "\n";
 }
 
 void SwpathtracerApp::printIntegratorInfo() const {
-    std::cout << "+---- Integrator --------------------------------------------------------------+\n";
+    std::cout << "Integrator\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
     std::cout << "  Type ...........................: ";
 
     if (integrator_->getType() == Integrator::Type::NORMAL_RAYCASTER) {
@@ -373,7 +377,7 @@ void SwpathtracerApp::printIntegratorInfo() const {
     else if (integrator_->getPixelSampler().getType() == PixelSampler::Type::JITTERED)
         std::cout << "jittered (box filter)\n";
 
-    std::cout << "+------------------------------------------------------------------------------+\n";
+    std::cout << "\n";
 }
 
 void SwpathtracerApp::render() {

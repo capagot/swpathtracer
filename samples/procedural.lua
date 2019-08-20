@@ -17,7 +17,7 @@ Camera{
 
 PixelSampler{
     type = "jittered",
-    spp = 256
+    spp = 16
 }
 
 ImageBuffer{
@@ -39,7 +39,7 @@ Integrator{
     type = "path-tracer",
     path_termination = "max-length",
     path_length = 5,
- }
+}
 
 local sampler_type = "importance"
 
@@ -50,7 +50,7 @@ local light = Material{
             bsdf_sampler = sampler_type
         }
     },
-    emission = Emission{1.25, 1.25, 1.25}
+    emission = Emission{2, 2, 2}
 }
 
 Triangle{
