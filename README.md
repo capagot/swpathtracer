@@ -55,33 +55,33 @@ I've compiled and executed this software only in Linux (i.e. Ubuntu 18.04). Thes
 
     `$ cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release DGLM_INCLUDE_DIRS=<glm dir>`
 
-    CMake will try to find Lua and Assimp automatically and, if it succeedes in doing that, everything will be fine and you may jump straight to step 7. However, if it cannot find them, you will have invoke CMake with some additional variables that you will have to set manually. Below you will find the instructions on setting those variables.
+CMake will try to find Lua and Assimp automatically and, if it succeedes in doing that, everything will be fine and you may jump straight to step 7. However, if it cannot find them, you will have invoke CMake with some additional variables that you will have to set manually. Below you will find the instructions on setting those variables.
 
 ### CMake did not find Assimp:
 
-    Issue the cmake command defining the following two additonal variables:
+Issue the cmake command defining the following two additonal variables:
 
     `$ cmake ... -DASSIMP_INCLUDE_DIRS=<path to assimp include dir> -DASSIMP_LIBRARIES=<fully qualified assimp library name>`
 
 ### CMake did not find Lua:
 
-    Issue the cmake command defining the following two additonal variables:
+Issue the cmake command defining the following two additonal variables:
 
     `$ cmake ... -DLUA_INCLUDE_DIR=<path to Lua includes> -DLUA_LIBRARIES=<fully qualified Lua library name>`
 
 ### CMake did not find OpenMP:
 
-    OpenMP is not simply a library or an include, it depends on the direct support of the compiler. If your compiler supports OpenMP and, even in this case, CMake cannot properly set its variables, one alternative may be to issue the cmake command defining the following additonal variable:
+OpenMP is not simply a library or an include, it depends on the direct support of the compiler. If your compiler supports OpenMP and, even in this case, CMake cannot properly set its variables, one alternative may be to issue the cmake command defining the following additonal variable:
 
     `$ cmake ... -DOpenMP_CXX_FLAGS=-fopenmp`
 
 7. make
 8. Done!
 
-    To render one of the accompanying sample files you may just issue the following command directly from within the `_build` directory:
+To render one of the accompanying sample files you may just issue the following command directly from within the `_build` directory:
 
     `$ ./swpathtracer -i ../samples/<sample Lua script>`
 
 ## TODOs
 
-    The implementation of this ray tracer is on going project in its early steps, and there are lots of things still to be improved and added to the renderer (this could be easily considered a lifetime software project). Among the planned features I would mention: multiple importance sampling (MIS), higher order pixel samplers, direct light sampling, bidirectioal path tracing, metropolis light transport, VCM, instancing, thin lens camera, CSG, subsurface scattering, photon mapping, light probes, spectral rendering, support for OpenEXR, Disney "principled" BRDFs, higher order primitives (e.g. polynomials), and more.
+The implementation of this ray tracer is on going project in its early steps, and there are lots of things still to be improved and added to the renderer (this could be easily considered a lifetime software project). Among the planned features I would mention: multiple importance sampling (MIS), higher order pixel samplers, direct light sampling, bidirectioal path tracing, metropolis light transport, VCM, instancing, thin lens camera, CSG, subsurface scattering, photon mapping, light probes, spectral rendering, support for OpenEXR, Disney "principled" BRDFs, higher order primitives (e.g. polynomials), and more.
