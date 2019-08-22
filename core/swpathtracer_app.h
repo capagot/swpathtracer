@@ -53,14 +53,10 @@ class SwpathtracerApp {
     void loadPrimitives(const lb::LuaBind& lua_bind);
     void loadScene(const lb::LuaBind& lua_bind);
     void loadIntegrator(const lb::LuaBind& lua_bind);
-
-    // void printPreRenderingInfo();
-    // void printPostRenderingInfo();
-
     void printCameraInfo() const;
+    void printInOutInfo() const;
     void printSceneInfo() const;
     void printIntegratorInfo() const;
-
     void init();
     void render();
     void saveImageToFile();

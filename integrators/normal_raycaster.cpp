@@ -4,16 +4,16 @@ NormalRayCaster::NormalRayCaster(Camera& camera, const Scene& scene)
     : RayCaster(camera, scene, Integrator::Type::NORMAL_RAYCASTER) {}
 
 void NormalRayCaster::saveImageToFile() {
-    for (unsigned int x = 0; x < camera_.getImage().getImageWidth(); ++x)
-        for (unsigned int y = 0; y < camera_.getImage().getImageHeight(); ++y) {
+    for (unsigned int x = 0; x < camera_.getImageBuffer().getImageWidth(); ++x)
+        for (unsigned int y = 0; y < camera_.getImageBuffer().getImageHeight(); ++y) {
             if ((buffer_[x][y][0] != 0.0f) || (buffer_[x][y][1] != 0.0f) ||
                 (buffer_[x][y][2] != 0.0f))  // if it is not background color...
 
                 // normal encoded as: n.xyz * 1/2 + 1/2
-                camera_.getImage().setPixelValue(x, y, buffer_[x][y] * 0.5f + 0.5f);
+                camera_.getImageBuffer().setPixelValue(x, y, buffer_[x][y] * 0.5f + 0.5f);
         }
 
-    camera_.getImage().saveToFile();
+    camera_.getImageBuffer().saveToFile();
 }
 
 glm::vec3 NormalRayCaster::getHitValue(const IntersectionRecord& intersection_record,

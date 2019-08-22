@@ -19,7 +19,7 @@ void SwpathtracerApp::run() {
 void SwpathtracerApp::printAppInfo() {
     std::cout << APP_NAME << " - v" << APP_MAJOR_VERSION << "." << APP_MINOR_VERSION << " - " << APP_BUILD_MODE << "\n";
     std::cout << "Copyright (C) 2016 Christian Azambuja Pagot\n";
-    std::cout << "License MIT (https://opensource.org/licenses/MIT).\n";
+    std::cout << "License MIT (https://opensource.org/licenses/MIT).\n\n";
 }
 
 void SwpathtracerApp::parseCmdLineOptions() {
@@ -61,6 +61,7 @@ void SwpathtracerApp::loadCamera(const lb::LuaBind& lua_bind) {
     }
 
     printCameraInfo();
+    printInOutInfo();
 }
 
 void SwpathtracerApp::loadScene(const lb::LuaBind& lua_bind) {
@@ -280,6 +281,25 @@ void SwpathtracerApp::printCameraInfo() const {
         std::cout << "  Vertical FOV ...................: " << pinhole_cam_ptr->getVFov() << "\n";
     }
 
+    std::cout << "  Image size .....................: " << camera_->getImageBuffer().getImageWidth() << " x "
+              << camera_->getImageBuffer().getImageHeight()
+              << " (= " << camera_->getImageBuffer().getImageWidth() * camera_->getImageBuffer().getImageHeight()
+              << ") pixels\n";
+    std::cout << "  Viewport top left corner .......: (" << camera_->getImageBuffer().getViewportLeft() << ", "
+              << camera_->getImageBuffer().getViewportTop() << ")\n";
+    std::cout << "  Viewport size ..................: " << camera_->getImageBuffer().getViewportWidth() << " x "
+              << camera_->getImageBuffer().getViewportHeight()
+              << " (= " << camera_->getImageBuffer().getViewportWidth() * camera_->getImageBuffer().getViewportHeight()
+              << ") pixels\n";
+
+    std::cout << "\n";
+}
+
+void SwpathtracerApp::printInOutInfo() const {
+    std::cout << "Input/Output\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
+    std::cout << "  Input file .....................: " << lua_script_filename_ << "\n";
+    std::cout << "  Output file ....................: " << camera_->getImageBuffer().getOutputFilename() << "\n";
     std::cout << "\n";
 }
 

@@ -53,9 +53,21 @@ class LuaBind {
     std::unique_ptr<Integrator> getIntegrator() const;
 
    private:
-    float getNumberField(const std::string& field_name) const;
-    std::string getStringField(const std::string& field_name) const;
-    glm::vec3 getVec3Field(const std::string& field_name) const;
+    template<typename T>
+    bool getNumberField(const std::string& field_name, T& val) const {
+        bool result = false;
+
+        if (lua_getfield(lua_state_, -1, field_name.c_str()) == LUA_TNUMBER) {
+            result = true;
+            if (lua_isnumber(lua_state_, -1)) val = lua_tonumber(lua_state_, -1);
+        }
+
+        lua_pop(lua_state_, 1);
+        return result;
+    }
+
+    bool getStringField(const std::string& field_name, std::string& str) const;    
+    bool getVec3Field(const std::string& field_name, glm::vec3& vec) const;
 
     lua_State* lua_state_ = nullptr;
 };

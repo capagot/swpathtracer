@@ -10,8 +10,8 @@ void DepthRayCaster::saveImageToFile() {
     min_depth_ = std::numeric_limits<float>::infinity();
     max_depth_ = -std::numeric_limits<float>::infinity();
 
-    for (unsigned int x = 0; x < camera_.getImage().getImageWidth(); ++x)
-        for (unsigned int y = 0; y < camera_.getImage().getImageHeight(); ++y) {
+    for (unsigned int x = 0; x < camera_.getImageBuffer().getImageWidth(); ++x)
+        for (unsigned int y = 0; y < camera_.getImageBuffer().getImageHeight(); ++y) {
             max_depth_ = (max_depth_ < buffer_[x][y]) ? buffer_[x][y] : max_depth_;
             min_depth_ = ((buffer_[x][y] > 0.0f) && (min_depth_ > buffer_[x][y])) ? buffer_[x][y] : min_depth_;
         }
@@ -20,17 +20,17 @@ void DepthRayCaster::saveImageToFile() {
     max_depth_ = (prescribed_max_depth_ != -1.0f) ? prescribed_max_depth_ : max_depth_;
     float depth_range = max_depth_ - min_depth_;
 
-    for (unsigned int x = 0; x < camera_.getImage().getImageWidth(); ++x)
-        for (unsigned int y = 0; y < camera_.getImage().getImageHeight(); ++y)
+    for (unsigned int x = 0; x < camera_.getImageBuffer().getImageWidth(); ++x)
+        for (unsigned int y = 0; y < camera_.getImageBuffer().getImageHeight(); ++y)
             if (buffer_[x][y] != -1.0f) {  // if it is not background...
                 if (depth_range)
-                    camera_.getImage().setPixelValue(x, y, glm::vec3((buffer_[x][y] - min_depth_) / depth_range));
+                    camera_.getImageBuffer().setPixelValue(x, y, glm::vec3((buffer_[x][y] - min_depth_) / depth_range));
                 else
-                    camera_.getImage().setPixelValue(x, y, glm::vec3(1.0f));
+                    camera_.getImageBuffer().setPixelValue(x, y, glm::vec3(1.0f));
             } else  //  if it is background, paint with black
-                camera_.getImage().setPixelValue(x, y, glm::vec3(0.0f));
+                camera_.getImageBuffer().setPixelValue(x, y, glm::vec3(0.0f));
 
-    camera_.getImage().saveToFile();
+    camera_.getImageBuffer().saveToFile();
 }
 
 float DepthRayCaster::getHitValue(const IntersectionRecord& intersection_record, std::size_t num_intersection_tests,

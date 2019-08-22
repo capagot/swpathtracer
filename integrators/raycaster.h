@@ -43,7 +43,7 @@ class RayCaster : public Integrator {
 template <class T>
 RayCaster<T>::RayCaster(Camera& camera, const Scene& scene, Integrator::Type integrator_type)
     : Integrator(camera, scene, integrator_type, std::make_unique<RegularPixelSampler>(1)),
-      buffer_(camera_.getImage().getImageWidth(), std::vector<T>(camera_.getImage().getImageHeight())) {}
+      buffer_(camera_.getImageBuffer().getImageWidth(), std::vector<T>(camera_.getImageBuffer().getImageHeight())) {}
 
 template <class T>
 RayCaster<T>::~RayCaster() {}
@@ -73,8 +73,8 @@ void RayCaster<T>::render() {
 #pragma omp parallel for schedule(dynamic, 1) reduction(+ : int_tests_count_, int_count_) reduction(min: min_int_tests_count_pp_, min_int_count_pp_) reduction(max: max_int_tests_count_pp_, max_int_count_pp_)
 #endif
 
-    for (unsigned int y = 0; y < camera_.getImage().getImageHeight(); ++y)
-        for (unsigned int x = 0; x < camera_.getImage().getImageWidth(); ++x) {
+    for (unsigned int y = 0; y < camera_.getImageBuffer().getImageHeight(); ++y)
+        for (unsigned int x = 0; x < camera_.getImageBuffer().getImageWidth(); ++x) {
             std::size_t curr_int_tests_count;
             std::size_t curr_int_count;
 

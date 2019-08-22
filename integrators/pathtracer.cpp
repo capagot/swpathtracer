@@ -76,10 +76,10 @@ void PathTracer::render() {
 
     timer.start();
 
-    unsigned int x_ini = camera_.getImage().getViewportLeft();
-    unsigned int x_end = x_ini + camera_.getImage().getViewportWidth();
-    unsigned int y_ini = camera_.getImage().getViewportTop();
-    unsigned int y_end = y_ini + camera_.getImage().getViewportHeight();
+    unsigned int x_ini = camera_.getImageBuffer().getViewportLeft();
+    unsigned int x_end = x_ini + camera_.getImageBuffer().getViewportWidth();
+    unsigned int y_ini = camera_.getImageBuffer().getViewportTop();
+    unsigned int y_end = y_ini + camera_.getImageBuffer().getViewportHeight();
 
 #ifndef DEBUG
 #pragma omp parallel for schedule(dynamic, 1) reduction(+ : int_tests_count_, int_count_) reduction(min: min_int_tests_count_pp_, min_int_count_pp_) reduction(max: max_int_tests_count_pp_, max_int_count_pp_)
@@ -99,11 +99,11 @@ void PathTracer::render() {
                 Ray ray = camera_.getRay(x_screen, y_screen);
                 glm::vec3 radiance = traceRay(ray, 0, curr_int_tests_count, curr_int_count);
 
-                camera_.getImage().setPixelValue(x, y, camera_.getImage().getPixelValue(x, y) + radiance);
+                camera_.getImageBuffer().setPixelValue(x, y, camera_.getImageBuffer().getPixelValue(x, y) + radiance);
             }
 
-            camera_.getImage().setPixelValue(
-                x, y, camera_.getImage().getPixelValue(x, y) / static_cast<float>(pixel_sampler_->getSPP()));
+            camera_.getImageBuffer().setPixelValue(
+                x, y, camera_.getImageBuffer().getPixelValue(x, y) / static_cast<float>(pixel_sampler_->getSPP()));
 
             // update integration statistics...
             int_tests_count_ += curr_int_tests_count;
@@ -132,14 +132,14 @@ void PathTracer::render() {
 }
 
 void PathTracer::saveImageToFile() {
-    camera_.getImage().convertTosRGB();
-    camera_.getImage().saveToFile();
+    camera_.getImageBuffer().convertTosRGB();
+    camera_.getImageBuffer().saveToFile();
 }
 
 void PathTracer::printProgress(unsigned int y) {
     std::stringstream progress_stream;
     progress_stream << "\r  Progress .......................: " << std::fixed << std::setw(6) << std::setprecision(2)
-                    << 100.0f * y / (camera_.getImage().getViewportTop() + camera_.getImage().getViewportHeight() - 1)
+                    << 100.0f * y / (camera_.getImageBuffer().getViewportTop() + camera_.getImageBuffer().getViewportHeight() - 1)
                     << "%";
     std::clog << progress_stream.str();
 }

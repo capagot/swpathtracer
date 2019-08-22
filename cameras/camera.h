@@ -16,7 +16,7 @@ class Camera {
     Camera(const glm::vec3& position, const glm::vec3& look_at, const glm::vec3& up,
            std::unique_ptr<ImageBuffer> image_buffer, Type camera_type);
     virtual ~Camera(){};
-    inline ImageBuffer& getImage() {
+    inline ImageBuffer& getImageBuffer() const {
         return (*image_buffer_.get());
     };
     virtual Ray getRay(float x, float y) const = 0;

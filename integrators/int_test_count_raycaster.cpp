@@ -26,8 +26,8 @@ void IntTestCountRayCaster::saveImageToFile() {
     unsigned int hit_test_range_pp = max_int_tests_count_pp - min_int_tests_count_pp;
 
     // intersection test count normalization (everything will be in [0,1])
-    for (unsigned int x = 0; x < camera_.getImage().getImageWidth(); ++x)
-        for (unsigned int y = 0; y < camera_.getImage().getImageHeight(); ++y) {
+    for (unsigned int x = 0; x < camera_.getImageBuffer().getImageWidth(); ++x)
+        for (unsigned int y = 0; y < camera_.getImageBuffer().getImageHeight(); ++y) {
             float value;
             if (hit_test_range_pp > 0)
                 value = (buffer_[x][y] - min_int_tests_count_pp) / static_cast<float>(hit_test_range_pp);
@@ -36,13 +36,13 @@ void IntTestCountRayCaster::saveImageToFile() {
             else
                 value = 0.0f;
 
-            camera_.getImage().setPixelValue(x, y, glm::vec3(value));
+            camera_.getImageBuffer().setPixelValue(x, y, glm::vec3(value));
         }
 
     // heat map color computation
-    for (unsigned int x = 0; x < camera_.getImage().getImageWidth(); ++x) {
-        for (unsigned int y = 0; y < camera_.getImage().getImageHeight(); ++y) {
-            float t = camera_.getImage().getPixelValue(x, y)[0];
+    for (unsigned int x = 0; x < camera_.getImageBuffer().getImageWidth(); ++x) {
+        for (unsigned int y = 0; y < camera_.getImageBuffer().getImageHeight(); ++y) {
+            float t = camera_.getImageBuffer().getPixelValue(x, y)[0];
 
             glm::vec3 rgb_color(0.0f);
             glm::vec3 hsl_color(0.65f - (t * 0.65f), 1.0f, t * 0.5f);
@@ -65,11 +65,11 @@ void IntTestCountRayCaster::saveImageToFile() {
                                       Hue2RGB(v1, v2, hsl_color[0] - (1.0f / 3.0f)));
             }
 
-            camera_.getImage().setPixelValue(x, y, rgb_color);
+            camera_.getImageBuffer().setPixelValue(x, y, rgb_color);
         }
     }
 
-    camera_.getImage().saveToFile();
+    camera_.getImageBuffer().saveToFile();
 }
 
 long int IntTestCountRayCaster::getHitValue(const IntersectionRecord& int_record, std::size_t num_int_tests,

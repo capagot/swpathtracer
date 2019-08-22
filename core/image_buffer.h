@@ -28,6 +28,9 @@ class ImageBuffer {
     inline unsigned int getViewportHeight() const {
         return viewport_height_;
     }
+    inline const std::string& getOutputFilename() const {
+        return file_name_;
+    }
     inline const glm::vec3& getPixelValue(unsigned int x, unsigned int y) const {
         return pixel_data_[x][y];
     }
