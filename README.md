@@ -4,7 +4,7 @@ An experimental ray tracer in its early stages of development.
 
 ## Introduction
 
-Physically based rendering is a subject under active research and for which new techniques are being developed continuously. In order to be able to experiment and learn the most as possible about it, I've decided to write an experimental ray tracer in C++ from the scratch. Although some acceleration techniques have been (or may be) included in the project, the main goal is not performance, but the construction of readable, modular, extensible and easy to understand code.
+Physically based rendering is a subject under active research and for which new techniques are being developed continuously. In order to be able to experiment and learn the most as possible about it, I've decided to write an experimental ray tracer in C++ from the scratch. Although some acceleration techniques have already been (and may be in the future) included into the project, the main goal is not performance, but the construction of a full featured, CPU-based ray tracer through readable, modular, extensible and easy to understand code.
 I am also trying to, as time permits, record its development at https://pbrexperiments.blogspot.com.br. 
 
 ## Current Features
