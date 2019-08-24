@@ -4,8 +4,8 @@ package.path = package.path .. ';./lua_core/?.lua'
 require "core"
 
 -------------------------------------------------------------------------------
-local image_width = 870
-local image_height = 150
+local image_width = 1200
+local image_height = 207
 
 Camera{
     type     = "pinhole",
@@ -17,7 +17,7 @@ Camera{
 
 PixelSampler{
     type = "jittered",
-    spp = 256 * 4 * 4
+    spp = 256 * 4 * 4 * 4
 }
 
 ImageBuffer{
@@ -216,4 +216,4 @@ Sphere{
     center = {5.5, 0, 0},
     radius = 1,
     material = mat_coated_copper
- }
+}

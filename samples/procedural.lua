@@ -4,8 +4,8 @@ package.path = package.path .. ';./lua_core/?.lua'
 require "core"
 
 -------------------------------------------------------------------------------
-local image_width = 800
-local image_height = 512
+local image_width = 1200
+local image_height = 768
 
 Camera{
     type     = "pinhole",
@@ -17,7 +17,7 @@ Camera{
 
 PixelSampler{
     type = "jittered",
-    spp = 16 * 4
+    spp = 1024 * 4 * 4 
 }
 
 ImageBuffer{
@@ -37,8 +37,8 @@ GlobalSettings{
 
 Integrator{
     type = "path-tracer",
-    path_termination = "max-length",
-    path_length = 5,
+    path_termination = "russian-roulette",
+    path_length = 3,
 }
 
 local sampler_type = "importance"
@@ -50,7 +50,7 @@ local light = Material{
             bsdf_sampler = sampler_type
         }
     },
-    emission = Emission{2, 2, 2}
+    emission = Emission{3, 3, 3}
 }
 
 Triangle{
@@ -74,6 +74,10 @@ for c1 = 1, 10 do
             radius = 0.5,
             material = Material{
                 bsdf = LayeredBSDF{
+                    SmoothDielectric{
+                        ior = 1.49,
+                        bsdf_sampler = sampler_type
+                    },
                     Lambertian{
                         kd = {math.random(), math.random(), math.random()},
                         bsdf_sampler = sampler_type

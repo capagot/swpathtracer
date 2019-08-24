@@ -216,7 +216,7 @@ std::unique_ptr<lb::BSDF> lb::LuaBind::getBSDFAt(unsigned int id) const {
         float roughness = 0.2f;
         glm::vec3 reflectance_at_normal_incidence;
 
-        if (!getNumberField("iroughnessor", roughness) ||
+        if (!getNumberField("roughness", roughness) ||
             !getVec3Field("reflectance_at_normal_incidence", reflectance_at_normal_incidence))
             throw std::runtime_error("ERROR: Invalid BSDF definition. Exiting...");
 

@@ -4,8 +4,8 @@ package.path = package.path .. ';./lua_core/?.lua'
 require "core"
 
 -------------------------------------------------------------------------------
-local image_width = 512
-local image_height = 512
+local image_width = 512 * 2
+local image_height = 512 * 2
 
 Camera{
     type     = "pinhole",
@@ -17,7 +17,7 @@ Camera{
 
 PixelSampler{
     type = "jittered",
-    spp = 256
+    spp = 16384
 }
 
 ImageBuffer{
