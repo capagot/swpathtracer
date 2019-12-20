@@ -22,11 +22,11 @@ BSDFSample CookTorranceBSDFSampler::getSample(const glm::vec3& local_wo) const {
 float CookTorranceBSDFSampler::getProbability(const glm::vec3& local_wo, const glm::vec3& local_wi) const {
     if (local_wi.y <= 0.0f) return 1.0f;  // dummy
 
-    glm::vec3 h = local_wo + local_wi;
+    glm::vec3 h = local_wo + local_wi; // h is the normal vector of the microfacet
 
     h = glm::normalize(h);
 
-    float nh = std::max(0.0f, h.y);
+    float nh = std::max(0.0f, h.y); // nh is the dot between h and the normal of the average surface
 
     if (nh == 0.0f) return 1e-5f;  // dummy value
 

@@ -17,7 +17,7 @@ Camera{
 
 PixelSampler{
     type = "jittered",
-    spp = 1024 * 4 * 4 
+    spp = 256
 }
 
 ImageBuffer{

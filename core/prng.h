@@ -37,8 +37,12 @@ class PRNG {
         // Guarantee that 'value' will be in [0, 1)
         while (value == max_) value = distribution_(engines_[thread_id]);
 
+        ++aux_count_; 
+        
         return value;
     }
+
+    std::size_t aux_count_ = 0;
 
     VALUE_TYPE min_;
     VALUE_TYPE max_;

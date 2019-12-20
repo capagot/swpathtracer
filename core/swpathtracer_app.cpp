@@ -204,11 +204,17 @@ void SwpathtracerApp::loadPrimitives(const lb::LuaBind& lua_bind) {
             scene_->addPrimitive(std::move(primitive));
         } else if (lua_object->type_ == lb::Object::Type::MESH) {
             lb::Mesh* lua_mesh = dynamic_cast<lb::Mesh*>(lua_object.get());
-            scene_->loadFlatMesh(lua_mesh->filename_, lua_mesh->material_id_);
-        } else if (lua_object->type_ == lb::Object::Type::SMOOTH_MESH) {
-            lb::SmoothMesh* lua_smooth_mesh = dynamic_cast<lb::SmoothMesh*>(lua_object.get());
-            scene_->loadSmoothMesh(lua_smooth_mesh->filename_, lua_smooth_mesh->material_id_);
-        }
+            std::unordered_map <std::string, long unsigned int> submeshes;
+
+            for (const lb::SubMesh& submesh: lua_mesh->submeshes)
+                submeshes.insert(std::make_pair(submesh.name, submesh.material_id));
+
+            bool render_all_submeshes = true;
+            if (lua_mesh->render_submeshes ==  lb::Mesh::RenderSubMeshes::NONE)
+                render_all_submeshes = false;
+
+            scene_->loadMesh(lua_mesh->filename_, lua_mesh->material_id_, render_all_submeshes, submeshes);
+        } 
     }
 }
 

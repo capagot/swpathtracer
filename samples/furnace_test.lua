@@ -20,7 +20,7 @@ Camera{
 
 PixelSampler{
     type = "jittered",
-    spp = 64
+    spp = 256
 }
 
 ImageBuffer{
@@ -143,8 +143,8 @@ Sphere{
     radius = 1,
     --material = mat_lambertian
     --material = mat_smooth_conductor
-    --material = mat_cook_torrance
+    material = mat_cook_torrance
     --material = mat_smooth_dielectric
     --material = mat_plastic
-    material = mat_coating
+    --material = mat_coating
 }

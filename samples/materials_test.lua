@@ -17,7 +17,7 @@ Camera{
 
 PixelSampler{
     type = "jittered",
-    spp = 256 * 4 * 4 * 4
+    spp = 256
 }
 
 ImageBuffer{
@@ -119,7 +119,7 @@ local mat_red = Material{
     emission = Emission{0, 0, 0}
 }
 
--- Red plastic made up of two layers: 
+-- Red plastic made up of two layers:
 local mat_red_plastic = Material{
     bsdf = LayeredBSDF{
         SmoothDielectric{
@@ -163,7 +163,7 @@ Sphere{
     radius = 2000,
     material = mat_weak_light
  }
- 
+
 -- Floor
 local a = 20000
 
@@ -193,7 +193,7 @@ Sphere{
     radius = 1,
     material = mat_smooth_dielectric
  }
- 
+
 Sphere{
     center = {-1.1, 0, 0},
     radius = 1,

@@ -4,20 +4,20 @@ package.path = package.path .. ';./lua_core/?.lua'
 require "core"
 
 -------------------------------------------------------------------------------
-local image_width = 512 * 2
-local image_height = 512 * 2
+local image_width = 512
+local image_height = 512
 
 Camera{
     type     = "pinhole",
     position = { 0, 0, 8 },
     look_at  = { 0, 0, 0 },
-    up       = { 0, 1, 0 }, 
+    up       = { 0, 1, 0 },
     fov      = 40,
 }
 
 PixelSampler{
     type = "jittered",
-    spp = 16384
+    spp = 256
 }
 
 ImageBuffer{
@@ -40,7 +40,7 @@ Integrator{
     path_termination = "russian-roulette",
     path_length = 3
  }
- 
+
 local sampler_type = "importance"
 local no_emission = Emission{0, 0, 0}
 
@@ -181,5 +181,6 @@ Triangle{
 
 Mesh{
     filename = "../samples/meshes/monkey.obj",
-    material = mat_white
+    material = mat_white,
+    render_submeshes = "all"
 }

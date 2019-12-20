@@ -2,6 +2,7 @@
 #define CORE_SCENE_H
 
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "assimp/Importer.hpp"
@@ -27,8 +28,8 @@ class Scene {
     void addEmission(const glm::vec3& emission);
     void addMaterial(const Material& material);
     void addPrimitive(std::unique_ptr<Primitive> primitive);
-    void loadFlatMesh(const std::string& filename, long unsigned int material_id);
-    void loadSmoothMesh(const std::string& filename, long unsigned int material_id);
+    void loadMesh(const std::string& filename, long unsigned int default_material_id, bool render_all_submeshes, 
+                  const std::unordered_map<std::string, long unsigned int>& submeshes);
     void buildAccelStructure();
     bool intersect(const Ray& ray, IntersectionRecord& intersection_record, std::size_t& num_intersection_tests,
                    std::size_t& num_intersections) const;
@@ -77,7 +78,6 @@ class Scene {
     float z_max_ = -std::numeric_limits<float>::infinity();
 
    private:
-    void loadMesh(const std::string& filename, long unsigned int material_id, int assimp_post_processes);
     void updateSceneExtents(const glm::vec3& vertex);
 
     std::vector<std::unique_ptr<BSDF>> bsdfs_;

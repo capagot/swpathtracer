@@ -74,12 +74,12 @@ std::unique_ptr<lb::Camera> lb::LuaBind::getCamera() const {
 
     if (type == "orthographic") {
         float min_x = -1.0f;
-        float max_x =  1.0f;
+        float max_x = 1.0f;
         float min_y = -1.0f;
-        float max_y =  1.0f;
+        float max_y = 1.0f;
 
         if (!getNumberField("min_x", min_x) || !getNumberField("max_x", max_x) || !getNumberField("min_y", min_y) ||
-            !getNumberField("tymax_ype", max_y))
+            !getNumberField("max_y", max_y))
             throw std::runtime_error("ERROR: Invalid camera definition. Exiting...");
 
         lua_camera = std::make_unique<lb::OrthographicCamera>(position, look_at, up, min_x, max_x, min_y, max_y);
@@ -405,18 +405,37 @@ std::unique_ptr<lb::Object> lb::LuaBind::getObjectAt(unsigned int id) const {
         lua_object = std::make_unique<lb::Sphere>(center, radius, material_id);
     } else if (type == "mesh") {
         std::string filename;
+        std::string render_submeshes_str;
 
-        if (!getStringField("filename", filename))
+        if (!getStringField("filename", filename) || !getStringField("render_submeshes", render_submeshes_str))
             throw std::runtime_error("ERROR: Invalid object definiton. Exiting...");
 
-        lua_object = std::make_unique<lb::Mesh>(filename, material_id);
-    } else if (type == "smooth_mesh") {
-        std::string filename;
+        Mesh::RenderSubMeshes render_submeshes;
 
-        if (!getStringField("filename", filename))
-            throw std::runtime_error("ERROR: Invalid object definiton. Exiting...");
+        if (render_submeshes_str == "all")
+            render_submeshes = Mesh::RenderSubMeshes::ALL;
+        else
+            render_submeshes = Mesh::RenderSubMeshes::NONE;
 
-        lua_object = std::make_unique<lb::SmoothMesh>(filename, material_id);
+        lua_object = std::make_unique<lb::Mesh>(filename, material_id, render_submeshes);
+
+        if (lua_getfield(lua_state_, -1, "sub_meshes") == LUA_TTABLE) {
+            lua_pushnil(lua_state_);
+            while (lua_next(lua_state_, -2) != 0) {
+                std::string name;
+                unsigned long material_id = 0;
+
+                if (!getStringField("name", name) || !getNumberField("material", material_id))
+                    throw std::runtime_error("ERROR: Invalid object definiton. Exiting...");
+
+                --material_id;  // Lua has 1-based arrays and C++ has 0-based arrays
+
+                dynamic_cast<lb::Mesh*>(lua_object.get())->submeshes.push_back(SubMesh(name, material_id));
+                lua_pop(lua_state_, 1);
+            }
+        }
+
+        lua_pop(lua_state_, 1);
     }
 
     lua_pop(lua_state_, 3);

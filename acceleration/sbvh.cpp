@@ -411,7 +411,7 @@ void SBVH::splitNode(std::unique_ptr<SBVHNode>& node, float root_aabb_area, cons
         node->right_node_->aabb_.setMin(node->right_node_->aabb_.getMin() - 1e-3f);
         node->right_node_->aabb_.setMax(node->right_node_->aabb_.getMax() + 1e-3f);
 
-        if (child_side == "root->L->R->R->L->R->L->L->L->L->R->R") std::cout << "!!!\n";
+        //if (child_side == "root->L->R->R->L->R->L->L->L->L->R->R") std::cout << "!!!\n";
 
         node->primitive_ref_list_.reset();
 

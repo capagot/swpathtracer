@@ -1,5 +1,7 @@
 * Implement additional pixel samplers.
 
+* Use indexes to avoid vertex data duplication.
+
 * Care must be taken in the case of layered materials because of the IORs of each dielectric layer.
  For instance, for the top most layer, the ior_i is 1 (air), while for a dielectric in a inner
  layer, the ior_i will be the ior of the layer above.
@@ -8,4 +10,4 @@
 
 * Implement the original Fresnel for dielectrics.
 
-* BUG (??) : SBVH actual split phase is not considering all axis????
+* BUG in the ray-sphere intersection.

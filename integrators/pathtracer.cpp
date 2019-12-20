@@ -68,11 +68,11 @@ void PathTracer::render() {
     std::cout << "Rendering\n";
     std::cout << "--------------------------------------------------------------------------------\n";
 
-#ifndef DEBUG    
+#ifndef DEBUG
     std::cout << "  Threads ........................: " << omp_get_max_threads() << "\n";
 #else
     std::cout << "  Threads ........................: 1\n";
-#endif 
+#endif
 
     timer.start();
 
@@ -85,18 +85,33 @@ void PathTracer::render() {
 #pragma omp parallel for schedule(dynamic, 1) reduction(+ : int_tests_count_, int_count_) reduction(min: min_int_tests_count_pp_, min_int_count_pp_) reduction(max: max_int_tests_count_pp_, max_int_count_pp_)
 #endif
 
-    for (unsigned int y = y_ini; y < y_end; ++y) {
+    // DEBUG
+    //for (std::size_t i = 0; i < 231214328; ++i )
+    //    float dummy = prng_();
+
+    for (unsigned int y = y_ini; y < y_end; ++y)
+    //unsigned int y = 314;
+    {
+
         printProgress(y);
 
-        for (unsigned int x = x_ini; x < x_end; ++x) {
+        for (unsigned int x = x_ini; x < x_end; ++x)
+        //unsigned int x = 323;
+        {
             std::size_t curr_int_tests_count;
             std::size_t curr_int_count;
 
             for (unsigned int sample = 0; sample < pixel_sampler_->getSPP(); ++sample) {
+
+                // DEBUG
+                //if (y > 310)
+                //    std::cout << "[" << x << ", " << y << "] ( sample: " << sample << ") - prng_.aux_count_: " << prng_.aux_count_ << "\n";
+
                 float x_screen = x + pixel_sampler_->getSample(sample).x;
                 float y_screen = y + pixel_sampler_->getSample(sample).y;
 
                 Ray ray = camera_.getRay(x_screen, y_screen);
+
                 glm::vec3 radiance = traceRay(ray, 0, curr_int_tests_count, curr_int_count);
 
                 camera_.getImageBuffer().setPixelValue(x, y, camera_.getImageBuffer().getPixelValue(x, y) + radiance);
@@ -120,7 +135,7 @@ void PathTracer::render() {
 
     std::cout << "\n";
     std::cout << "  Statistics :\n";
-    std::cout << "    Total rendering time .........: " << total_integration_time_ << "\n";
+    std::cout << "    Total rendering time .........: " << total_integration_time_ << " usec\n";
     std::cout << "    Intersection tests ...........: " << int_tests_count_ << "\n";
     std::cout << "      Min intersection tests pp ..: " << min_int_tests_count_pp_ << "\n";
     std::cout << "      Max intersection tests pp ..: " << max_int_tests_count_pp_ << "\n";
@@ -138,8 +153,11 @@ void PathTracer::saveImageToFile() {
 
 void PathTracer::printProgress(unsigned int y) {
     std::stringstream progress_stream;
+    // progress_stream << "\r  Progress .......................: " << std::fixed << std::setw(6) << std::setprecision(2)
+    //                 << 100.0f * y / (camera_.getImageBuffer().getViewportTop() + camera_.getImageBuffer().getViewportHeight() - 1)
+    //                 << "%";
     progress_stream << "\r  Progress .......................: " << std::fixed << std::setw(6) << std::setprecision(2)
-                    << 100.0f * y / (camera_.getImageBuffer().getViewportTop() + camera_.getImageBuffer().getViewportHeight() - 1)
+                    << 100.0f * (y - camera_.getImageBuffer().getViewportTop()) / camera_.getImageBuffer().getViewportHeight()
                     << "%";
     std::clog << progress_stream.str();
 }

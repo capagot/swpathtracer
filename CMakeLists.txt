@@ -14,6 +14,13 @@ else(CMAKE_BUILD_TYPE MATCHES Release)
   message("Building RELEASE version")
 endif()
 
+if (DEFINE_ENABLE_FEEXCEPTION)
+  add_definitions(-DENABLE_FEEXCEPTION)
+  message("Catch SIGFPE enabled")
+else()
+  message("Catch SIGFPE disabled")
+endif()
+
 ###############################################################################
 # Find packages: OpenMP, Lua 5.3, Assimp
 ###############################################################################

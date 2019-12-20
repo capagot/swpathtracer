@@ -88,14 +88,3 @@ function Mesh(self)
 
     updateRendererObjectList(self)
 end
-
-function SmoothMesh(self)
-    self.type = "smooth_mesh"
-
-    if (not CheckStringField(self, "filename")) then
-        print("Lua ERROR: Invalid smooth mesh file name. Exiting...")
-        os.exit()
-    end
-
-    updateRendererObjectList(self)
-end

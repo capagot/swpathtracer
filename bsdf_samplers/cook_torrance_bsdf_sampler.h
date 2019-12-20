@@ -2,6 +2,7 @@
 #define BSDF_SAMPLERS_COOK_TORRANCE_BSDF_SAMPLER_H
 
 #include <math.h>
+#include <limits>
 #include <glm/glm.hpp>
 
 #include "bsdf_sampler.h"

@@ -3,6 +3,8 @@
 
 #include <fenv.h>
 #include <iostream>
+#include <unordered_map>
+
 #include "cmd_line_options.h"
 #include "cook_torrance.h"
 #include "cook_torrance_bsdf_sampler.h"

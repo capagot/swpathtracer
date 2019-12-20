@@ -14,6 +14,8 @@ void LayeredBSDF::evalBSDF(const glm::vec3& local_wo, glm::vec3& bsdf, glm::vec3
     glm::vec3 final_reflectance = glm::vec3(1.0f);
     float final_pdf = 1.0f;
     glm::vec3 new_local_wo = local_wo;
+    bool reached_inf = false;
+    int bounce_count = 0;
 
     if (new_local_wo.y > 0.0f)  // camera ray from outside
         bsdf_id = 0;
@@ -22,10 +24,13 @@ void LayeredBSDF::evalBSDF(const glm::vec3& local_wo, glm::vec3& bsdf, glm::vec3
 
     // Loops over all material layers (all the BSDFs), accumulating the contribution of 
     // each BSDF and the probabilities of each new sample generated.
-    while ((bsdf_id > -1) && (bsdf_id < static_cast<long int>(bsdfs_.size())) && (final_pdf > 0.0f)) {
+    while ((bsdf_id > -1) && (bsdf_id < static_cast<long int>(bsdfs_.size())) && (final_pdf > 0.0f) && (!reached_inf) && (bounce_count < 500)) {
         BSDFSample bsdf_sample = bsdfs_[bsdf_id]->getSample(new_local_wo);
         local_wi = bsdf_sample.sample_;
         final_pdf *= bsdf_sample.probability_;
+        
+        if (!(final_pdf < std::numeric_limits<float>::infinity()))
+            reached_inf = true;
 
         if (local_wi.y > 0.0f) {
             if (bsdf_id == 0)
@@ -48,10 +53,16 @@ void LayeredBSDF::evalBSDF(const glm::vec3& local_wo, glm::vec3& bsdf, glm::vec3
         } else                 // if local_wi.y == 0.0f, i.e., local_wi is tangent to the surface
             final_pdf = 0.0f;  // stop the layered bsdf traversal
 
+        if (!((final_bsdf.x < std::numeric_limits<float>::infinity()) &&
+        (final_bsdf.y < std::numeric_limits<float>::infinity()) &&
+        (final_bsdf.z < std::numeric_limits<float>::infinity())))
+            reached_inf = true;
+
         new_local_wo = -local_wi;
+        ++bounce_count;
     }
 
-    if (final_pdf > 0.0f) {
+    if ((bounce_count < 500) && !reached_inf && (final_pdf > 0.0f)) {
         pdf = final_pdf;
         bsdf = final_bsdf;
         reflectance = final_reflectance;
