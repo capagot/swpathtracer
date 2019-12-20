@@ -7,6 +7,7 @@ An experimental ray tracer in its early stages of development.
 SWPathtracer is a physically based renderer, based on the Path Tracing algorithm, that has been written from scratch in C++ for educational purposes. Although some acceleration techniques have already been (and may be in the future) included into the project, the main goal is not performance, but the construction of a high quality, full featured, CPU-based ray tracer through readable, modular, extensible and easy to understand code.
 
 ![Happy Buddha](https://github.com/capagot/swpathtracer/blob/master/samples/happy_buddha.png)
+
 Happy Buddha rendering specifications:
 * 800x600 pixels.
 * Forward Path Tracing.
