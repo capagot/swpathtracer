@@ -6,6 +6,17 @@ An experimental ray tracer in its early stages of development.
 
 SWPathtracer is a physically based renderer, based on the Path Tracing algorithm, that has been written from scratch in C++ for educational purposes. Although some acceleration techniques have already been (and may be in the future) included into the project, the main goal is not performance, but the construction of a high quality, full featured, CPU-based ray tracer through readable, modular, extensible and easy to understand code.
 
+![Happy Buddha](https://github.com/capagot/swpathtracer/blob/master/samples/happy_buddha.png)
+Happy Buddha rendering specifications:
+* 800x600 pixels.
+* Forward Path Tracing.
+* 4096 samples per pixel with box-filtering.
+* BSDF importance sampling.
+* ~1M triangles.
+* SAH-bases BVH (~787K nodes).
+* Buddha material: 2 layer BSDF (dielectric + rough conductor).
+* Rendering time: ~1h24min on a Intel i5 running Ubuntu 18.04.
+
 ## Current Features
 
 - Perspective (pinhole) and orthographic cameras.
